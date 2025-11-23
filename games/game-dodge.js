@@ -16,6 +16,11 @@
   const canvas = document.getElementById('dodge-canvas');
   const ctx = canvas.getContext('2d');
   
+  // 获取CSS变量值的辅助函数
+  function getCSSVariable(varName) {
+    return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  }
+  
   // 游戏配置
   canvas.width = 400;
   canvas.height = 600;
@@ -25,7 +30,8 @@
     x: canvas.width / 2,
     y: canvas.height - 50,
     radius: 15,
-    speed: 5
+    speed: 5,
+    emoji: '' // 玩家表情符号
   };
   
   // 障碍物数组
@@ -33,6 +39,10 @@
   
   // 触屏控制
   let touchX = player.x;
+  
+  // 表情符号数组
+  const playerEmojis = ['🎾', '🏀', '🥎', '🏐'];
+  const obstacleEmojis = ['💣', '🔥', '⚡', '💥'];
   
   // 生成障碍物
   function spawnObstacle() {
@@ -46,7 +56,8 @@
       y: -20,
       radius: 15 + Math.random() * 10,
       speed: baseSpeed + Math.random() * 2,
-      color: `hsl(${Math.random() * 360}, 70%, 50%)`
+      color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+      emoji: obstacleEmojis[Math.floor(Math.random() * obstacleEmojis.length)]
     });
     
     const spawnRate = Math.max(500, baseSpawnRate - gameTime * 10);
@@ -98,28 +109,22 @@
   // 绘制
   function draw() {
     // 清空画布
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = getCSSVariable('--pixel-black') || '#1a1a2e';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // 绘制障碍物
+    // 绘制障碍物（使用表情符号）
     obstacles.forEach(obs => {
-      ctx.beginPath();
-      ctx.arc(obs.x, obs.y, obs.radius, 0, Math.PI * 2);
-      ctx.fillStyle = obs.color;
-      ctx.fill();
-      ctx.strokeStyle = '#FFF';
-      ctx.lineWidth = 2;
-      ctx.stroke();
+      ctx.font = `${obs.radius * 2}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(obs.emoji, obs.x, obs.y);
     });
     
-    // 绘制玩家
-    ctx.beginPath();
-    ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
-    ctx.fillStyle = '#4ECDC4';
-    ctx.fill();
-    ctx.strokeStyle = '#FFF';
-    ctx.lineWidth = 3;
-    ctx.stroke();
+    // 绘制玩家（使用表情符号）
+    ctx.font = `${player.radius * 2}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(player.emoji, player.x, player.y);
   }
   
   // 更新UI
@@ -150,6 +155,7 @@
     
     player.x = canvas.width / 2;
     player.y = canvas.height - 50;
+    player.emoji = playerEmojis[Math.floor(Math.random() * playerEmojis.length)];
     touchX = player.x;
     
     updateUI();

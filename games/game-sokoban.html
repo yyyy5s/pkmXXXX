@@ -55,31 +55,18 @@
       max-width: 200px;
     }
     
-    .sokoban-control-btn {
-      padding: 8px;
-      background: var(--bg-panel);
-      border: 2px solid var(--border-color);
-      font-size: 20px;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-      font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
-    }
-    
-    .sokoban-control-btn:active {
-      background: var(--primary);
-      transform: scale(0.95);
-    }
+    /* 使用统一的按钮样式，已在style.css中定义 */
   </style>
 </head>
 <body class="game-fullscreen" data-theme="day">
   <div class="phone-frame">
     <header class="game-header">
     <div class="game-header-left">
-      <button id="btn-back" class="pixel-btn small">←</button>
+      <button id="btn-back" class="back-btn">←</button>
     </div>
     <div class="game-header-center">
       <span class="game-title">推箱子</span>
-      <span class="game-score">积分: <span id="score">0</span></span>
+      <span class="game-score">🏆 <span id="score">0</span></span>
       <div class="game-pet-container" id="pet-container"></div>
     </div>
     <div class="game-header-right">
@@ -109,8 +96,8 @@
         </div>
       </div>
       <div class="sokoban-controls">
-        <button class="sokoban-control-btn" id="btn-up">↑</button>
         <button class="sokoban-control-btn" id="btn-left">←</button>
+        <button class="sokoban-control-btn" id="btn-up">↑</button>
         <button class="sokoban-control-btn" id="btn-right">→</button>
         <button class="sokoban-control-btn" id="btn-down" style="grid-column: 2;">↓</button>
       </div>
@@ -124,7 +111,7 @@
       <div class="game-end-rewards" id="rewards-info"></div>
       <div class="game-end-actions">
         <button class="pixel-btn primary" id="btn-restart">再来一局</button>
-        <button class="pixel-btn" id="btn-return">←</button>
+        <button class="back-btn" id="btn-return">←</button>
       </div>
     </div>
   </div>

@@ -91,7 +91,7 @@
     // 如果翻了两张牌，检查是否匹配
     if (flippedCards.length === 2) {
       canFlip = false;
-      setTimeout(checkMatch, 1000);
+      setTimeout(checkMatch, 800);
     }
   }
   
@@ -100,27 +100,37 @@
     const [card1, card2] = flippedCards;
     
     if (card1.value === card2.value) {
-      // 匹配成功
+      // 匹配成功 - 标记为已匹配
       card1.matched = true;
       card2.matched = true;
       matchedPairs++;
       matched++;
       score += 50;
       
+      // 立即更新显示
+      render();
+      updateUI();
+      
+      // 重置翻牌状态
+      flippedCards = [];
+      canFlip = true;
+      
       // 检查是否完成
       if (matchedPairs === cards.length / 2) {
-        completeLevel();
+        setTimeout(() => {
+          completeLevel();
+        }, 500);
       }
     } else {
       // 不匹配，翻回去
-      card1.flipped = false;
-      card2.flipped = false;
+      setTimeout(() => {
+        card1.flipped = false;
+        card2.flipped = false;
+        flippedCards = [];
+        canFlip = true;
+        render();
+      }, 1000);
     }
-    
-    flippedCards = [];
-    canFlip = true;
-    updateUI();
-    render();
   }
   
   // 完成关卡

@@ -15,6 +15,7 @@
   // 初始化游戏板
   function initBoard() {
     board = Array(SIZE).fill().map(() => Array(SIZE).fill(0));
+    lastBoard = Array(SIZE).fill().map(() => Array(SIZE).fill(0));
     addRandomTile();
     addRandomTile();
     render();
@@ -124,13 +125,17 @@
     if (moved) {
       moves++;
       addRandomTile();
-      render();
-      updateUI();
       
-      // 检查游戏结束
-      if (isGameOver()) {
-        endGame();
-      }
+      // 延迟渲染以显示动画
+      setTimeout(() => {
+        render();
+        updateUI();
+        
+        // 检查游戏结束
+        if (isGameOver()) {
+          endGame();
+        }
+      }, 50);
     }
     
     return moved;
@@ -162,8 +167,22 @@
   }
   
   // 渲染
+  let lastBoard = [];
+  let newTiles = [];
+  
   function render() {
     const boardElement = document.getElementById('game-board');
+    
+    // 检测新生成的方块
+    newTiles = [];
+    for (let i = 0; i < SIZE; i++) {
+      for (let j = 0; j < SIZE; j++) {
+        if (board[i][j] !== 0 && (!lastBoard[i] || lastBoard[i][j] === 0)) {
+          newTiles.push({row: i, col: j});
+        }
+      }
+    }
+    
     boardElement.innerHTML = '';
     
     for (let i = 0; i < SIZE; i++) {
@@ -178,11 +197,20 @@
           if (value > 2048) {
             cell.classList.add('tile-super');
           }
+          
+          // 添加新方块动画
+          const isNew = newTiles.some(t => t.row === i && t.col === j);
+          if (isNew) {
+            cell.classList.add('new-tile');
+          }
         }
         
         boardElement.appendChild(cell);
       }
     }
+    
+    // 保存当前状态
+    lastBoard = board.map(row => [...row]);
   }
   
   // 更新UI

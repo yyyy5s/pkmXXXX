@@ -31,51 +31,156 @@
   const BOX_ON_TARGET = 4;
   const PLAYER = 5;
   
-  // 关卡数据（简化版，3个关卡）
+  // 关卡数据（10个关卡，难度递增）
   const levels = [
-    // 关卡1
+    // 关卡1 - 简单：2个箱子，宽敞空间
     [
       [1,1,1,1,1,1,1,1,1,1,1,1],
       [1,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,1],
-      [1,0,2,2,0,0,0,0,0,0,0,1],
-      [1,0,2,2,0,0,0,3,3,0,0,1],
-      [1,0,0,0,0,0,0,3,3,0,0,1],
+      [1,0,0,2,0,0,0,0,2,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,3,0,0,0,0,0,0,3,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,5,0,1],
-      [1,0,0,0,0,0,0,0,0,0,0,1],
-      [1,0,0,0,0,0,0,0,0,0,0,1],
       [1,1,1,1,1,1,1,1,1,1,1,1]
     ],
-    // 关卡2
+    // 关卡2 - 简单：2个箱子，有墙壁
+    [
+      [1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,1,1,0,0,0,0,1],
+      [1,0,2,0,0,1,1,0,0,2,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,3,0,0,0,0,0,0,3,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,5,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1]
+    ],
+    // 关卡3 - 简单：3个箱子
+    [
+      [1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,2,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,3,0,0,0,0,0,3,3,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,5,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1]
+    ],
+    // 关卡4 - 中等：3个箱子，有墙壁限制
     [
       [1,1,1,1,1,1,1,1,1,1,1,1],
       [1,0,0,0,0,1,1,0,0,0,0,1],
-      [1,0,3,3,0,1,1,0,3,3,0,1],
-      [1,0,3,3,0,0,0,0,3,3,0,1],
-      [1,0,0,0,0,2,2,0,0,0,0,1],
-      [1,1,0,0,0,2,2,0,0,0,1,1],
+      [1,0,0,0,0,1,1,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,2,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
       [1,1,0,0,0,0,0,0,0,0,1,1],
       [1,0,0,0,0,0,0,0,0,0,0,1],
-      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,0,0,1],
+      [1,0,3,0,0,0,0,0,3,3,0,1],
       [1,0,0,0,0,0,0,0,0,5,0,1],
-      [1,0,0,0,0,0,0,0,0,0,0,1],
       [1,1,1,1,1,1,1,1,1,1,1,1]
     ],
-    // 关卡3
+    // 关卡5 - 中等：4个箱子
     [
       [1,1,1,1,1,1,1,1,1,1,1,1],
       [1,0,0,0,0,0,0,0,0,0,0,1],
-      [1,0,3,3,0,0,0,0,3,3,0,1],
-      [1,0,3,3,0,1,1,0,3,3,0,1],
-      [1,0,0,0,0,1,1,0,0,0,0,1],
-      [1,0,2,2,0,0,0,0,2,2,0,1],
-      [1,0,2,2,0,0,0,0,2,2,0,1],
-      [1,0,0,0,0,1,1,0,0,0,0,1],
-      [1,0,0,0,0,1,1,0,0,0,0,1],
-      [1,0,0,0,0,0,0,0,0,5,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,2,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,2,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,3,0,0,0,0,0,3,3,0,1],
+      [1,0,0,0,0,0,0,0,0,3,0,1],
+      [1,0,0,0,0,0,0,0,0,5,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1]
+    ],
+    // 关卡6 - 中等：4个箱子，复杂路径
+    [
+      [1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,1,1,0,0,0,0,1],
+      [1,0,0,0,0,1,1,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,2,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,0,0,0,0,0,0,0,0,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,2,0,1],
+      [1,0,0,0,0,1,1,0,0,0,0,1],
+      [1,0,3,0,0,0,0,0,3,3,0,1],
+      [1,0,0,0,0,0,0,0,0,5,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1]
+    ],
+    // 关卡7 - 困难：4个箱子，需要策略
+    [
+      [1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,1,1,0,0,0,0,1],
+      [1,0,0,0,0,1,1,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,2,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,0,0,0,0,0,0,0,0,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,2,0,1],
+      [1,0,0,0,0,1,1,0,0,0,0,1],
+      [1,0,3,3,0,0,0,0,3,3,0,1],
+      [1,0,0,0,0,0,0,0,0,5,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1]
+    ],
+    // 关卡8 - 困难：5个箱子
+    [
+      [1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,2,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,2,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,0,0,1],
+      [1,0,3,0,0,0,0,0,3,3,0,1],
+      [1,0,0,0,0,0,0,0,3,5,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1]
+    ],
+    // 关卡9 - 困难：5个箱子，复杂布局
+    [
+      [1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,1,1,0,0,0,0,1],
+      [1,0,0,0,0,1,1,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,2,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,0,0,0,0,0,0,0,0,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,2,0,1],
+      [1,0,0,0,0,1,1,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,3,3,0,1],
+      [1,0,3,0,0,0,0,0,3,5,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1]
+    ],
+    // 关卡10 - 困难：5个箱子，最复杂
+    [
+      [1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,1,1,0,0,0,0,1],
+      [1,0,0,0,0,1,1,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,2,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,0,0,0,0,0,0,0,0,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,0,2,0,1],
+      [1,0,0,0,0,1,1,0,0,0,0,1],
+      [1,0,2,0,0,0,0,0,3,3,0,1],
+      [1,0,3,3,0,0,0,0,3,5,0,1],
       [1,1,1,1,1,1,1,1,1,1,1,1]
     ]
   ];
@@ -108,9 +213,17 @@
     draw();
   }
   
-  // 移动玩家
+  // 动画状态
+  let animating = false;
+  let animPlayerX = 0;
+  let animPlayerY = 0;
+  let animBoxX = -1;
+  let animBoxY = -1;
+  let animProgress = 0;
+  
+  // 移动玩家（带动画）
   function movePlayer(dx, dy) {
-    if (!gameRunning) return;
+    if (!gameRunning || animating) return;
     
     const newX = playerX + dx;
     const newY = playerY + dy;
@@ -123,36 +236,67 @@
     // 如果是墙，不能移动
     if (nextTile === WALL) return;
     
+    let boxMoved = false;
+    let boxNewX = -1;
+    let boxNewY = -1;
+    
     // 如果是箱子
     if (nextTile === BOX || nextTile === BOX_ON_TARGET) {
-      const boxNewX = newX + dx;
-      const boxNewY = newY + dy;
+      boxNewX = newX + dx;
+      boxNewY = newY + dy;
       
       // 检查箱子能否移动
       if (boxNewX < 0 || boxNewX >= COLS || boxNewY < 0 || boxNewY >= ROWS) return;
       if (map[boxNewY][boxNewX] === WALL) return;
       if (map[boxNewY][boxNewX] === BOX || map[boxNewY][boxNewX] === BOX_ON_TARGET) return;
       
-      // 移动箱子
-      const wasOnTarget = map[newY][newX] === BOX_ON_TARGET;
-      map[newY][newX] = wasOnTarget ? TARGET : FLOOR;
+      boxMoved = true;
+    }
+    
+    // 开始动画
+    animating = true;
+    animPlayerX = playerX;
+    animPlayerY = playerY;
+    animBoxX = boxMoved ? newX : -1;
+    animBoxY = boxMoved ? newY : -1;
+    animProgress = 0;
+    
+    // 动画循环
+    const animate = () => {
+      animProgress += 0.2;
+      if (animProgress >= 1) {
+        animProgress = 1;
+        animating = false;
+        
+        // 实际移动
+        if (boxMoved) {
+          const wasOnTarget = map[newY][newX] === BOX_ON_TARGET;
+          map[newY][newX] = wasOnTarget ? TARGET : FLOOR;
+          
+          const isOnTarget = map[boxNewY][boxNewX] === TARGET;
+          map[boxNewY][boxNewX] = isOnTarget ? BOX_ON_TARGET : BOX;
+        }
+        
+        playerX = newX;
+        playerY = newY;
+        moves++;
+        
+        // 检查是否完成
+        if (checkWin()) {
+          completeLevel();
+        }
+        
+        updateUI();
+      }
       
-      const isOnTarget = map[boxNewY][boxNewX] === TARGET;
-      map[boxNewY][boxNewX] = isOnTarget ? BOX_ON_TARGET : BOX;
-    }
+      draw();
+      
+      if (animating) {
+        requestAnimationFrame(animate);
+      }
+    };
     
-    // 移动玩家
-    playerX = newX;
-    playerY = newY;
-    moves++;
-    
-    // 检查是否完成
-    if (checkWin()) {
-      completeLevel();
-    }
-    
-    updateUI();
-    draw();
+    animate();
   }
   
   // 检查是否胜利
@@ -187,64 +331,96 @@
   
   // 绘制
   function draw() {
-    // 清空画布
-    ctx.fillStyle = '#333';
+    // 清空画布 - 使用清新的渐变背景
+    const bgGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    bgGradient.addColorStop(0, '#E8F5E9');
+    bgGradient.addColorStop(1, '#C8E6C9');
+    ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 设置emoji字体
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
     
     for (let y = 0; y < ROWS; y++) {
       for (let x = 0; x < COLS; x++) {
         const tile = map[y][x];
         const px = x * TILE_SIZE;
         const py = y * TILE_SIZE;
+        const centerX = px + TILE_SIZE / 2;
+        const centerY = py + TILE_SIZE / 2;
         
-        // 绘制地板
+        // 绘制地板（带纹理）
         if (tile !== WALL) {
-          ctx.fillStyle = '#555';
+          ctx.fillStyle = '#F1F8E9';
           ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-        }
-        
-        // 绘制目标点
-        if (tile === TARGET || tile === BOX_ON_TARGET) {
-          ctx.fillStyle = '#FFD700';
-          ctx.beginPath();
-          ctx.arc(px + TILE_SIZE / 2, py + TILE_SIZE / 2, TILE_SIZE / 4, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        
-        // 绘制墙
-        if (tile === WALL) {
-          ctx.fillStyle = '#8B4513';
-          ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-          ctx.strokeStyle = '#654321';
-          ctx.lineWidth = 2;
+          
+          // 添加网格线
+          ctx.strokeStyle = 'rgba(129, 199, 132, 0.2)';
+          ctx.lineWidth = 1;
           ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
         }
         
-        // 绘制箱子
-        if (tile === BOX || tile === BOX_ON_TARGET) {
-          ctx.fillStyle = tile === BOX_ON_TARGET ? '#90EE90' : '#D2691E';
-          ctx.fillRect(px + 2, py + 2, TILE_SIZE - 4, TILE_SIZE - 4);
-          ctx.strokeStyle = '#000';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(px + 2, py + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+        // 绘制墙 - 使用砖块emoji
+        if (tile === WALL) {
+          ctx.fillStyle = '#8D6E63';
+          ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+          
+          // 绘制砖块emoji
+          ctx.font = `${TILE_SIZE * 0.8}px Arial`;
+          ctx.fillText('🧱', centerX, centerY);
+        }
+        
+        // 绘制目标点 - 使用标记emoji
+        if (tile === TARGET) {
+          ctx.font = `${TILE_SIZE * 0.7}px Arial`;
+          ctx.fillText('🎯', centerX, centerY);
+        }
+        
+        // 绘制箱子（不在动画中）
+        if (tile === BOX && !(x === animBoxX && y === animBoxY)) {
+          ctx.font = `${TILE_SIZE * 0.8}px Arial`;
+          ctx.fillText('📦', centerX, centerY);
+        }
+        
+        // 绘制在目标点上的箱子 - 显示成功效果
+        if (tile === BOX_ON_TARGET && !(x === animBoxX && y === animBoxY)) {
+          // 先画目标点
+          ctx.font = `${TILE_SIZE * 0.7}px Arial`;
+          ctx.fillText('🎯', centerX, centerY);
+          // 再画箱子，带绿色阴影表示成功
+          ctx.shadowColor = '#4CAF50';
+          ctx.shadowBlur = 5;
+          ctx.font = `${TILE_SIZE * 0.8}px Arial`;
+          ctx.fillText('📦', centerX, centerY);
+          ctx.shadowBlur = 0;
         }
       }
     }
     
-    // 绘制玩家
-    ctx.fillStyle = '#FF6B6B';
-    ctx.beginPath();
-    ctx.arc(
-      playerX * TILE_SIZE + TILE_SIZE / 2,
-      playerY * TILE_SIZE + TILE_SIZE / 2,
-      TILE_SIZE / 2 - 2,
-      0,
-      Math.PI * 2
-    );
-    ctx.fill();
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    // 绘制动画中的箱子
+    if (animBoxX >= 0 && animBoxY >= 0) {
+      const oldPx = animBoxX * TILE_SIZE + TILE_SIZE / 2;
+      const oldPy = animBoxY * TILE_SIZE + TILE_SIZE / 2;
+      const newPx = (animBoxX + (playerX - animPlayerX)) * TILE_SIZE + TILE_SIZE / 2;
+      const newPy = (animBoxY + (playerY - animPlayerY)) * TILE_SIZE + TILE_SIZE / 2;
+      const px = oldPx + (newPx - oldPx) * animProgress;
+      const py = oldPy + (newPy - oldPy) * animProgress;
+      
+      ctx.font = `${TILE_SIZE * 0.8}px Arial`;
+      ctx.fillText('📦', px, py);
+    }
+    
+    // 绘制玩家（带动画）- 使用可爱的emoji
+    const playerPx = animating 
+      ? (animPlayerX + (playerX - animPlayerX) * animProgress) * TILE_SIZE + TILE_SIZE / 2
+      : playerX * TILE_SIZE + TILE_SIZE / 2;
+    const playerPy = animating
+      ? (animPlayerY + (playerY - animPlayerY) * animProgress) * TILE_SIZE + TILE_SIZE / 2
+      : playerY * TILE_SIZE + TILE_SIZE / 2;
+    
+    ctx.font = `${TILE_SIZE * 0.9}px Arial`;
+    ctx.fillText('🐱', playerPx, playerPy);
   }
   
   // 更新UI

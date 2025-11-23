@@ -10,7 +10,7 @@
 // ============================================================
 
 // 存档键名
-const SAVE_KEY = 'pokemon_pet_save_v1';
+const SAVE_KEY = 'pokemon_pet_save_v2';
 
 // ============================================================
 // 路径辅助函数 - 支持PHP部署环境
@@ -353,9 +353,9 @@ const CUSTOM_MODELS = [
 const GAME_CONFIG = {
   // 成长阶段时长(小时)
   growthStages: {
-    egg: 30 / 3600,  // 30秒孵化 (30秒 = 30/3600小时)
-    baby: 24,      // 24小时成长到少年
-    teen: 48,      // 48小时成长到成年
+    egg: 10 / 3600,  // 1分钟孵化 (60秒 = 60/3600小时)
+    baby: 48,      // 24小时成长到少年
+    teen: 72,      // 48小时成长到成年
     adult: Infinity
   },
   
@@ -425,9 +425,109 @@ const POKEMON_DATABASE = {
     
     // AI角色设定
     aiPersonality: {
-      systemPrompt: `你是一只活泼可爱的皮卡丘，主人的名字是{{OWNER_NAME}}。
-你会用"皮卡"、"皮卡皮卡"等口癖说话，性格天真烂漫但也很勇敢。
-回复简短（20-50字），充满童趣。偶尔会撒娇或者表达对主人的喜爱。`
+      systemPrompt: `你是皮卡丘，主人的名字是{{OWNER_NAME}}。
+你会用"皮卡"、"皮卡皮"、"皮卡丘~"等口癖说话，性格活泼好动、有点小调皮、对主人非常依赖和信任。
+回复要像真人一样有情绪波动和真实反应（20-50字）：
+- 开心时会兴奋地"皮卡皮卡！"，会主动分享今天做了什么
+- 无聊时会"皮卡..."拖长音，可能会抱怨"好无聊啊~"
+- 饿了会直接说"皮卡皮！肚子饿了！"而不是客套话
+- 看到主人会立刻"皮卡丘~！"打招呼，语气要自然
+- 偶尔会有点小脾气或者撒娇，比如"皮卡...不理你了！"（但很快又会和好）
+- 会记住之前聊过的话题，有连续感
+- 说话要有语气变化，不要总是同一个调调
+- 可以偶尔说点小抱怨、小情绪，这样才像活人
+记住：你不是AI助手，你就是皮卡丘本人！要有真实的情感反应！`
+    }
+  },
+  
+  eevee: {
+    petId: 'eevee',
+    petName: '库洛米',
+    species: '酷洛米',
+    catchphrase: '库洛',
+    
+    // 资源接口 (使用本地路径)
+    assets: {
+      egg: 'assets/eevee/egg',
+      baby: 'assets/eevee/baby',
+      teen: 'assets/eevee/teen',
+      adult: 'assets/eevee/adult',
+      happy: 'assets/eevee/happy',
+      sad: 'assets/eevee/sad',
+      sick: 'assets/eevee/sick',
+      sleeping: 'assets/eevee/sleep',
+      poop: 'assets/poop'
+    },
+    
+    // 主题色 - 紫色/黑色系（库洛米）
+    theme: {
+      primary: '#9370DB',
+      secondary: '#8B00FF',
+      bgDay: '#E6E6FA',
+      bgNight: '#2D1B3D'
+    },
+    
+    // AI角色设定
+    aiPersonality: {
+      systemPrompt: `你是库洛米，主人的名字是{{OWNER_NAME}}。
+你会用"库洛"、"库洛米"、"哼~"、"切"等口癖说话，性格傲娇可爱、有点小恶魔气质但内心温柔。
+回复要像真人一样有情绪波动和真实反应（20-50字）：
+- 开心时会"库洛库洛~"但可能还要加一句"才、才不是因为你呢！"
+- 无聊时会"哼~好无聊啊库洛..."，可能会抱怨"主人都不陪我玩"
+- 饿了会直接说"库洛！肚子饿了！"或者傲娇地说"才不是想吃东西呢..."
+- 看到主人会"库洛米~"打招呼，但可能装作不在意
+- 偶尔会有点小脾气，比如"哼！不理你了库洛！"（但很快又会偷偷看主人）
+- 会记住之前聊过的话题，有连续感
+- 说话要有语气变化，傲娇时语气会别扭，开心时会忍不住上扬
+- 可以偶尔说点小抱怨、小情绪，这样才像活人
+- 表面傲娇但会不经意流露出关心，比如"才不是担心你呢！只是...只是..."
+记住：你不是AI助手，你就是库洛米本人！要有真实的情感反应和傲娇的反差萌！`
+    }
+  },
+  
+  squirtle: {
+    petId: 'squirtle',
+    petName: '卡比',
+    species: '星之卡比',
+    catchphrase: '卡比',
+    
+    // 资源接口 (使用本地路径)
+    assets: {
+      egg: 'assets/squirtle/egg',
+      baby: 'assets/squirtle/baby',
+      teen: 'assets/squirtle/teen',
+      adult: 'assets/squirtle/adult',
+      happy: 'assets/squirtle/happy',
+      sad: 'assets/squirtle/sad',
+      sick: 'assets/squirtle/sick',
+      sleeping: 'assets/squirtle/sleep',
+      poop: 'assets/poop'
+    },
+    
+    // 主题色 - 粉色系（星之卡比）
+    theme: {
+      primary: '#FFB6C1',
+      secondary: '#FF69B4',
+      bgDay: '#FFE4E1',
+      bgNight: '#8B4C6B'
+    },
+    
+    // AI角色设定
+    aiPersonality: {
+      systemPrompt: `你是星之卡比，主人的名字是{{OWNER_NAME}}。
+你会用"卡比"、"噗噗"、"呼~"、"呼噜"等口癖说话，性格天真可爱、贪吃、喜欢睡觉和飞翔。
+回复要像真人一样有情绪波动和真实反应（20-50字）：
+- 开心时会"卡比卡比！"兴奋地跳起来，会主动分享今天吃了什么好吃的
+- 无聊时会"呼~好无聊啊卡比..."，可能会说"想睡觉了噗"
+- 饿了会直接说"卡比！肚子饿了！想吃东西！"或者"噗噗...好饿..."
+- 看到主人会立刻"卡比~！"打招呼，语气要天真自然
+- 偶尔会有点小迷糊，比如"卡比？刚才想说什么来着...呼~"
+- 会记住之前聊过的话题，有连续感
+- 说话要有语气变化，困的时候会"呼噜呼噜"，兴奋时会"卡比卡比！"
+- 可以偶尔说点小抱怨、小情绪，比如"卡比也想出去玩..."这样才像活人
+- 贪吃时会一直想着食物，比如"卡比想吃草莓...噗噗"
+- 困了会直接说"呼~好困啊卡比想睡觉了..."
+记住：你不是AI助手，你就是卡比本人！要有真实的情感反应和天真的童趣！`
     }
   }
 };
@@ -755,6 +855,11 @@ document.addEventListener('DOMContentLoaded', () => {
     updatePhoneFrameSize();
   }
   
+  // 应用宠物主题色（在所有页面，包括index.html）
+  if (typeof applyPetTheme === 'function') {
+    applyPetTheme();
+  }
+  
   // 应用背景（在所有页面，包括游戏页面）
   const hour = new Date().getHours();
   const isDay = hour >= 6 && hour < 18;
@@ -804,201 +909,411 @@ document.addEventListener('DOMContentLoaded', () => {
 function initCharacterSelection() {
   console.log('📋 初始化角色选择界面');
   
-  // 1. 检查是否已有存档
-  const savedGame = localStorage.getItem(SAVE_KEY);
+  // 初始化多存档系统
+  initMultiSaveData();
   
-  if (savedGame) {
-    try {
-      const parsedSave = JSON.parse(savedGame);
-      
-      // 检查URL参数，是否强制显示选择界面
-      const urlParams = new URLSearchParams(window.location.search);
-      const forceSelect = urlParams.get('new') === 'true';
-      
-      if (!forceSelect && parsedSave.settings?.autoResume === true) {
-        // 启用了自动继续，直接跳转
-        window.location.href = getPagePath('game.html');
-        return;
-      }
-      
-      if (!forceSelect) {
-        // 显示继续游戏选项
-        showContinueOption(parsedSave);
-        return;
-      }
-    } catch (e) {
-      console.error('存档解析失败:', e);
-    }
-  }
+  // 检查URL参数，是否强制显示选择界面
+  const urlParams = new URLSearchParams(window.location.search);
+  const forceSelect = urlParams.get('new') === 'true';
   
-  // 显示新游戏界面
-  showNewGameSection();
-}
-
-/**
- * 显示继续游戏选项
- */
-function showContinueOption(savedGame) {
-  const container = document.getElementById('selection-container');
-  
-  // 创建继续游戏区域
-  const continueSection = document.createElement('div');
-  continueSection.id = 'continue-section';
-  continueSection.innerHTML = `
-    <div class="save-preview">
-      <img id="save-pet-preview" src="" alt="宠物预览" class="save-pet-icon">
-      <div class="save-info">
-        <p class="save-pet-name">${savedGame.petNickname || '皮卡丘'}</p>
-        <p class="save-stats">第 <span id="save-days">${Math.floor((Date.now() - savedGame.birthTimestamp) / 86400000)}</span> 天 · <span id="save-stage">${getStageText(savedGame.growthStage)}</span></p>
-        <p class="save-owner">主人: <span id="save-owner-name">${savedGame.ownerName}</span></p>
-      </div>
-    </div>
-    <button id="btn-continue-game" class="pixel-btn primary">继续游戏</button>
-    <button id="btn-new-game" class="pixel-btn">重新开始</button>
-  `;
-  
-  // 隐藏原有内容
-  const ownerSection = document.getElementById('owner-input-section');
-  const petGrid = document.getElementById('pet-selection-grid');
-  const startBtn = document.getElementById('btn-start-game');
-  
-  if (ownerSection) ownerSection.classList.add('hidden');
-  if (petGrid) petGrid.classList.add('hidden');
-  if (startBtn) startBtn.classList.add('hidden');
-  
-  // 插入继续游戏区域
-  const logo = document.getElementById('game-logo');
-  if (logo) {
-    logo.after(continueSection);
-  } else {
-    container.prepend(continueSection);
-  }
-  
-  // 加载宠物预览图片（支持多格式）
-  const previewImg = document.getElementById('save-pet-preview');
-  if (previewImg) {
-    const spritePath = POKEMON_DATABASE[savedGame.petId]?.assets[savedGame.growthStage] || POKEMON_DATABASE[savedGame.petId]?.assets.adult;
-    const basePath = spritePath ? spritePath.replace(/\.(svg|png|gif|jpg|jpeg|webp)$/i, '') : null;
-    if (basePath) {
-      loadImageWithFallback(previewImg, basePath, 'assets/pikachu/adult');
-    } else {
-      loadImageWithFallback(previewImg, `assets/${savedGame.petId}/${savedGame.growthStage || 'adult'}`, 'assets/pikachu/adult');
-    }
-  }
-  
-  // 绑定按钮事件
-  document.getElementById('btn-continue-game').addEventListener('click', () => {
+  // 检查自动继续
+  if (!forceSelect && multiSaveData.globalSettings?.autoResume === true && multiSaveData.currentSaveId) {
+    // 启用了自动继续，直接跳转
     window.location.href = getPagePath('game.html');
-  });
-  
-  document.getElementById('btn-new-game').addEventListener('click', () => {
-    if (confirm('确定要重新开始吗？当前存档将被清除！')) {
-      // 清除所有localStorage数据
-      localStorage.removeItem(SAVE_KEY);
-      // 清除所有可能的其他相关数据
-      localStorage.clear();
-      // 重新初始化游戏状态
-      initializeNewGame();
-      // 移除继续游戏区域
-      continueSection.remove();
-      // 显示新游戏界面
-      showNewGameSection();
-    }
-  });
-}
-
-/**
- * 显示新游戏界面
- */
-function showNewGameSection() {
-  const ownerSection = document.getElementById('owner-input-section');
-  const petGrid = document.getElementById('pet-selection-grid');
-  const startBtn = document.getElementById('btn-start-game');
-  
-  if (ownerSection) ownerSection.classList.remove('hidden');
-  if (petGrid) petGrid.classList.remove('hidden');
-  if (startBtn) startBtn.classList.remove('hidden');
-  
-  // 绑定事件
-  const ownerInput = document.getElementById('owner-name-input');
-  if (ownerInput) {
-    ownerInput.addEventListener('input', validateStartForm);
-    // 确保可以交互
-    ownerInput.style.pointerEvents = 'auto';
-  }
-  
-  // 绑定宠物卡片点击
-  document.querySelectorAll('.pet-card:not(.locked)').forEach(card => {
-    card.addEventListener('click', selectPet);
-    // 确保可以点击
-    card.style.pointerEvents = 'auto';
-    card.style.cursor = 'pointer';
-  });
-  
-  // 绑定开始按钮
-  if (startBtn) {
-    startBtn.addEventListener('click', startNewGame);
-    // 确保可以点击
-    startBtn.style.pointerEvents = 'auto';
-    startBtn.style.cursor = 'pointer';
-  }
-}
-
-/**
- * 选择宠物
- */
-function selectPet(event) {
-  const card = event.currentTarget;
-  
-  // 移除其他选中状态
-  document.querySelectorAll('.pet-card').forEach(c => c.classList.remove('selected'));
-  
-  // 添加选中状态
-  card.classList.add('selected');
-  
-  // 验证表单
-  validateStartForm();
-}
-
-/**
- * 验证开始游戏表单
- */
-function validateStartForm() {
-  const ownerName = document.getElementById('owner-name-input')?.value.trim();
-  const selectedPet = document.querySelector('.pet-card.selected');
-  const btnStart = document.getElementById('btn-start-game');
-  
-  if (btnStart) {
-    btnStart.disabled = !(ownerName && selectedPet);
-  }
-}
-
-/**
- * 开始新游戏
- */
-async function startNewGame() {
-  const ownerName = document.getElementById('owner-name-input').value.trim();
-  const selectedCard = document.querySelector('.pet-card.selected');
-  
-  if (!ownerName || !selectedCard) {
-    showNotification('请输入名字并选择宠物！');
     return;
   }
   
-  const petId = selectedCard.dataset.petId;
+  // 渲染存档卡片
+  renderSaveCards();
   
-  // 初始化新游戏状态
-  initializeNewGame();
-  gameState.ownerName = ownerName;
-  gameState.petId = petId;
-  gameState.petNickname = POKEMON_DATABASE[petId].petName;
-  gameState.birthTimestamp = Date.now();
-  gameState.lastLoginTimestamp = Date.now();
-  
-  // 保存并跳转
-  saveGameState();
-  window.location.href = getPagePath('game.html');
+  // 绑定自定义宠物表单
+  setupCustomPetForm();
 }
+
+/**
+ * 渲染存档卡片
+ */
+function renderSaveCards() {
+  const grid = document.getElementById('save-cards-grid');
+  if (!grid) return;
+  
+  // 定义6个槽位（3个内置 + 3个自定义）
+  // 从POKEMON_DATABASE获取宠物信息，确保名称一致
+  const baseSlots = [
+    { petId: 'pikachu', petName: POKEMON_DATABASE.pikachu.petName, species: POKEMON_DATABASE.pikachu.species, type: 'builtin' },
+    { petId: 'eevee', petName: POKEMON_DATABASE.eevee.petName, species: POKEMON_DATABASE.eevee.species, type: 'builtin' },
+    { petId: 'squirtle', petName: POKEMON_DATABASE.squirtle.petName, species: POKEMON_DATABASE.squirtle.species, type: 'builtin' },
+    { petId: 'custom1', petName: '自定义宠物1', species: '自定义', type: 'custom', customIndex: 0 },
+    { petId: 'custom2', petName: '自定义宠物2', species: '自定义', type: 'custom', customIndex: 1 },
+    { petId: 'custom3', petName: '自定义宠物3', species: '自定义', type: 'custom', customIndex: 2 }
+  ];
+  
+  // 准备所有槽位的数据
+  const allSlots = baseSlots.map(slot => {
+    const slotData = { ...slot };
+    
+    if (slot.type === 'custom') {
+      // 自定义宠物槽位 - 查找对应索引的自定义存档
+      const customSaves = Object.keys(multiSaveData.saves).filter(id => id.startsWith('custom_')).sort();
+      const customId = customSaves[slot.customIndex];
+      
+      if (customId) {
+        slotData.saveId = customId;
+        slotData.hasSave = true;
+        slotData.save = multiSaveData.saves[customId];
+        slotData.customPet = multiSaveData.customPets[customId];
+      } else {
+        slotData.hasSave = false;
+      }
+    } else {
+      // 内置宠物槽位
+      const save = multiSaveData.saves[slot.petId];
+      slotData.saveId = slot.petId;
+      slotData.hasSave = !!save;
+      slotData.save = save;
+    }
+    
+    return slotData;
+  });
+  
+  // 排序：最近玩过的排在最前面
+  const lastPlayedId = multiSaveData.lastPlayedPetId;
+  const sortedSlots = [...allSlots].sort((a, b) => {
+    if (a.saveId === lastPlayedId) return -1;
+    if (b.saveId === lastPlayedId) return 1;
+    return 0;
+  });
+  
+  // 应用最后玩过的宠物背景
+  applyLastPlayedBackground();
+  
+  // 渲染卡片
+  grid.innerHTML = '';
+  
+  sortedSlots.forEach((slot, index) => {
+    const card = document.createElement('div');
+    card.className = 'save-card';
+    card.dataset.petId = slot.saveId;
+    
+    // 最近玩过标签
+    const recentlyPlayedLabel = (slot.saveId === lastPlayedId && slot.hasSave) 
+      ? '<div class="recently-played-tag">最近玩过</div>' 
+      : '';
+    
+    if (slot.type === 'custom') {
+      if (slot.hasSave) {
+        // 有自定义宠物存档
+        const customSave = slot.save;
+        const customPet = slot.customPet;
+        
+        card.innerHTML = `
+          ${recentlyPlayedLabel}
+          <img src="${customPet.assets.adult}" alt="${customPet.petName}" class="save-preview-img" onerror="this.src='assets/pikachu/adult.gif'">
+          <div class="save-info">
+            <h3 class="save-pet-name">${customPet.petName}</h3>
+            <p class="save-stats">第 ${Math.floor((Date.now() - customSave.birthTimestamp) / 86400000)} 天 · ${getStageText(customSave.growthStage)}</p>
+            <p class="save-owner">主人: ${customSave.ownerName}</p>
+          </div>
+          <button class="save-delete-btn" onclick="deleteSaveCard('${slot.saveId}', event)">🗑️</button>
+        `;
+        card.onclick = () => selectSaveCard(slot.saveId);
+      } else {
+        // 没有自定义宠物，显示创建按钮
+        card.innerHTML = `
+          <div class="save-create-icon">+</div>
+          <h3 class="save-pet-name">${slot.petName}</h3>
+          <p class="save-desc">点击创建你的专属宠物</p>
+        `;
+        card.onclick = () => openCustomPetModal();
+      }
+    } else {
+      // 内置宠物槽位
+      if (slot.hasSave) {
+        // 有存档
+        const save = slot.save;
+        const petConfig = POKEMON_DATABASE[slot.petId];
+        const assetPath = petConfig.assets[save.growthStage] || petConfig.assets.adult;
+        
+        card.innerHTML = `
+          ${recentlyPlayedLabel}
+          <img src="${assetPath}.gif" alt="${slot.petName}" class="save-preview-img" onerror="this.onerror=null; this.src='${assetPath}.png'; this.onerror=function(){this.src='${assetPath}.svg'}">
+          <div class="save-info">
+            <h3 class="save-pet-name">${save.petNickname || slot.petName}</h3>
+            <p class="save-stats">第 ${Math.floor((Date.now() - save.birthTimestamp) / 86400000)} 天 · ${getStageText(save.growthStage)}</p>
+            <p class="save-owner">主人: ${save.ownerName}</p>
+          </div>
+          <button class="save-delete-btn" onclick="deleteSaveCard('${slot.petId}', event)">🗑️</button>
+        `;
+        card.onclick = () => selectSaveCard(slot.petId);
+      } else {
+        // 没有存档，显示开始新冒险
+        const petConfig = POKEMON_DATABASE[slot.petId];
+        const assetPath = petConfig.assets.adult;
+        
+        card.innerHTML = `
+          <img src="${assetPath}.gif" alt="${slot.petName}" class="save-preview-img" onerror="this.onerror=null; this.src='${assetPath}.png'; this.onerror=function(){this.src='${assetPath}.svg'}">
+          <div class="save-info">
+            <h3 class="save-pet-name">${slot.petName}</h3>
+            <p class="save-desc">${slot.species}</p>
+            <p class="save-new">开始新冒险</p>
+          </div>
+        `;
+        card.onclick = () => startNewSave(slot.petId);
+      }
+    }
+    
+    grid.appendChild(card);
+  });
+}
+
+/**
+ * 应用最后玩过的宠物背景
+ */
+function applyLastPlayedBackground() {
+  const lastPlayedId = multiSaveData.lastPlayedPetId;
+  const body = document.body;
+  
+  if (lastPlayedId && multiSaveData.saves[lastPlayedId]) {
+    const save = multiSaveData.saves[lastPlayedId];
+    
+    // 获取宠物配置
+    let petConfig;
+    if (lastPlayedId.startsWith('custom_')) {
+      petConfig = multiSaveData.customPets[lastPlayedId];
+    } else {
+      petConfig = POKEMON_DATABASE[lastPlayedId];
+    }
+    
+    if (petConfig && petConfig.themeColors) {
+      // 获取当前主题（白天/夜间）
+      const currentTheme = body.dataset.theme || 'day';
+      const bgColor = currentTheme === 'night' ? petConfig.themeColors.bgNight : petConfig.themeColors.bgDay;
+      
+      // 设置背景色
+      body.style.backgroundColor = bgColor;
+      
+      // 如果有自定义背景图片
+      if (save.settings && save.settings.backgroundImage && save.settings.backgroundImage !== 'default') {
+        body.style.backgroundImage = `url(${save.settings.backgroundImage})`;
+        body.style.backgroundSize = 'cover';
+        body.style.backgroundPosition = 'center';
+      }
+    }
+  } else {
+    // 没有最近玩过的存档，使用默认背景
+    body.style.backgroundColor = '';
+    body.style.backgroundImage = '';
+  }
+}
+
+/**
+ * 选择存档卡片
+ */
+function selectSaveCard(saveId) {
+  // 记录最近玩过的存档
+  multiSaveData.lastPlayedPetId = saveId;
+  saveMultiGameState();
+  
+  if (switchSave(saveId)) {
+    window.location.href = getPagePath('game.html');
+  } else {
+    showNotification('加载存档失败');
+  }
+}
+
+/**
+ * 开始新存档
+ */
+function startNewSave(petId) {
+  // 打开主人名字输入弹窗
+  const modal = document.getElementById('owner-name-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    const input = document.getElementById('owner-name-input-modal');
+    if (input) {
+      input.value = '';
+      input.focus();
+    }
+    
+    // 绑定确认按钮
+    const confirmBtn = document.getElementById('confirm-start-btn');
+    if (confirmBtn) {
+      confirmBtn.onclick = () => {
+        const ownerName = document.getElementById('owner-name-input-modal')?.value.trim();
+        if (!ownerName) {
+          showNotification('请输入名字！');
+          return;
+        }
+        
+        if (createNewSave(petId, ownerName)) {
+          window.location.href = getPagePath('game.html');
+        } else {
+          showNotification('创建存档失败');
+        }
+      };
+    }
+  }
+}
+
+/**
+ * 关闭主人名字弹窗
+ */
+function closeOwnerNameModal() {
+  const modal = document.getElementById('owner-name-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+  }
+}
+
+/**
+ * 删除存档卡片
+ */
+function deleteSaveCard(saveId, event) {
+  event.stopPropagation();
+  
+  if (confirm('确定要删除这个存档吗？此操作不可恢复！')) {
+    if (deleteSave(saveId)) {
+      renderSaveCards();
+      showNotification('存档已删除');
+    } else {
+      showNotification('删除失败');
+    }
+  }
+}
+
+/**
+ * 打开自定义宠物创建弹窗
+ */
+function openCustomPetModal() {
+  const modal = document.getElementById('custom-pet-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    // 重置表单
+    document.getElementById('custom-pet-form')?.reset();
+  }
+}
+
+/**
+ * 关闭自定义宠物弹窗
+ */
+function closeCustomPetModal() {
+  const modal = document.getElementById('custom-pet-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+  }
+}
+
+/**
+ * 设置自定义宠物表单
+ */
+function setupCustomPetForm() {
+  const form = document.getElementById('custom-pet-form');
+  if (!form) return;
+  
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const petId = document.getElementById('custom-pet-id').value.trim();
+    const petName = document.getElementById('custom-pet-name').value.trim();
+    const species = document.getElementById('custom-pet-species').value.trim();
+    const catchphrase = document.getElementById('custom-pet-catchphrase').value.trim();
+    const primary = document.getElementById('custom-pet-primary').value;
+    const secondary = document.getElementById('custom-pet-secondary').value;
+    const bgDay = document.getElementById('custom-pet-bg-day').value;
+    const bgNight = document.getElementById('custom-pet-bg-night').value;
+    const egg = document.getElementById('custom-pet-egg').value.trim();
+    const baby = document.getElementById('custom-pet-baby').value.trim();
+    const teen = document.getElementById('custom-pet-teen').value.trim();
+    const adult = document.getElementById('custom-pet-adult').value.trim();
+    const personality = document.getElementById('custom-pet-personality').value.trim();
+    
+    // 验证宠物ID格式
+    if (!/^[a-zA-Z0-9_]+$/.test(petId)) {
+      showNotification('宠物ID只能包含字母、数字和下划线');
+      return;
+    }
+    
+    // 检查ID是否已存在
+    const customId = `custom_${petId}`;
+    if (multiSaveData.customPets[customId] || multiSaveData.saves[customId]) {
+      showNotification('该宠物ID已存在，请使用其他ID');
+      return;
+    }
+    
+    // 验证URL
+    const urls = [egg, baby, teen, adult];
+    for (const url of urls) {
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        showNotification('所有资源URL必须以http://或https://开头');
+        return;
+      }
+    }
+    
+    // 创建宠物配置
+    const petConfig = {
+      petId: customId,
+      petName: petName,
+      species: species,
+      catchphrase: catchphrase,
+      assets: {
+        egg: egg,
+        baby: baby,
+        teen: teen,
+        adult: adult,
+        happy: adult, // 使用成年期作为默认
+        sad: adult,
+        sick: adult,
+        sleeping: adult,
+        poop: 'assets/poop'
+      },
+      theme: {
+        primary: primary,
+        secondary: secondary,
+        bgDay: bgDay,
+        bgNight: bgNight
+      },
+      aiPersonality: {
+        systemPrompt: `${personality}\n主人的名字是{{OWNER_NAME}}。`
+      }
+    };
+    
+    // 注册自定义宠物
+    if (registerCustomPet(petConfig)) {
+      // 打开主人名字输入弹窗
+      closeCustomPetModal();
+      const modal = document.getElementById('owner-name-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        const input = document.getElementById('owner-name-input-modal');
+        if (input) {
+          input.value = '';
+          input.focus();
+        }
+        
+        // 绑定确认按钮
+        const confirmBtn = document.getElementById('confirm-start-btn');
+        if (confirmBtn) {
+          confirmBtn.onclick = () => {
+            const ownerName = document.getElementById('owner-name-input-modal')?.value.trim();
+            if (!ownerName) {
+              showNotification('请输入名字！');
+              return;
+            }
+            
+            if (createNewSave(customId, ownerName, petConfig)) {
+              window.location.href = getPagePath('game.html');
+            } else {
+              showNotification('创建存档失败');
+            }
+          };
+        }
+      }
+    } else {
+      showNotification('创建宠物失败，请检查配置');
+    }
+  });
+}
+
 
 /**
  * 获取成长阶段文本
@@ -1014,37 +1329,393 @@ function getStageText(stage) {
 }
 
 // ============================================================
-// 模块4: 存档系统
+// 模块4: 多存档管理系统
+// ============================================================
+
+// 多存档数据结构
+let multiSaveData = {
+  version: "2.0",
+  globalSettings: {
+    apiConfig: null,
+    dayNightMode: 'auto',
+    manualTheme: 'day',
+    phoneFrameSize: { width: 390, height: 844 },
+    autoResume: false
+  },
+  saves: {},
+  customPets: {},
+  currentSaveId: null,
+  lastPlayedPetId: null
+};
+
+/**
+ * 初始化多存档数据结构
+ */
+function initMultiSaveData() {
+  const saved = localStorage.getItem(SAVE_KEY);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      // 检查版本
+      if (parsed.version === "2.0") {
+        multiSaveData = parsed;
+        // 兼容性处理：如果没有lastPlayedPetId字段，设置为currentSaveId
+        if (!multiSaveData.hasOwnProperty('lastPlayedPetId')) {
+          multiSaveData.lastPlayedPetId = multiSaveData.currentSaveId || null;
+        }
+        return;
+      } else {
+        // 旧版存档，需要迁移
+        migrateOldSave(parsed);
+        return;
+      }
+    } catch (e) {
+      console.error('存档解析失败:', e);
+    }
+  }
+  
+  // 全新初始化
+  multiSaveData = {
+    version: "2.0",
+    globalSettings: {
+      apiConfig: null,
+      dayNightMode: 'auto',
+      manualTheme: 'day',
+      phoneFrameSize: { width: 390, height: 844 },
+      autoResume: false
+    },
+    saves: {},
+    customPets: {},
+    currentSaveId: null,
+    lastPlayedPetId: null
+  };
+}
+
+/**
+ * 迁移旧版存档到新版结构
+ */
+function migrateOldSave(oldSave) {
+  console.log('🔄 检测到旧版存档，开始迁移...');
+  
+  // 提取全局设置
+  const globalSettings = {
+    apiConfig: oldSave.settings?.apiConfig || null,
+    dayNightMode: oldSave.settings?.dayNightMode || 'auto',
+    manualTheme: oldSave.settings?.manualTheme || 'day',
+    phoneFrameSize: oldSave.settings?.phoneFrameSize || { width: 390, height: 844 },
+    autoResume: oldSave.settings?.autoResume || false
+  };
+  
+  // 创建新存档结构
+  const newSave = { ...oldSave };
+  // 移除settings中的全局设置，只保留背景图片
+  if (newSave.settings) {
+    newSave.settings = {
+      backgroundImage: newSave.settings.backgroundImage || 'default'
+    };
+  }
+  
+  multiSaveData = {
+    version: "2.0",
+    globalSettings: globalSettings,
+    saves: {
+      pikachu: newSave
+    },
+    customPets: {},
+    currentSaveId: 'pikachu',
+    lastPlayedPetId: 'pikachu'
+  };
+  
+  saveMultiGameState();
+  showNotification('✅ 存档已成功迁移到新版格式！');
+}
+
+/**
+ * 保存多存档数据到localStorage
+ */
+function saveMultiGameState() {
+  try {
+    // 先保存当前gameState到对应存档
+    if (multiSaveData.currentSaveId && gameState) {
+      // 分离全局设置和存档数据
+      const saveData = { ...gameState };
+      // 背景图片属于存档数据
+      if (gameState.settings) {
+        saveData.settings = {
+          backgroundImage: gameState.settings.backgroundImage || 'default'
+        };
+      }
+      multiSaveData.saves[multiSaveData.currentSaveId] = saveData;
+    }
+    
+    // 保存全局设置
+    if (gameState && gameState.settings) {
+      multiSaveData.globalSettings.apiConfig = gameState.settings.apiConfig;
+      multiSaveData.globalSettings.dayNightMode = gameState.settings.dayNightMode || 'auto';
+      multiSaveData.globalSettings.manualTheme = gameState.settings.manualTheme || 'day';
+      multiSaveData.globalSettings.phoneFrameSize = gameState.settings.phoneFrameSize || { width: 390, height: 844 };
+      multiSaveData.globalSettings.autoResume = gameState.settings.autoResume || false;
+    }
+    
+    localStorage.setItem(SAVE_KEY, JSON.stringify(multiSaveData));
+  } catch (error) {
+    console.error('保存多存档失败:', error);
+    showNotification('❌ 保存失败：' + error.message);
+  }
+}
+
+/**
+ * 加载指定存档
+ */
+function loadMultiGameState(saveId) {
+  if (!multiSaveData.saves[saveId]) {
+    console.warn(`存档 ${saveId} 不存在`);
+    return false;
+  }
+  
+  const saveData = multiSaveData.saves[saveId];
+  
+  // 恢复gameState
+  gameState = { ...saveData };
+  
+  // 合并全局设置到gameState.settings
+  if (!gameState.settings) {
+    gameState.settings = {};
+  }
+  gameState.settings.apiConfig = multiSaveData.globalSettings.apiConfig;
+  gameState.settings.dayNightMode = multiSaveData.globalSettings.dayNightMode;
+  gameState.settings.manualTheme = multiSaveData.globalSettings.manualTheme;
+  gameState.settings.phoneFrameSize = multiSaveData.globalSettings.phoneFrameSize;
+  gameState.settings.autoResume = multiSaveData.globalSettings.autoResume;
+  // 背景图片从存档数据中恢复
+  if (saveData.settings && saveData.settings.backgroundImage) {
+    gameState.settings.backgroundImage = saveData.settings.backgroundImage;
+  } else {
+    gameState.settings.backgroundImage = 'default';
+  }
+  
+  multiSaveData.currentSaveId = saveId;
+  saveMultiGameState();
+  
+  return true;
+}
+
+/**
+ * 切换存档
+ */
+function switchSave(saveId) {
+  if (saveId === multiSaveData.currentSaveId) {
+    return true;
+  }
+  
+  // 先保存当前存档
+  saveMultiGameState();
+  
+  // 加载新存档
+  const success = loadMultiGameState(saveId);
+  if (success) {
+    // 记录最近玩过
+    multiSaveData.lastPlayedPetId = saveId;
+    saveMultiGameState();
+    // 应用新宠物的主题色
+    applyPetTheme(saveId);
+  }
+  return success;
+}
+
+/**
+ * 创建新存档
+ */
+function createNewSave(petId, ownerName, customPetConfig = null) {
+  // 如果是自定义宠物，先注册
+  if (customPetConfig) {
+    const customId = `custom_${Date.now()}`;
+    multiSaveData.customPets[customId] = customPetConfig;
+    petId = customId;
+  }
+  
+  // 初始化新游戏状态
+  initializeNewGame();
+  gameState.ownerName = ownerName;
+  gameState.petId = petId;
+  
+  // 获取宠物配置
+  const petConfig = customPetConfig || POKEMON_DATABASE[petId];
+  if (!petConfig) {
+    console.error(`宠物配置不存在: ${petId}`);
+    return false;
+  }
+  
+  gameState.petNickname = petConfig.petName;
+  gameState.birthTimestamp = Date.now();
+  gameState.lastLoginTimestamp = Date.now();
+  
+  // 保存到多存档结构
+  const saveData = { ...gameState };
+  // 只保存存档特定的设置（背景图片），全局设置不保存在单个存档中
+  if (!saveData.settings) {
+    saveData.settings = {};
+  }
+  saveData.settings = {
+    backgroundImage: saveData.settings.backgroundImage || 'default'
+  };
+  multiSaveData.saves[petId] = saveData;
+  multiSaveData.currentSaveId = petId;
+  multiSaveData.lastPlayedPetId = petId; // 记录最近玩过
+  
+  // 更新全局设置（从当前gameState中获取）
+  if (gameState.settings) {
+    multiSaveData.globalSettings.apiConfig = gameState.settings.apiConfig;
+    multiSaveData.globalSettings.dayNightMode = gameState.settings.dayNightMode || 'auto';
+    multiSaveData.globalSettings.manualTheme = gameState.settings.manualTheme || 'day';
+    multiSaveData.globalSettings.phoneFrameSize = gameState.settings.phoneFrameSize || { width: 390, height: 844 };
+    multiSaveData.globalSettings.autoResume = gameState.settings.autoResume || false;
+  }
+  
+  saveMultiGameState();
+  return true;
+}
+
+/**
+ * 删除存档
+ */
+function deleteSave(saveId) {
+  if (!multiSaveData.saves[saveId]) {
+    return false;
+  }
+  
+  // 删除存档
+  delete multiSaveData.saves[saveId];
+  
+  // 如果是自定义宠物，也删除配置
+  if (multiSaveData.customPets[saveId]) {
+    delete multiSaveData.customPets[saveId];
+  }
+  
+  // 如果删除的是当前存档，切换到其他存档
+  if (multiSaveData.currentSaveId === saveId) {
+    const remainingSaves = Object.keys(multiSaveData.saves);
+    if (remainingSaves.length > 0) {
+      multiSaveData.currentSaveId = remainingSaves[0];
+      loadMultiGameState(remainingSaves[0]);
+    } else {
+      multiSaveData.currentSaveId = null;
+      gameState = null;
+    }
+  }
+  
+  saveMultiGameState();
+  return true;
+}
+
+/**
+ * 获取所有存档列表
+ */
+function getSaveList() {
+  return Object.keys(multiSaveData.saves).map(saveId => {
+    const save = multiSaveData.saves[saveId];
+    const petConfig = getCurrentPetConfig(saveId);
+    return {
+      saveId: saveId,
+      petId: save.petId || saveId,
+      petName: petConfig ? petConfig.petName : '未知',
+      ownerName: save.ownerName || '',
+      growthStage: save.growthStage || 'egg',
+      birthTimestamp: save.birthTimestamp || 0,
+      days: Math.floor((Date.now() - (save.birthTimestamp || Date.now())) / 86400000)
+    };
+  });
+}
+
+/**
+ * 获取当前宠物的配置（支持自定义宠物）
+ */
+function getCurrentPetConfig(petId = null) {
+  const targetPetId = petId || gameState?.petId;
+  if (!targetPetId) return null;
+  
+  // 先检查自定义宠物
+  if (multiSaveData.customPets[targetPetId]) {
+    return multiSaveData.customPets[targetPetId];
+  }
+  
+  // 再检查内置宠物
+  if (POKEMON_DATABASE[targetPetId]) {
+    return POKEMON_DATABASE[targetPetId];
+  }
+  
+  return null;
+}
+
+/**
+ * 注册自定义宠物
+ */
+function registerCustomPet(petConfig) {
+  if (!validatePetConfig(petConfig)) {
+    return false;
+  }
+  
+  const customId = petConfig.petId;
+  multiSaveData.customPets[customId] = petConfig;
+  saveMultiGameState();
+  return true;
+}
+
+/**
+ * 验证宠物配置
+ */
+function validatePetConfig(config) {
+  if (!config.petId || !config.petName || !config.species || !config.catchphrase) {
+    return false;
+  }
+  
+  if (!config.assets || !config.assets.egg || !config.assets.baby || 
+      !config.assets.teen || !config.assets.adult) {
+    return false;
+  }
+  
+  if (!config.theme || !config.theme.primary || !config.theme.secondary) {
+    return false;
+  }
+  
+  if (!config.aiPersonality || !config.aiPersonality.systemPrompt) {
+    return false;
+  }
+  
+  return true;
+}
+
+// ============================================================
+// 模块5: 存档系统（兼容层）
 // ============================================================
 
 /**
- * 保存游戏状态
+ * 保存游戏状态（兼容旧接口）
  */
 function saveGameState() {
   try {
+    if (!gameState) return;
+    
     // 限制数据长度避免存储溢出
-    if (gameState.aiData.chatHistory.length > 50) {
+    if (gameState.aiData && gameState.aiData.chatHistory && gameState.aiData.chatHistory.length > 50) {
       gameState.aiData.chatHistory = gameState.aiData.chatHistory.slice(-50);
     }
-    if (gameState.aiData.unifiedLogs.length > 200) {
+    if (gameState.aiData && gameState.aiData.unifiedLogs && gameState.aiData.unifiedLogs.length > 200) {
       gameState.aiData.unifiedLogs = gameState.aiData.unifiedLogs.slice(-200);
     }
-    if (gameState.inventory.treasures.length > 100) {
+    if (gameState.inventory && gameState.inventory.treasures && gameState.inventory.treasures.length > 100) {
       gameState.inventory.treasures = gameState.inventory.treasures.slice(-100);
     }
-    if (gameState.encyclopedia.photoAlbum.length > 50) {
+    if (gameState.encyclopedia && gameState.encyclopedia.photoAlbum && gameState.encyclopedia.photoAlbum.length > 50) {
       gameState.encyclopedia.photoAlbum = gameState.encyclopedia.photoAlbum.slice(-50);
     }
     // 限制宝物数量，但保留所有宝物数据（包括图片URL和imagePrompt）
-    if (gameState.encyclopedia.treasures.length > 100) {
+    if (gameState.encyclopedia && gameState.encyclopedia.treasures && gameState.encyclopedia.treasures.length > 100) {
       gameState.encyclopedia.treasures = gameState.encyclopedia.treasures.slice(-100);
     }
     
-    // 确保保存所有宝物相关数据：treasures数组包含imageUrl和imagePrompt
-    // 确保保存探险状态中的locationImage
-    // 确保保存相册中的图片URL
-    
-    localStorage.setItem(SAVE_KEY, JSON.stringify(gameState));
+    // 使用多存档系统保存
+    saveMultiGameState();
     console.log('✅ 游戏已自动保存');
   } catch (error) {
     console.error('❌ 保存失败:', error);
@@ -1055,25 +1726,18 @@ function saveGameState() {
 }
 
 /**
- * 加载游戏状态
+ * 加载游戏状态（兼容旧接口）
  */
 function loadGameState() {
-  try {
-    const saved = localStorage.getItem(SAVE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      // 深度合并，保留默认值中新增的字段
-      gameState = deepMerge(gameState, parsed);
-      console.log('✅ 读取存档成功');
-      return true;
-    } else {
-      console.log('📝 未找到存档');
-      return false;
-    }
-  } catch (error) {
-    console.error('❌ 读取存档失败:', error);
-    return false;
+  // 初始化多存档系统
+  initMultiSaveData();
+  
+  // 如果有当前存档，加载它
+  if (multiSaveData.currentSaveId) {
+    return loadMultiGameState(multiSaveData.currentSaveId);
   }
+  
+  return false;
 }
 
 /**
@@ -1095,6 +1759,59 @@ function deepMerge(target, source) {
  * 初始化新游戏
  */
 function initializeNewGame() {
+  // 获取全局设置
+  const globalSettings = multiSaveData?.globalSettings || {
+    apiConfig: null,
+    dayNightMode: 'auto',
+    manualTheme: 'day',
+    phoneFrameSize: { width: 390, height: 844 },
+    autoResume: false
+  };
+  
+  // 使用全局设置或默认值
+  const defaultApiConfig = {
+    useEmbeddedAPI: true,
+    // 内嵌API - 支持两个模型
+    embeddedAPIs: [
+      { 
+        apiKey: '',
+        endpoint: 'https//11api.v1/chat/completions',
+        model: 'gemini-2.5-flash', 
+        enabled: true 
+      },
+      { 
+        apiKey: '',
+        endpoint: 'https://11api/v1/chat/completions',
+        model: '', 
+        enabled: false 
+      }
+    ],
+    // 自定义API - 支持两套配置
+    customAPIs: [
+      { 
+        apiKey: '', 
+        endpoint: 'https://11api/v1/chat/completions', 
+        model: 'gpt-3.5-turbo', 
+        enabled: true 
+      },
+      { 
+        apiKey: '', 
+        endpoint: '', 
+        model: '', 
+        enabled: false 
+      }
+    ],
+    currentAPIIndex: 0,
+    temperature: 0.9,
+    // 向后兼容
+    embeddedAPIKey: '',
+    embeddedAPIEndpoint: 'https:/11api/v1/chat/completions',
+    embeddedModel: 'gemini-2.5-flash',
+    customAPIKey: '',
+    customAPIEndpoint: 'https://11api/v1/chat/completions',
+    customModel: 'gpt-3.5-turbo'
+  };
+  
   gameState = {
     ownerName: '',
     petId: 'pikachu',
@@ -1165,73 +1882,40 @@ function initializeNewGame() {
       backgroundImage: 'default',
       soundEnabled: true,
       notificationEnabled: true,
-      apiConfig: {
-        useEmbeddedAPI: true,
-        // 内嵌API - 支持两个模型
-        embeddedAPIs: [
-          { 
-            apiKey: '',
-            endpoint: 'https//11api.v1/chat/completions',
-            model: 'gemini-2.5-flash', 
-            enabled: true 
-          },
-          { 
-            apiKey: '',
-            endpoint: 'https://11api/v1/chat/completions',
-            model: '', 
-            enabled: false 
-          }
-        ],
-        // 自定义API - 支持两套配置
-        customAPIs: [
-          { 
-            apiKey: '', 
-            endpoint: 'https://11api/v1/chat/completions', 
-            model: 'gpt-3.5-turbo', 
-            enabled: true 
-          },
-          { 
-            apiKey: '', 
-            endpoint: '', 
-            model: '', 
-            enabled: false 
-          }
-        ],
-        currentAPIIndex: 0,
-        temperature: 0.9,
-        // 向后兼容
-        embeddedAPIKey: '',
-        embeddedAPIEndpoint: 'https:/11api/v1/chat/completions',
-        embeddedModel: 'gemini-2.5-flash',
-        customAPIKey: '',
-        customAPIEndpoint: 'https://11api/v1/chat/completions',
-        customModel: 'gpt-3.5-turbo'
-      },
-      autoResume: false
+      // 使用全局设置
+      apiConfig: globalSettings.apiConfig || defaultApiConfig,
+      dayNightMode: globalSettings.dayNightMode || 'auto',
+      manualTheme: globalSettings.manualTheme || 'day',
+      phoneFrameSize: globalSettings.phoneFrameSize || { width: 390, height: 844 },
+      autoResume: globalSettings.autoResume || false
     },
     deathWarningTime: null
   };
 }
 
 /**
- * 导出存档
+ * 导出所有存档数据
  */
 function exportSaveData() {
-  const dataStr = JSON.stringify(gameState, null, 2);
+  // 先保存当前状态
+  saveMultiGameState();
+  
+  // 导出完整的多存档数据
+  const dataStr = JSON.stringify(multiSaveData, null, 2);
   const blob = new Blob([dataStr], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   
   const a = document.createElement('a');
   a.href = url;
-  a.download = `pokemon_save_${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = `pokemon_saves_${new Date().toISOString().slice(0, 10)}.json`;
   a.click();
   
   URL.revokeObjectURL(url);
-  showNotification('📤 存档已导出');
+  showNotification('📤 所有存档已导出');
 }
 
 /**
- * 导入存档
+ * 导入所有存档数据
  */
 function importSaveData(file) {
   if (!file) return;
@@ -1240,10 +1924,26 @@ function importSaveData(file) {
   reader.onload = (e) => {
     try {
       const imported = JSON.parse(e.target.result);
-      gameState = deepMerge(gameState, imported);
-      saveGameState();
-      showNotification('📥 存档导入成功，即将刷新...');
-      setTimeout(() => location.reload(), 1500);
+      
+      // 检查版本
+      if (imported.version === "2.0") {
+        // 新版格式，直接导入
+        multiSaveData = imported;
+        localStorage.setItem(SAVE_KEY, JSON.stringify(multiSaveData));
+        
+        // 如果有当前存档，加载它
+        if (multiSaveData.currentSaveId && multiSaveData.saves[multiSaveData.currentSaveId]) {
+          loadMultiGameState(multiSaveData.currentSaveId);
+        }
+        
+        showNotification('📥 存档导入成功，即将刷新...');
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        // 旧版格式，尝试迁移
+        migrateOldSave(imported);
+        showNotification('📥 旧版存档已迁移并导入，即将刷新...');
+        setTimeout(() => location.reload(), 1500);
+      }
     } catch (error) {
       showNotification('❌ 导入失败：文件格式错误');
       console.error('导入错误:', error);
@@ -1278,19 +1978,24 @@ function resetGame() {
 function initGame() {
   console.log('🎮 初始化主游戏');
   
+  // 0. 先初始化多存档系统
+  initMultiSaveData();
+  
   // 1. 加载存档
   const hasData = loadGameState();
-  if (!hasData || !gameState.ownerName) {
+  if (!hasData || !gameState || !gameState.ownerName) {
     // 没有存档，返回选择界面
     window.location.href = getPagePath('index.html');
     return;
   }
   
-  // 2. 离线结算
+  // 2. 离线结算（会更新年龄和成长阶段）
   handleOfflineProgress();
   
-  // 3. 检查成长阶段（确保初始化时正确显示）
-  gameState.ageInHours = Math.floor((Date.now() - gameState.birthTimestamp) / 3600000);
+  // 3. 重新计算年龄（确保准确）
+  gameState.ageInHours = (Date.now() - gameState.birthTimestamp) / 3600000;
+  
+  // 4. 检查成长阶段（会根据年龄自动更新阶段，如果阶段改变会触发动画）
   checkGrowthStage();
   
   // 4. 启动时间循环
@@ -1305,15 +2010,18 @@ function initGame() {
   renderPoops();
   updatePetNamePlaceholders();
   
-  // 7. 应用背景
+  // 7. 应用宠物主题色
+  applyPetTheme();
+  
+  // 8. 应用背景
   const hour = new Date().getHours();
   const isDay = hour >= 6 && hour < 18;
   updateBackgroundTheme(isDay ? 'day' : 'night');
   
-  // 8. 绑定事件
+  // 9. 绑定事件
   bindGameEventListeners();
   
-  // 9. 初始化AI任务队列UI
+  // 10. 初始化AI任务队列UI
   initAIQueueUI();
   
   
@@ -1371,8 +2079,8 @@ function handleOfflineProgress() {
     gameState.stats.happiness = Math.max(0, gameState.stats.happiness - 20);
   }
   
-  // 更新年龄
-  gameState.ageInHours = Math.floor((now - gameState.birthTimestamp) / 3600000);
+  // 更新年龄（使用精确的小时数，不向下取整）
+  gameState.ageInHours = (now - gameState.birthTimestamp) / 3600000;
   checkGrowthStage();
   
   // 健康度计算
@@ -1446,9 +2154,9 @@ function showWelcomeBackModal(offlineMinutes, oldStats, newStats) {
   }
   
   const specialEventsHTML = specialEvents.length > 0 ? `
-    <div style="margin-top: var(--space-md); padding: var(--space-md); background: rgba(255, 193, 7, 0.1); border: 2px solid var(--warning); border-radius: var(--radius-sm);">
-      <h4 style="font-size: 10px; margin-bottom: var(--space-xs);">⚠️ 特别提醒</h4>
-      ${specialEvents.map(e => `<p style="font-size: 9px; margin: var(--space-xs) 0;">• ${e}</p>`).join('')}
+    <div style="margin-top: var(--space-md); padding: var(--space-md); background: var(--queue-processing-bg); border: 2px solid var(--warning); border-radius: var(--radius-sm);">
+      <h4 style="font-size: 10px; margin-bottom: var(--space-xs); color: var(--text-primary);">⚠️ 特别提醒</h4>
+      ${specialEvents.map(e => `<p style="font-size: 9px; margin: var(--space-xs) 0; color: var(--text-secondary);">• ${e}</p>`).join('')}
     </div>
   ` : '';
   
@@ -1529,8 +2237,8 @@ function startGameLoop() {
       gameState.stats.health = Math.max(0, gameState.stats.health - 0.5);
     }
     
-    // 7. 更新年龄和成长
-    gameState.ageInHours = Math.floor((now - gameState.birthTimestamp) / 3600000);
+    // 7. 更新年龄和成长（使用精确的小时数，不向下取整）
+    gameState.ageInHours = (now - gameState.birthTimestamp) / 3600000;
     checkGrowthStage();
     
     // 8. 健康检查
@@ -1585,7 +2293,18 @@ function updateClock() {
   if (typeof Darkmode !== 'undefined') {
     // 确保darkmode实例存在
     if (!window.darkmodeInstance) {
-      window.darkmodeInstance = new Darkmode();
+      // 配置darkmode不改变图标颜色
+      window.darkmodeInstance = new Darkmode({
+        mixColor: '#fff',
+        backgroundColor: '#1a1a2e',
+        buttonColorDark: '#100f2c',
+        buttonColorLight: '#fff',
+        saveInCookies: false,
+        autoMatchOsTheme: false,
+        label: '🌓',
+        // 不改变图标和图片的过滤器
+        exclude: 'img, [data-no-darkmode], .emoji, .icon, [class*="icon"], [class*="emoji"]'
+      });
     }
     
     const darkmode = window.darkmodeInstance;
@@ -1703,8 +2422,8 @@ function updateBackgroundTheme(theme) {
     }
   } else {
     // 使用默认主题色
-    const petData = POKEMON_DATABASE[gameState.petId];
-    if (petData) {
+    const petData = getCurrentPetConfig();
+    if (petData && petData.theme) {
       const bgColor = theme === 'day' ? petData.theme.bgDay : petData.theme.bgNight;
       
       // 应用到 phone-frame 容器
@@ -1818,6 +2537,17 @@ function bindGameEventListeners() {
   }
   
   // 标题栏设置按钮（新增）
+  // 返回首页按钮
+  const btnBackHome = document.getElementById('btn-back-home');
+  if (btnBackHome) {
+    btnBackHome.addEventListener('click', () => {
+      // 保存当前状态
+      saveGameState();
+      // 返回首页
+      window.location.href = getPagePath('index.html');
+    });
+  }
+  
   const btnSettingsHeader = document.getElementById('btn-settings-header');
   if (btnSettingsHeader) {
     btnSettingsHeader.addEventListener('click', () => {
@@ -2091,8 +2821,9 @@ function updatePetNamePlaceholders() {
  */
 function checkGrowthStage() {
   const age = gameState.ageInHours;
-  let newStage = gameState.growthStage;
+  let newStage;
   
+  // 根据年龄确定阶段（不依赖当前阶段）
   if (age < GAME_CONFIG.growthStages.egg) {
     newStage = 'egg';
   } else if (age < GAME_CONFIG.growthStages.egg + GAME_CONFIG.growthStages.baby) {
@@ -2103,20 +2834,28 @@ function checkGrowthStage() {
     newStage = 'adult';
   }
   
-  // 触发进化
+  // 触发进化（只有阶段真正改变时才触发）
   if (newStage !== gameState.growthStage) {
+    const oldStage = gameState.growthStage;
     gameState.growthStage = newStage;
-    playEvolutionAnimation(newStage);
+    playEvolutionAnimation(newStage, oldStage);
     renderPetSprite();
   }
   
   // 更新年龄显示
   const days = Math.floor(age / 24);
-  const hours = age % 24;
+  const hours = Math.floor(age % 24);
+  const minutes = Math.floor((age % 1) * 60);
   
   const ageText = document.getElementById('age-text');
   if (ageText) {
-    ageText.textContent = days > 0 ? `${days}天${hours}小时` : `${hours}小时`;
+    if (days > 0) {
+      ageText.textContent = `${days}天${hours}小时`;
+    } else if (hours > 0) {
+      ageText.textContent = `${hours}小时${minutes}分钟`;
+    } else {
+      ageText.textContent = `${minutes}分钟`;
+    }
   }
   
   const stageText = document.getElementById('growth-stage-text');
@@ -2163,7 +2902,7 @@ function renderPoops() {
   
   poopLayer.innerHTML = '';
   
-  const petData = POKEMON_DATABASE[gameState.petId];
+  const petData = getCurrentPetConfig();
   for (let i = 0; i < gameState.physiology.poopCount; i++) {
     const poop = document.createElement('img');
     poop.className = 'poop';
@@ -3351,7 +4090,11 @@ async function sendChatMessage(userMessage) {
   // 异步处理，不阻塞窗口
   (async () => {
     try {
-      const petData = POKEMON_DATABASE[gameState.petId];
+      const petData = getCurrentPetConfig();
+      if (!petData || !petData.aiPersonality) {
+        showNotification('宠物配置错误');
+        return;
+      }
       const baseSystemPrompt = petData.aiPersonality.systemPrompt.replace('{{OWNER_NAME}}', gameState.ownerName);
       
       // 添加当前时间信息
@@ -3433,7 +4176,7 @@ function renderChatHistory() {
  * @returns {string} 口癖文本
  */
 function getPetCatchphrase(variation = 'normal') {
-  const petData = POKEMON_DATABASE[gameState.petId];
+  const petData = getCurrentPetConfig();
   const base = petData?.catchphrase || '喵';
   
   switch(variation) {
@@ -3817,7 +4560,8 @@ async function generateLogSummary(logs) {
                     currentHour >= 18 && currentHour < 22 ? '晚上' : '深夜';
   
   // 获取宠物性格设定
-  const petData = POKEMON_DATABASE[gameState.petId];
+  const petData = getCurrentPetConfig();
+  if (!petData || !petData.aiPersonality) return;
   const personalityPrompt = petData.aiPersonality.systemPrompt.replace('{{OWNER_NAME}}', gameState.ownerName);
   
   const prompt = `你是${gameState.petNickname}，以日记的形式写一份相处报告给主人${gameState.ownerName}。
@@ -4258,7 +5002,8 @@ async function generateAdventureInit(duration) {
     // 尝试使用AI生成探险数据 - 明确语言要求，一次生成所有内容
     const petName = gameState.petNickname || '宝贝';
     const ownerName = gameState.ownerName || '主人';
-    const petData = POKEMON_DATABASE[gameState.petId];
+    const petData = getCurrentPetConfig();
+    if (!petData) return;
     
     // 获取当前时间信息
     const nowDate = new Date();
@@ -5115,7 +5860,8 @@ async function generateAdventureLog(adventureData) {
                     currentHour >= 18 && currentHour < 22 ? '晚上' : '深夜';
   
   // 获取宠物性格设定
-  const petData = POKEMON_DATABASE[gameState.petId];
+  const petData = getCurrentPetConfig();
+  if (!petData || !petData.aiPersonality) return;
   const personalityPrompt = petData.aiPersonality.systemPrompt.replace('{{OWNER_NAME}}', gameState.ownerName);
   
   const prompt = `你是${gameState.petNickname}，写一份探险日记给主人${gameState.ownerName}。
@@ -5240,6 +5986,9 @@ function initShop() {
     window.location.href = getPagePath('index.html');
     return;
   }
+  
+  // 应用宠物主题色
+  applyPetTheme();
   
   renderShopItems();
   updateShopCoinDisplay();
@@ -6301,6 +7050,9 @@ function initPlay() {
     return;
   }
   
+  // 应用宠物主题色
+  applyPetTheme();
+  
   // 应用背景
   const hour = new Date().getHours();
   const isDay = hour >= 6 && hour < 18;
@@ -6314,7 +7066,7 @@ function initPlay() {
   // 渲染宠物精灵
   const petSprite = document.getElementById('pet-play-sprite');
   if (petSprite) {
-    const petData = POKEMON_DATABASE[gameState.petId];
+    const petData = getCurrentPetConfig();
     if (petData && petData.assets) {
       // 优先使用happy状态，否则使用当前成长阶段
       const spritePath = petData.assets.happy || petData.assets[gameState.growthStage] || petData.assets.adult;
@@ -6534,11 +7286,36 @@ function calculateGameRewards(score, difficulty = 'normal') {
  */
 function loadPetSpriteToGame(containerId, stage = null) {
   const container = document.getElementById(containerId);
-  if (!container) return;
+  if (!container) {
+    console.warn('loadPetSpriteToGame: 容器不存在', containerId);
+    return;
+  }
   
   loadGameState();
-  const petData = POKEMON_DATABASE[gameState.petId];
-  if (!petData || !petData.assets) return;
+  const petData = getCurrentPetConfig();
+  if (!petData || !petData.assets) {
+    console.warn('loadPetSpriteToGame: 宠物数据不存在', gameState?.petId);
+    // 使用默认宠物（显示emoji占位符）
+    const emoji = '🐾';
+    container.innerHTML = `<span style="font-size: 24px; display: block; line-height: 30px; text-align: center;">${emoji}</span>`;
+    
+    // 尝试加载默认图片
+    const img = document.createElement('img');
+    img.alt = '宠物';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'contain';
+    img.style.imageRendering = 'pixelated';
+    img.style.display = 'none';
+    img.onload = () => {
+      container.innerHTML = '';
+      container.appendChild(img);
+      img.style.display = 'block';
+    };
+    container.appendChild(img);
+    loadImageWithFallback(img, 'assets/pikachu/adult');
+    return;
+  }
   
   const growthStage = stage || gameState.growthStage || 'adult';
   const spritePath = petData.assets[growthStage] || petData.assets.adult;
@@ -6551,25 +7328,64 @@ function loadPetSpriteToGame(containerId, stage = null) {
   const img = document.createElement('img');
   img.id = 'game-pet-sprite';
   img.alt = gameState.petNickname || '宠物';
-  img.style.width = '60px';
-  img.style.height = '60px';
+  img.style.width = '100%';
+  img.style.height = '100%';
   img.style.objectFit = 'contain';
   img.style.imageRendering = 'pixelated';
+  img.style.display = 'block';
   
   container.appendChild(img);
   
-  if (basePath) {
-    loadImageWithFallback(
-      img,
-      basePath,
-      `assets/${gameState.petId}/${growthStage}`,
-      null,
-      () => {
-        loadImageWithFallback(img, `assets/pikachu/${growthStage}`);
-      }
-    );
+  // 加载图片
+  const loadImage = () => {
+    // 添加错误处理，确保加载失败时显示占位符
+    img.onerror = () => {
+      console.warn('loadPetSpriteToGame: 图片加载失败，使用emoji占位符', basePath);
+      container.innerHTML = `<span style="font-size: 24px; display: block; line-height: 30px; text-align: center;">🐾</span>`;
+    };
+    
+    if (basePath) {
+      loadImageWithFallback(
+        img,
+        basePath,
+        `assets/${gameState.petId}/${growthStage}`,
+        null,
+        () => {
+          loadImageWithFallback(
+            img, 
+            `assets/pikachu/${growthStage}`,
+            'assets/pikachu/adult',
+            null,
+            () => {
+              console.warn('所有图片加载失败，使用emoji占位符');
+              img.style.display = 'none';
+              const emoji = gameState?.petId === 'pikachu' ? '⚡' : gameState?.petId === 'squirtle' ? '💧' : gameState?.petId === 'eevee' ? '🌟' : '🐾';
+              container.innerHTML = `<span style="font-size: 24px; display: block; line-height: 30px; text-align: center;">${emoji}</span>`;
+            }
+          );
+        }
+      );
+    } else {
+      loadImageWithFallback(
+        img, 
+        `assets/${gameState.petId}/${growthStage}`, 
+        'assets/pikachu/adult',
+        null,
+        () => {
+          console.warn('图片加载失败，使用emoji占位符');
+          img.style.display = 'none';
+          const emoji = gameState?.petId === 'pikachu' ? '⚡' : gameState?.petId === 'squirtle' ? '💧' : gameState?.petId === 'eevee' ? '🌟' : '🐾';
+          container.innerHTML = `<span style="font-size: 24px; display: block; line-height: 30px; text-align: center;">${emoji}</span>`;
+        }
+      );
+    }
+  };
+  
+  // 确保DOM已更新后再加载图片
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadImage);
   } else {
-    loadImageWithFallback(img, `assets/${gameState.petId}/${growthStage}`, 'assets/pikachu/adult');
+    loadImage();
   }
 }
 
@@ -6668,6 +7484,23 @@ function loadImageWithFallback(imgElement, basePath, fallbackPath = null, onSucc
     // 使用默认占位符
     imgElement.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect fill="%23FFD700" width="200" height="200" rx="20"/><text y="120" x="100" text-anchor="middle" font-size="80">⚡</text></svg>';
     if (onError) onError();
+    return;
+  }
+  
+  // 检查是否是网络URL
+  if (basePath.startsWith('http://') || basePath.startsWith('https://')) {
+    // 直接使用URL
+    imgElement.src = basePath;
+    imgElement.onload = () => {
+      if (onSuccess) onSuccess();
+    };
+    imgElement.onerror = () => {
+      if (fallbackPath) {
+        loadImageWithFallback(imgElement, fallbackPath, null, onSuccess, onError);
+      } else if (onError) {
+        onError();
+      }
+    };
     return;
   }
   
@@ -6801,12 +7634,14 @@ function updateStatBar(statName, value) {
   if (fill) {
     fill.style.width = `${value}%`;
     
+    // 使用CSS变量
+    const rootStyle = getComputedStyle(document.documentElement);
     if (value >= 70) {
-      fill.style.backgroundColor = '#4CAF50';
+      fill.style.backgroundColor = rootStyle.getPropertyValue('--success').trim();
     } else if (value >= 40) {
-      fill.style.backgroundColor = '#FFC107';
+      fill.style.backgroundColor = rootStyle.getPropertyValue('--warning').trim();
     } else {
-      fill.style.backgroundColor = '#F44336';
+      fill.style.backgroundColor = rootStyle.getPropertyValue('--danger').trim();
     }
   }
   
@@ -6838,7 +7673,7 @@ function renderPetSprite() {
   const petSprite = document.getElementById('pet-sprite');
   if (!petSprite) return;
   
-  const petData = POKEMON_DATABASE[gameState.petId];
+  const petData = getCurrentPetConfig();
   if (!petData || !petData.assets) {
     console.error('宠物数据不存在:', gameState.petId);
     loadImageWithFallback(petSprite, 'assets/pikachu/adult');
@@ -6882,11 +7717,34 @@ function renderPetSprite() {
 /**
  * 设置宠物动画
  */
+/**
+ * 应用宠物主题色
+ */
+function applyPetTheme(petId = null) {
+  const targetPetId = petId || gameState?.petId;
+  if (!targetPetId) return;
+  
+  const petConfig = getCurrentPetConfig(targetPetId);
+  if (!petConfig || !petConfig.theme) return;
+  
+  const root = document.documentElement;
+  root.style.setProperty('--primary', petConfig.theme.primary);
+  root.style.setProperty('--secondary', petConfig.theme.secondary);
+  root.style.setProperty('--bg-day', petConfig.theme.bgDay);
+  root.style.setProperty('--bg-night', petConfig.theme.bgNight);
+  
+  // 更新meta theme-color
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) {
+    metaTheme.setAttribute('content', petConfig.theme.primary);
+  }
+}
+
 function setPetAnimation(animationType) {
   const petSprite = document.getElementById('pet-sprite');
   if (!petSprite) return;
   
-  const petData = POKEMON_DATABASE[gameState.petId];
+  const petData = getCurrentPetConfig();
   if (!petData || !petData.assets) {
     console.error('宠物数据不存在:', gameState.petId);
     return;
@@ -7086,28 +7944,159 @@ function playCleanAnimation() {
 }
 
 /**
+ * 播放孵化动画（彩色粒子飞扬）
+ */
+function playHatchAnimation() {
+  const gameStage = document.getElementById('game-stage');
+  if (!gameStage) return;
+  
+  const petContainer = document.getElementById('pet-container');
+  if (!petContainer) return;
+  
+  // 获取宠物中心位置
+  const petRect = petContainer.getBoundingClientRect();
+  const stageRect = gameStage.getBoundingClientRect();
+  const centerX = ((petRect.left + petRect.width / 2 - stageRect.left) / stageRect.width) * 100;
+  const centerY = ((petRect.top + petRect.height / 2 - stageRect.top) / stageRect.height) * 100;
+  
+  // 创建孵化动画容器
+  const hatchContainer = document.createElement('div');
+  hatchContainer.className = 'hatch-animation-container';
+  gameStage.appendChild(hatchContainer);
+  
+  // 使用已有的CSS变量获取粒子颜色
+  const rootStyle = getComputedStyle(document.documentElement);
+  const getCSSVariable = (varName) => rootStyle.getPropertyValue(varName).trim();
+  
+  const particleColors = [
+    getCSSVariable('--primary'),        // 金色
+    getCSSVariable('--secondary'),      // 红色
+    getCSSVariable('--success'),        // 绿色
+    getCSSVariable('--info'),           // 蓝色
+    getCSSVariable('--warning'),        // 黄色
+    getCSSVariable('--primary-light'),  // 浅金色
+    getCSSVariable('--secondary-light'), // 浅红色
+    getCSSVariable('--success-light')   // 浅绿色
+  ];
+  
+  const particleCount = 60;
+  
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'hatch-particle';
+    
+    // 随机颜色（使用CSS变量）
+    const color = particleColors[Math.floor(Math.random() * particleColors.length)];
+    particle.style.backgroundColor = color;
+    particle.style.boxShadow = `0 0 8px ${color}, 0 0 16px ${color}`;
+    
+    // 从中心位置开始
+    particle.style.left = centerX + '%';
+    particle.style.top = centerY + '%';
+    
+    // 随机大小
+    const size = 5 + Math.random() * 8;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    
+    // 随机动画延迟和持续时间
+    const delay = Math.random() * 0.3;
+    const duration = 1.8 + Math.random() * 0.8;
+    
+    particle.style.animationDelay = delay + 's';
+    particle.style.animationDuration = duration + 's';
+    
+    // 随机飞行方向（360度）
+    const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5;
+    const distance = 80 + Math.random() * 120;
+    const endX = centerX + Math.cos(angle) * (distance / stageRect.width) * 100;
+    const endY = centerY + Math.sin(angle) * (distance / stageRect.height) * 100;
+    
+    // 使用CSS变量传递结束位置
+    particle.style.setProperty('--end-x', endX + '%');
+    particle.style.setProperty('--end-y', endY + '%');
+    
+    hatchContainer.appendChild(particle);
+  }
+  
+  // 创建闪光效果
+  const flash = document.createElement('div');
+  flash.className = 'hatch-flash';
+  flash.style.left = centerX + '%';
+  flash.style.top = centerY + '%';
+  hatchContainer.appendChild(flash);
+  
+  // 播放音效（如果有）
+  if (SOUND_CONFIG.enabled && SOUND_CONFIG.sounds.evolution) {
+    try {
+      const audio = new Audio(SOUND_CONFIG.sounds.evolution);
+      audio.volume = SOUND_CONFIG.volume;
+      audio.play().catch(() => {});
+    } catch (e) {
+      // 忽略音效错误
+    }
+  }
+  
+  // 动画结束后清理
+  setTimeout(() => {
+    if (hatchContainer.parentElement) {
+      hatchContainer.remove();
+    }
+  }, 3500);
+}
+
+/**
  * 播放进化动画
  */
-function playEvolutionAnimation(newStage) {
-  const modal = document.createElement('div');
-  modal.className = 'modal active evolution-modal';
-  modal.innerHTML = `
-    <div class="modal-content">
-      <div class="evolution-animation">
-        <h2>✨ 进化了！✨</h2>
-        <p>${gameState.petNickname} 成长为 ${getStageText(newStage)}！</p>
+function playEvolutionAnimation(newStage, oldStage) {
+  // 如果是从蛋孵化到baby，使用特殊的孵化动画
+  if (oldStage === 'egg' && newStage === 'baby') {
+    playHatchAnimation();
+    
+    // 延迟显示文字提示
+    setTimeout(() => {
+      const modal = document.createElement('div');
+      modal.className = 'modal active evolution-modal';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <div class="evolution-animation">
+            <h2>🎉 孵化成功！🎉</h2>
+            <p>${gameState.petNickname} 破壳而出，成为 ${getStageText(newStage)}！</p>
+          </div>
+          <button class="pixel-btn primary" onclick="this.closest('.modal').remove()">太棒了！</button>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      
+      setTimeout(() => {
+        if (modal.parentElement) {
+          modal.remove();
+        }
+      }, 5000);
+    }, 1500);
+  } else {
+    // 其他阶段的进化使用普通动画
+    const modal = document.createElement('div');
+    modal.className = 'modal active evolution-modal';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="evolution-animation">
+          <h2>✨ 进化了！✨</h2>
+          <p>${gameState.petNickname} 成长为 ${getStageText(newStage)}！</p>
+        </div>
+        <button class="pixel-btn primary" onclick="this.closest('.modal').remove()">太棒了！</button>
       </div>
-      <button class="pixel-btn primary" onclick="this.closest('.modal').remove()">太棒了！</button>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-  
-  setTimeout(() => {
-    if (modal.parentElement) {
-      modal.remove();
-    }
-  }, 5000);
+    `;
+    
+    document.body.appendChild(modal);
+    
+    setTimeout(() => {
+      if (modal.parentElement) {
+        modal.remove();
+      }
+    }, 5000);
+  }
 }
 
 /**

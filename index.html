@@ -13,52 +13,130 @@
 <body class="pixel-bg" data-theme="day">
   <div class="phone-frame">
     <div id="selection-container">
-    <!-- Logo区域 -->
-    <div id="game-logo">
-      <h1 class="pixel-title">宠物养成日记</h1>
-      <p class="subtitle">Pixel Pet Adventure</p>
-    </div>
-    
-    <!-- 饲养者信息输入 -->
-    <div id="owner-input-section">
-      <label for="owner-name-input" class="pixel-label">
-        请输入你的名字：
-      </label>
-      <input 
-        type="text" 
-        id="owner-name-input" 
-        class="pixel-input" 
-        maxlength="10"
-        placeholder="主人"
-      >
-    </div>
-    
-    <!-- 宠物选择卡片 -->
-    <div id="pet-selection-grid">
-      <!-- 皮卡丘卡片 -->
-      <div class="pet-card" data-pet-id="pikachu">
-        <img src="assets/pikachu/adult.gif" alt="皮卡丘" class="pet-preview">
-        <h3 class="pet-name">皮卡丘</h3>
-        <p class="pet-desc">电气鼠宠物</p>
+      <!-- Logo区域 -->
+      <div id="game-logo">
+        <h1 class="pixel-title">宠物养成日记</h1>
+        <p class="subtitle">Pixel Pet Adventure</p>
       </div>
       
-      <!-- 预留卡片（锁定状态） -->
-      <div class="pet-card locked">
-        <div class="lock-icon">🔒</div>
-        <p>即将到来...</p>
-      </div>
-      
-      <!-- 预留卡片（锁定状态） -->
-      <div class="pet-card locked">
-        <div class="lock-icon">🔒</div>
-        <p>即将到来...</p>
+      <!-- 存档卡片网格 -->
+      <div id="save-cards-grid">
+        <!-- 卡片将通过JavaScript动态生成 -->
       </div>
     </div>
     
-    <!-- 开始按钮 -->
-    <button id="btn-start-game" class="pixel-btn primary" disabled>
-      开始冒险
-    </button>
+    <!-- 自定义宠物创建表单弹窗 -->
+    <div id="custom-pet-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>创建自定义宠物</h3>
+          <button class="close-btn" onclick="closeCustomPetModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <form id="custom-pet-form">
+            <!-- 基础信息 -->
+            <div class="form-section">
+              <h4 class="section-title">基础信息</h4>
+              <div class="form-item">
+                <label class="pixel-label">宠物ID（唯一标识）</label>
+                <input type="text" id="custom-pet-id" class="pixel-input" maxlength="20" placeholder="例如: my_pet" required>
+                <p class="form-hint">只能包含字母、数字和下划线</p>
+              </div>
+              <div class="form-item">
+                <label class="pixel-label">宠物名字</label>
+                <input type="text" id="custom-pet-name" class="pixel-input" maxlength="10" placeholder="例如: 小可爱" required>
+              </div>
+              <div class="form-item">
+                <label class="pixel-label">物种描述</label>
+                <input type="text" id="custom-pet-species" class="pixel-input" maxlength="20" placeholder="例如: 神秘生物" required>
+              </div>
+              <div class="form-item">
+                <label class="pixel-label">口癖</label>
+                <input type="text" id="custom-pet-catchphrase" class="pixel-input" maxlength="10" placeholder="例如: 喵" required>
+              </div>
+            </div>
+            
+            <!-- 主题色 -->
+            <div class="form-section">
+              <h4 class="section-title">主题色</h4>
+              <div class="form-item">
+                <label class="pixel-label">主色</label>
+                <input type="color" id="custom-pet-primary" class="pixel-input" value="#FFD700" required>
+              </div>
+              <div class="form-item">
+                <label class="pixel-label">副色</label>
+                <input type="color" id="custom-pet-secondary" class="pixel-input" value="#FF6B6B" required>
+              </div>
+              <div class="form-item">
+                <label class="pixel-label">白天背景色</label>
+                <input type="color" id="custom-pet-bg-day" class="pixel-input" value="#87CEEB" required>
+              </div>
+              <div class="form-item">
+                <label class="pixel-label">夜间背景色</label>
+                <input type="color" id="custom-pet-bg-night" class="pixel-input" value="#2C3E50" required>
+              </div>
+            </div>
+            
+            <!-- 资源URL -->
+            <div class="form-section">
+              <h4 class="section-title">资源URL（网络地址）</h4>
+              <p class="form-hint">所有资源必须使用完整的网络URL（http://或https://开头）</p>
+              <div class="form-item">
+                <label class="pixel-label">蛋阶段图片URL</label>
+                <input type="url" id="custom-pet-egg" class="pixel-input" placeholder="https://example.com/egg.gif" required>
+              </div>
+              <div class="form-item">
+                <label class="pixel-label">幼年期图片URL</label>
+                <input type="url" id="custom-pet-baby" class="pixel-input" placeholder="https://example.com/baby.gif" required>
+              </div>
+              <div class="form-item">
+                <label class="pixel-label">少年期图片URL</label>
+                <input type="url" id="custom-pet-teen" class="pixel-input" placeholder="https://example.com/teen.gif" required>
+              </div>
+              <div class="form-item">
+                <label class="pixel-label">成年期图片URL</label>
+                <input type="url" id="custom-pet-adult" class="pixel-input" placeholder="https://example.com/adult.gif" required>
+              </div>
+            </div>
+            
+            <!-- AI设定 -->
+            <div class="form-section">
+              <h4 class="section-title">AI角色设定</h4>
+              <div class="form-item">
+                <label class="pixel-label">角色描述</label>
+                <textarea id="custom-pet-personality" class="pixel-input" rows="5" placeholder="描述宠物的性格、说话方式等。例如：你是一只活泼可爱的小猫，会用'喵'、'喵喵'等口癖说话..." required></textarea>
+                <p class="form-hint">系统会自动添加"主人的名字是{{OWNER_NAME}}"</p>
+              </div>
+            </div>
+            
+            <!-- 提交按钮 -->
+            <div class="form-actions">
+              <button type="button" class="pixel-btn" onclick="closeCustomPetModal()">取消</button>
+              <button type="submit" class="pixel-btn primary">创建宠物</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 主人名字输入弹窗 -->
+    <div id="owner-name-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>开始新冒险</h3>
+          <button class="close-btn" onclick="closeOwnerNameModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-item">
+            <label class="pixel-label">请输入你的名字：</label>
+            <input type="text" id="owner-name-input-modal" class="pixel-input" maxlength="10" placeholder="主人" required>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="pixel-btn" onclick="closeOwnerNameModal()">取消</button>
+            <button type="button" class="pixel-btn primary" id="confirm-start-btn">开始</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   

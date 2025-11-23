@@ -18,6 +18,11 @@
   const nextCanvas = document.getElementById('next-canvas');
   const nextCtx = nextCanvas.getContext('2d');
   
+  // 获取CSS变量值的辅助函数
+  function getCSSVariable(varName) {
+    return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  }
+  
   // 游戏配置
   const COLS = 10;
   const ROWS = 20;
@@ -40,15 +45,51 @@
     [[0,0,1],[1,1,1]]  // L
   ];
   
+  // 多彩渐变色方案
   const COLORS = [
-    '#00F0F0', // I - 青色
-    '#F0F000', // O - 黄色
-    '#A000F0', // T - 紫色
-    '#00F000', // S - 绿色
-    '#F00000', // Z - 红色
-    '#0000F0', // J - 蓝色
-    '#F0A000'  // L - 橙色
+    '#00E5FF', // I - 亮青色
+    '#FFD700', // O - 金色
+    '#BA55D3', // T - 中紫色
+    '#32CD32', // S - 酸橙绿
+    '#FF4500', // Z - 橙红色
+    '#4169E1', // J - 皇家蓝
+    '#FF8C00'  // L - 深橙色
   ];
+  
+  // 渐变色辅助函数 - 增强渐变效果
+  function getGradientColor(ctx, x, y, width, height, baseColor) {
+    const gradient = ctx.createLinearGradient(x, y, x + width, y + height);
+    // 创建更亮的渐变，增强视觉层次
+    const lightColor = lightenColor(baseColor, 40);
+    const midLightColor = lightenColor(baseColor, 20);
+    const darkColor = darkenColor(baseColor, 25);
+    gradient.addColorStop(0, lightColor);
+    gradient.addColorStop(0.3, midLightColor);
+    gradient.addColorStop(0.5, baseColor);
+    gradient.addColorStop(0.7, baseColor);
+    gradient.addColorStop(1, darkColor);
+    return gradient;
+  }
+  
+  function lightenColor(color, percent) {
+    const num = parseInt(color.replace("#",""), 16);
+    const r = Math.min(255, (num >> 16) + percent);
+    const g = Math.min(255, ((num >> 8) & 0x00FF) + percent);
+    const b = Math.min(255, (num & 0x0000FF) + percent);
+    return "#" + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+  }
+  
+  function darkenColor(color, percent) {
+    const num = parseInt(color.replace("#",""), 16);
+    const r = Math.max(0, (num >> 16) - percent);
+    const g = Math.max(0, ((num >> 8) & 0x00FF) - percent);
+    const b = Math.max(0, (num & 0x0000FF) - percent);
+    return "#" + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+  }
+  
+  // 消除行动画
+  let clearingRows = [];
+  let clearAnimationFrame = null;
   
   // 游戏板
   let board = [];
@@ -128,24 +169,96 @@
     }
   }
   
-  // 清除完整行
+  // 清除完整行（带动画）
   function clearLines() {
-    let linesCleared = 0;
+    clearingRows = [];
     for (let row = ROWS - 1; row >= 0; row--) {
       if (board[row].every(cell => cell !== 0)) {
-        board.splice(row, 1);
-        board.unshift(Array(COLS).fill(0));
-        linesCleared++;
-        row++; // 重新检查这一行
+        clearingRows.push(row);
       }
     }
     
-    if (linesCleared > 0) {
-      lines += linesCleared;
-      // 积分计算：消除行数 * 100 * 等级
-      score += linesCleared * 100 * level;
-      level = Math.floor(lines / 10) + 1;
-      updateUI();
+    if (clearingRows.length > 0) {
+      // 开始消除动画
+      animateClear();
+    }
+  }
+  
+  // 消除动画
+  function animateClear() {
+    let frame = 0;
+    const maxFrames = 10;
+    
+    function animate() {
+      frame++;
+      const progress = frame / maxFrames;
+      const alpha = 1 - progress;
+      const scale = 1 - progress * 0.5;
+      
+      // 重绘游戏板，对消除行应用动画
+      drawBoardWithClearAnimation(clearingRows, alpha, scale);
+      
+      if (frame < maxFrames) {
+        clearAnimationFrame = requestAnimationFrame(animate);
+      } else {
+        // 动画完成，实际清除行
+        for (const row of clearingRows.sort((a, b) => b - a)) {
+          board.splice(row, 1);
+          board.unshift(Array(COLS).fill(0));
+        }
+        
+        lines += clearingRows.length;
+        // 积分计算：消除行数 * 100 * 等级
+        score += clearingRows.length * 100 * level;
+        level = Math.floor(lines / 10) + 1;
+        updateUI();
+        
+        clearingRows = [];
+        draw();
+      }
+    }
+    
+    animate();
+  }
+  
+  // 带消除动画的绘制
+  function drawBoardWithClearAnimation(rowsToClear, alpha, scale) {
+    ctx.fillStyle = getCSSVariable('--pixel-black') || '#1a1a2e';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 绘制已放置的方块
+    for (let row = 0; row < ROWS; row++) {
+      for (let col = 0; col < COLS; col++) {
+        if (board[row][col]) {
+          if (rowsToClear.includes(row)) {
+            // 消除行动画
+            const px = col * BLOCK_SIZE;
+            const py = row * BLOCK_SIZE;
+            const offsetX = (BLOCK_SIZE - BLOCK_SIZE * scale) / 2;
+            const offsetY = (BLOCK_SIZE - BLOCK_SIZE * scale) / 2;
+            
+            ctx.save();
+            ctx.translate(px + BLOCK_SIZE / 2, py + BLOCK_SIZE / 2);
+            ctx.scale(scale, scale);
+            ctx.translate(-BLOCK_SIZE / 2, -BLOCK_SIZE / 2);
+            drawBlock(ctx, col, row, COLORS[board[row][col] - 1], alpha);
+            ctx.restore();
+          } else {
+            drawBlock(ctx, col, row, COLORS[board[row][col] - 1]);
+          }
+        }
+      }
+    }
+    
+    // 绘制当前方块
+    if (currentPiece) {
+      for (let row = 0; row < currentPiece.shape.length; row++) {
+        for (let col = 0; col < currentPiece.shape[row].length; col++) {
+          if (currentPiece.shape[row][col]) {
+            drawBlock(ctx, currentX + col, currentY + row, currentPiece.color);
+          }
+        }
+      }
     }
   }
   
@@ -215,19 +328,63 @@
     updateUI();
   }
   
-  // 绘制方块
-  function drawBlock(ctx, x, y, color) {
-    ctx.fillStyle = color;
-    ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-    ctx.strokeStyle = '#000';
+  // 绘制方块（带增强渐变和阴影效果）
+  function drawBlock(ctx, x, y, color, alpha = 1) {
+    const px = x * BLOCK_SIZE;
+    const py = y * BLOCK_SIZE;
+    
+    // 绘制渐变背景 - 增强渐变
+    const gradient = getGradientColor(ctx, px, py, BLOCK_SIZE, BLOCK_SIZE, color);
+    ctx.fillStyle = gradient;
+    ctx.globalAlpha = alpha;
+    ctx.fillRect(px, py, BLOCK_SIZE, BLOCK_SIZE);
+    
+    // 绘制高光 - 增强高光效果
+    const highlightGradient = ctx.createLinearGradient(px, py, px, py + BLOCK_SIZE / 2);
+    highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
+    highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+    ctx.fillStyle = highlightGradient;
+    ctx.fillRect(px + 1, py + 1, BLOCK_SIZE - 2, BLOCK_SIZE / 2);
+    
+    // 绘制边框 - 增强边框
+    ctx.strokeStyle = getCSSVariable('--pixel-black') || '#1a1a2e';
+    ctx.lineWidth = 2;
+    ctx.globalAlpha = alpha;
+    ctx.strokeRect(px, py, BLOCK_SIZE, BLOCK_SIZE);
+    
+    // 绘制内边框 - 增强内边框高光
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
     ctx.lineWidth = 1;
-    ctx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+    ctx.strokeRect(px + 2, py + 2, BLOCK_SIZE - 4, BLOCK_SIZE - 4);
+    
+    // 添加底部阴影
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.fillRect(px + 1, py + BLOCK_SIZE - 2, BLOCK_SIZE - 2, 2);
+    
+    ctx.globalAlpha = 1;
   }
   
   // 绘制游戏板
   function drawBoard() {
-    ctx.fillStyle = '#000';
+    // 绘制背景网格
+    ctx.fillStyle = getCSSVariable('--pixel-dark-gray') || '#404040';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 绘制网格线
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= COLS; i++) {
+      ctx.beginPath();
+      ctx.moveTo(i * BLOCK_SIZE, 0);
+      ctx.lineTo(i * BLOCK_SIZE, canvas.height);
+      ctx.stroke();
+    }
+    for (let i = 0; i <= ROWS; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, i * BLOCK_SIZE);
+      ctx.lineTo(canvas.width, i * BLOCK_SIZE);
+      ctx.stroke();
+    }
     
     // 绘制已放置的方块
     for (let row = 0; row < ROWS; row++) {
@@ -238,8 +395,47 @@
       }
     }
     
-    // 绘制当前方块
+    // 绘制当前方块（带阴影预览）
     if (currentPiece) {
+      // 绘制阴影预览 - 增强阴影效果
+      let shadowY = currentY;
+      while (!checkCollision(currentPiece, currentX, shadowY + 1)) {
+        shadowY++;
+      }
+      if (shadowY > currentY) {
+        // 使用渐变阴影，更明显
+        const shadowGradient = ctx.createLinearGradient(
+          (currentX) * BLOCK_SIZE, (shadowY) * BLOCK_SIZE,
+          (currentX) * BLOCK_SIZE, (shadowY + currentPiece.shape.length) * BLOCK_SIZE
+        );
+        shadowGradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+        shadowGradient.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
+        ctx.fillStyle = shadowGradient;
+        for (let row = 0; row < currentPiece.shape.length; row++) {
+          for (let col = 0; col < currentPiece.shape[row].length; col++) {
+            if (currentPiece.shape[row][col]) {
+              // 绘制带边框的阴影
+              ctx.fillRect(
+                (currentX + col) * BLOCK_SIZE + 1,
+                (shadowY + row) * BLOCK_SIZE + 1,
+                BLOCK_SIZE - 2,
+                BLOCK_SIZE - 2
+              );
+              // 绘制阴影边框
+              ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+              ctx.lineWidth = 1;
+              ctx.strokeRect(
+                (currentX + col) * BLOCK_SIZE + 1,
+                (shadowY + row) * BLOCK_SIZE + 1,
+                BLOCK_SIZE - 2,
+                BLOCK_SIZE - 2
+              );
+            }
+          }
+        }
+      }
+      
+      // 绘制当前方块
       for (let row = 0; row < currentPiece.shape.length; row++) {
         for (let col = 0; col < currentPiece.shape[row].length; col++) {
           if (currentPiece.shape[row][col]) {
@@ -252,7 +448,7 @@
   
   // 绘制下一个方块
   function drawNext() {
-    nextCtx.fillStyle = '#000';
+    nextCtx.fillStyle = getCSSVariable('--pixel-black') || '#1a1a2e';
     nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
     
     if (!nextPiece) return;
@@ -271,7 +467,7 @@
             blockSize,
             blockSize
           );
-          nextCtx.strokeStyle = '#000';
+          nextCtx.strokeStyle = getCSSVariable('--pixel-black') || '#1a1a2e';
           nextCtx.lineWidth = 1;
           nextCtx.strokeRect(
             offsetX + col * blockSize,
@@ -351,6 +547,10 @@
     if (dropTimer) {
       clearTimeout(dropTimer);
       dropTimer = null;
+    }
+    if (clearAnimationFrame) {
+      cancelAnimationFrame(clearAnimationFrame);
+      clearAnimationFrame = null;
     }
     
     // 处理游戏结束

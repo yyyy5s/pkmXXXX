@@ -47,18 +47,113 @@
       transition: all 0.2s;
     }
     
-    .game-2048-cell.tile-2 { background: #EEE4DA; }
-    .game-2048-cell.tile-4 { background: #EDE0C8; }
-    .game-2048-cell.tile-8 { background: #F2B179; color: var(--pixel-white); }
-    .game-2048-cell.tile-16 { background: #F59563; color: var(--pixel-white); }
-    .game-2048-cell.tile-32 { background: #F67C5F; color: var(--pixel-white); }
-    .game-2048-cell.tile-64 { background: #F65E3B; color: var(--pixel-white); }
-    .game-2048-cell.tile-128 { background: #EDCF72; color: var(--pixel-white); font-size: 20px; }
-    .game-2048-cell.tile-256 { background: #EDCC61; color: var(--pixel-white); font-size: 20px; }
-    .game-2048-cell.tile-512 { background: #EDC850; color: var(--pixel-white); font-size: 20px; }
-    .game-2048-cell.tile-1024 { background: #EDC53F; color: var(--pixel-white); font-size: 18px; }
-    .game-2048-cell.tile-2048 { background: #EDC22E; color: var(--pixel-white); font-size: 18px; }
-    .game-2048-cell.tile-super { background: #3C3A32; color: var(--pixel-white); font-size: 16px; }
+    .game-2048-cell {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .game-2048-cell.tile-2 { 
+      background: linear-gradient(135deg, #EEE4DA 0%, #F5E6D3 100%);
+      color: var(--pixel-black);
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.5);
+    }
+    .game-2048-cell.tile-4 { 
+      background: linear-gradient(135deg, #EDE0C8 0%, #F0E4D0 100%);
+      color: var(--pixel-black);
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.5);
+    }
+    .game-2048-cell.tile-8 { 
+      background: linear-gradient(135deg, #F2B179 0%, #F5A460 100%);
+      color: var(--pixel-white);
+      box-shadow: 0 2px 8px rgba(242,177,121,0.6);
+    }
+    .game-2048-cell.tile-16 { 
+      background: linear-gradient(135deg, #F59563 0%, #FF7F50 100%);
+      color: var(--pixel-white);
+      box-shadow: 0 2px 8px rgba(245,149,99,0.6);
+    }
+    .game-2048-cell.tile-32 { 
+      background: linear-gradient(135deg, #F67C5F 0%, #FF6347 100%);
+      color: var(--pixel-white);
+      box-shadow: 0 2px 8px rgba(246,124,95,0.6);
+    }
+    .game-2048-cell.tile-64 { 
+      background: linear-gradient(135deg, #F65E3B 0%, #FF4500 100%);
+      color: var(--pixel-white);
+      box-shadow: 0 2px 8px rgba(246,94,59,0.6);
+    }
+    .game-2048-cell.tile-128 { 
+      background: linear-gradient(135deg, #EDCF72 0%, #FFD700 100%);
+      color: var(--pixel-black);
+      font-size: 20px;
+      box-shadow: 0 3px 10px rgba(237,207,114,0.7);
+      animation: pulse 0.3s ease;
+    }
+    .game-2048-cell.tile-256 { 
+      background: linear-gradient(135deg, #EDCC61 0%, #FFD700 100%);
+      color: var(--pixel-black);
+      font-size: 20px;
+      box-shadow: 0 3px 10px rgba(237,204,97,0.7);
+      animation: pulse 0.3s ease;
+    }
+    .game-2048-cell.tile-512 { 
+      background: linear-gradient(135deg, #EDC850 0%, #FFD700 100%);
+      color: var(--pixel-black);
+      font-size: 20px;
+      box-shadow: 0 3px 10px rgba(237,200,80,0.7);
+      animation: pulse 0.3s ease;
+    }
+    .game-2048-cell.tile-1024 { 
+      background: linear-gradient(135deg, #EDC53F 0%, #FFD700 50%, #FFA500 100%);
+      color: var(--pixel-black);
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(237,197,63,0.8);
+      animation: pulse 0.3s ease;
+    }
+    .game-2048-cell.tile-2048 { 
+      background: linear-gradient(135deg, #EDC22E 0%, #FFD700 50%, #FF8C00 100%);
+      color: var(--pixel-black);
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(237,194,46,0.8);
+      animation: pulse 0.3s ease, glow 2s ease-in-out infinite;
+    }
+    .game-2048-cell.tile-super { 
+      background: linear-gradient(135deg, #3C3A32 0%, #2C2C2C 50%, #1a1a1a 100%);
+      color: var(--pixel-white);
+      font-size: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.8), 0 0 20px rgba(255,215,0,0.5);
+      animation: pulse 0.3s ease, glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 4px 12px rgba(237,194,46,0.8), 0 0 20px rgba(255,215,0,0.3); }
+      50% { box-shadow: 0 4px 12px rgba(237,194,46,0.8), 0 0 30px rgba(255,215,0,0.7); }
+    }
+    
+    .game-2048-cell.new-tile {
+      animation: popIn 0.2s ease;
+    }
+    
+    .game-2048-cell.merged {
+      animation: merge 0.3s ease;
+    }
+    
+    @keyframes popIn {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    
+    @keyframes merge {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
     
     .game-2048-info {
       display: flex;
@@ -92,28 +187,10 @@
     }
     
     .game-2048-controls {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--space-xs);
-      margin-top: var(--space-xs);
-      max-width: 90%;
-      width: 100%;
+      display: none; /* 完全隐藏按钮，使用纯触屏操作 */
     }
     
-    .game-2048-control-btn {
-      padding: var(--space-sm);
-      background: var(--bg-panel);
-      border: 2px solid var(--border-color);
-      font-size: 24px;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-      font-family: inherit;
-    }
-    
-    .game-2048-control-btn:active {
-      background: var(--primary);
-      transform: scale(0.95);
-    }
+    /* 使用统一的按钮样式，已在style.css中定义 */
     
     @media (max-width: 768px) {
       .game-2048-cell {
@@ -145,11 +222,11 @@
   <div class="phone-frame">
     <header class="game-header">
     <div class="game-header-left">
-      <button id="btn-back" class="pixel-btn small">←</button>
+      <button id="btn-back" class="back-btn">←</button>
     </div>
     <div class="game-header-center">
       <span class="game-title">2048</span>
-      <span class="game-score">积分: <span id="score">0</span></span>
+      <span class="game-score">🏆 <span id="score">0</span></span>
       <div class="game-pet-container" id="pet-container"></div>
     </div>
     <div class="game-header-right">
@@ -175,8 +252,8 @@
         </div>
       </div>
       <div class="game-2048-controls">
-        <button class="game-2048-control-btn" id="btn-up">↑</button>
         <button class="game-2048-control-btn" id="btn-left">←</button>
+        <button class="game-2048-control-btn" id="btn-up">↑</button>
         <button class="game-2048-control-btn" id="btn-right">→</button>
         <button class="game-2048-control-btn" id="btn-down" style="grid-column: 2;">↓</button>
       </div>
@@ -190,7 +267,7 @@
       <div class="game-end-rewards" id="rewards-info"></div>
       <div class="game-end-actions">
         <button class="pixel-btn primary" id="btn-restart">再来一局</button>
-        <button class="pixel-btn" id="btn-return">←</button>
+        <button class="back-btn" id="btn-return">←</button>
       </div>
     </div>
   </div>

@@ -12,7 +12,7 @@
 <body class="shop-screen" data-theme="day">
   <div class="phone-frame">
     <header id="shop-header">
-    <button id="btn-back" class="pixel-btn small back-btn">←</button>
+    <button id="btn-back" class="back-btn">←</button>
     <h2>宠物商店</h2>
     <div id="shop-coin-display">
       💰 <span id="shop-coin-count">0</span>
@@ -49,12 +49,14 @@
         <h3>确认购买？</h3>
         <button class="close-btn" id="close-purchase-modal">×</button>
       </div>
-      <div id="purchase-details">
-        <!-- 动态填充商品信息 -->
-      </div>
-      <div class="modal-actions">
-        <button id="confirm-purchase-btn" class="pixel-btn primary">确认</button>
-        <button id="cancel-purchase-btn" class="pixel-btn">取消</button>
+      <div class="modal-body">
+        <div id="purchase-details">
+          <!-- 动态填充商品信息 -->
+        </div>
+        <div class="modal-actions">
+          <button id="confirm-purchase-btn" class="pixel-btn primary">确认</button>
+          <button id="cancel-purchase-btn" class="pixel-btn">取消</button>
+        </div>
       </div>
     </div>
   </div>
