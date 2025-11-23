@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#FFD700">
+  <title>俄罗斯方块 - 宝可梦养成日记</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    #tetris-canvas {
+      background: var(--pixel-black);
+      border: 3px solid var(--border-color);
+      box-shadow: 4px 4px 0 var(--shadow-color);
+    }
+    
+    .tetris-info {
+      display: flex;
+      flex-direction: row;
+      gap: var(--space-xs);
+      padding: 4px var(--space-sm);
+      background: var(--bg-panel);
+      border: 2px solid var(--border-color);
+      margin-top: var(--space-xs);
+      width: 100%;
+    }
+    
+    .tetris-info-item {
+      text-align: center;
+      padding: 2px;
+      flex: 1;
+    }
+    
+    .tetris-info-label {
+      font-size: 7px;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+      font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
+    }
+    
+    .tetris-info-value {
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: bold;
+      font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
+    }
+    
+    .tetris-next {
+      width: 80px;
+      height: 80px;
+      background: var(--pixel-black);
+      border: 2px solid var(--border-color);
+      margin: 0 auto;
+    }
+    
+    .tetris-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-xs);
+      margin-top: var(--space-xs);
+      max-width: 90%;
+      width: 100%;
+    }
+    
+    .tetris-control-btn {
+      padding: 8px;
+      background: var(--bg-panel);
+      border: 2px solid var(--border-color);
+      font-size: 20px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
+    }
+    
+    .tetris-control-btn:active {
+      background: var(--primary);
+      transform: scale(0.95);
+    }
+    
+    .tetris-next {
+      width: 40px;
+      height: 40px;
+    }
+  </style>
+</head>
+<body class="game-fullscreen" data-theme="day">
+  <div class="phone-frame">
+    <header class="game-header">
+    <div class="game-header-left">
+      <button id="btn-back" class="pixel-btn small">←</button>
+    </div>
+    <div class="game-header-center">
+      <span class="game-title">俄罗斯方块</span>
+      <span class="game-score">积分: <span id="score">0</span></span>
+      <div class="game-pet-container" id="pet-container"></div>
+    </div>
+    <div class="game-header-right">
+      <div class="game-difficulty-select" id="difficulty-select">
+        <button class="difficulty-btn" data-difficulty="easy">简单</button>
+        <button class="difficulty-btn active" data-difficulty="normal">普通</button>
+        <button class="difficulty-btn" data-difficulty="hard">地狱</button>
+      </div>
+    </div>
+  </header>
+  
+  <div class="game-container">
+    <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; padding: var(--space-md);">
+      <canvas id="tetris-canvas" class="game-canvas"></canvas>
+      <div class="tetris-info">
+        <div class="tetris-info-item">
+          <div class="tetris-info-label">等级</div>
+          <div class="tetris-info-value" id="level">1</div>
+        </div>
+        <div class="tetris-info-item">
+          <div class="tetris-info-label">行数</div>
+          <div class="tetris-info-value" id="lines">0</div>
+        </div>
+        <div class="tetris-info-item">
+          <div class="tetris-info-label">下一个</div>
+          <canvas class="tetris-next" id="next-canvas"></canvas>
+        </div>
+        <div class="tetris-controls">
+          <button class="tetris-control-btn" id="btn-left">←</button>
+          <button class="tetris-control-btn" id="btn-rotate">↻</button>
+          <button class="tetris-control-btn" id="btn-right">→</button>
+          <button class="tetris-control-btn" id="btn-down" style="grid-column: 2;">↓</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="game-end-modal" class="game-end-modal hidden">
+    <div class="game-end-content">
+      <h2 class="game-end-title">游戏结束</h2>
+      <div class="game-end-score">最终积分: <span id="final-score">0</span></div>
+      <div class="game-end-rewards" id="rewards-info"></div>
+      <div class="game-end-actions">
+        <button class="pixel-btn primary" id="btn-restart">再来一局</button>
+        <button class="pixel-btn" id="btn-return">←</button>
+      </div>
+    </div>
+  </div>
+  </div>
+  
+  <script src="../script.js"></script>
+  <script src="game-tetris.js"></script>
+</body>
+</html>
+

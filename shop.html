@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#FFD700">
+  <title>宠物商店</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="shop-screen" data-theme="day">
+  <div class="phone-frame">
+    <header id="shop-header">
+    <button id="btn-back" class="pixel-btn small back-btn">←</button>
+    <h2>宠物商店</h2>
+    <div id="shop-coin-display">
+      💰 <span id="shop-coin-count">0</span>
+    </div>
+  </header>
+  
+  <main id="shop-content">
+    <!-- 分类标签 -->
+    <div class="shop-categories">
+      <button class="category-btn active" data-category="all">全部</button>
+      <button class="category-btn" data-category="food">食物</button>
+      <button class="category-btn" data-category="toy">玩具</button>
+      <button class="category-btn" data-category="medicine">药品</button>
+      <button class="category-btn" data-category="tool">工具</button>
+    </div>
+    
+    <!-- 商品网格 -->
+    <div id="shop-grid">
+      <!-- 示例商品卡片结构（JS会动态生成） -->
+      <div class="shop-item" data-item-id="food_apple">
+        <img src="assets/shop/apple.png" class="item-icon" alt="苹果">
+        <h4 class="item-name">苹果</h4>
+        <p class="item-desc">新鲜的树果，能恢复饱食度</p>
+        <p class="item-price">💰 50</p>
+        <button class="buy-btn pixel-btn small">购买</button>
+      </div>
+    </div>
+  </main>
+  
+  <!-- 购买确认弹窗 -->
+  <div id="purchase-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>确认购买？</h3>
+        <button class="close-btn" id="close-purchase-modal">×</button>
+      </div>
+      <div id="purchase-details">
+        <!-- 动态填充商品信息 -->
+      </div>
+      <div class="modal-actions">
+        <button id="confirm-purchase-btn" class="pixel-btn primary">确认</button>
+        <button id="cancel-purchase-btn" class="pixel-btn">取消</button>
+      </div>
+    </div>
+  </div>
+  </div>
+  
+  <script src="script.js"></script>
+</body>
+</html>

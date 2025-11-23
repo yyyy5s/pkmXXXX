@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#FFD700">
+  <meta name="description" content="像素风宝可梦电子宠物养成游戏">
+  <title>宠物养成日记 - 选择你的伙伴</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="pixel-bg" data-theme="day">
+  <div class="phone-frame">
+    <div id="selection-container">
+    <!-- Logo区域 -->
+    <div id="game-logo">
+      <h1 class="pixel-title">宠物养成日记</h1>
+      <p class="subtitle">Pixel Pet Adventure</p>
+    </div>
+    
+    <!-- 饲养者信息输入 -->
+    <div id="owner-input-section">
+      <label for="owner-name-input" class="pixel-label">
+        请输入你的名字：
+      </label>
+      <input 
+        type="text" 
+        id="owner-name-input" 
+        class="pixel-input" 
+        maxlength="10"
+        placeholder="主人"
+      >
+    </div>
+    
+    <!-- 宠物选择卡片 -->
+    <div id="pet-selection-grid">
+      <!-- 皮卡丘卡片 -->
+      <div class="pet-card" data-pet-id="pikachu">
+        <img src="assets/pikachu/adult.gif" alt="皮卡丘" class="pet-preview">
+        <h3 class="pet-name">皮卡丘</h3>
+        <p class="pet-desc">电气鼠宠物</p>
+      </div>
+      
+      <!-- 预留卡片（锁定状态） -->
+      <div class="pet-card locked">
+        <div class="lock-icon">🔒</div>
+        <p>即将到来...</p>
+      </div>
+      
+      <!-- 预留卡片（锁定状态） -->
+      <div class="pet-card locked">
+        <div class="lock-icon">🔒</div>
+        <p>即将到来...</p>
+      </div>
+    </div>
+    
+    <!-- 开始按钮 -->
+    <button id="btn-start-game" class="pixel-btn primary" disabled>
+      开始冒险
+    </button>
+    </div>
+  </div>
+  
+  <script src="script.js"></script>
+</body>
+</html>

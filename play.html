@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#FFD700">
+  <title>玩耍 - 宝可梦养成日记</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="play-screen" data-theme="day">
+  <div class="phone-frame">
+    <header id="play-header">
+    <button id="btn-back" class="pixel-btn small back-btn">←</button>
+    <h2>和<span class="pet-name-placeholder"></span>玩耍</h2>
+  </header>
+  
+  <main id="play-area">
+    <!-- 小游戏选择界面 -->
+    <div id="mini-games-list">
+      <h3>选择小游戏</h3>
+      <div class="games-grid">
+        <button class="game-card" data-game="tetris">
+          <div class="game-icon">🧩</div>
+          <h4>俄罗斯方块</h4>
+          <p>消除方块，挑战高分</p>
+        </button>
+        <button class="game-card" data-game="2048">
+          <div class="game-icon">🔢</div>
+          <h4>2048</h4>
+          <p>合并数字，达到2048</p>
+        </button>
+        <button class="game-card" data-game="brick">
+          <div class="game-icon">🎯</div>
+          <h4>打砖块</h4>
+          <p>击碎所有砖块</p>
+        </button>
+        <button class="game-card" data-game="dodge">
+          <div class="game-icon">⚡</div>
+          <h4>躲避游戏</h4>
+          <p>躲避掉落的障碍物</p>
+        </button>
+        <button class="game-card" data-game="sokoban">
+          <div class="game-icon">📦</div>
+          <h4>推箱子</h4>
+          <p>将箱子推到目标位置</p>
+        </button>
+        <button class="game-card" data-game="memory">
+          <div class="game-icon">🧠</div>
+          <h4>记忆游戏</h4>
+          <p>记住图案顺序</p>
+        </button>
+      </div>
+    </div>
+    
+    <!-- 玩耍动画区域（游戏进行时显示） -->
+    <div id="play-animation" class="hidden">
+      <img id="pet-play-sprite" src="" alt="宝可梦">
+      <!-- 互动元素（如飞盘、球等） -->
+      <div id="play-object"></div>
+    </div>
+  </main>
+  
+  <footer id="play-footer">
+    <div id="play-stats">
+      <p>玩耍时间: <span id="play-duration">0</span>秒</p>
+      <p>心情提升: +<span id="happiness-gained">0</span></p>
+    </div>
+    <button id="end-play-btn" class="pixel-btn primary">结束玩耍</button>
+  </footer>
+  </div>
+  
+  <script src="script.js"></script>
+</body>
+</html>

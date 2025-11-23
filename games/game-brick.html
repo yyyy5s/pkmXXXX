@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#FFD700">
+  <title>打砖块 - 宝可梦养成日记</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    #brick-canvas {
+      background: var(--pixel-black);
+      border: 3px solid var(--border-color);
+      box-shadow: 4px 4px 0 var(--shadow-color);
+    }
+    
+    .brick-info {
+      display: flex;
+      flex-direction: row;
+      gap: var(--space-xs);
+      padding: 4px var(--space-sm);
+      background: var(--bg-panel);
+      border: 2px solid var(--border-color);
+      margin-left: 0;
+      margin-top: var(--space-xs);
+      width: 100%;
+    }
+    
+    .brick-info-item {
+      text-align: center;
+      flex: 1;
+      padding: 2px;
+    }
+    
+    .brick-info-label {
+      font-size: 7px;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+      font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
+    }
+    
+    .brick-info-value {
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: bold;
+      font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
+    }
+  </style>
+</head>
+<body class="game-fullscreen" data-theme="day">
+  <div class="phone-frame">
+    <header class="game-header">
+    <div class="game-header-left">
+      <button id="btn-back" class="pixel-btn small">←</button>
+    </div>
+    <div class="game-header-center">
+      <span class="game-title">打砖块</span>
+      <span class="game-score">积分: <span id="score">0</span></span>
+      <div class="game-pet-container" id="pet-container"></div>
+    </div>
+    <div class="game-header-right">
+      <div class="game-difficulty-select" id="difficulty-select">
+        <button class="difficulty-btn" data-difficulty="easy">简单</button>
+        <button class="difficulty-btn active" data-difficulty="normal">普通</button>
+        <button class="difficulty-btn" data-difficulty="hard">地狱</button>
+      </div>
+    </div>
+  </header>
+  
+  <div class="game-container">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 100%; padding: var(--space-xs);">
+      <canvas id="brick-canvas" class="game-canvas"></canvas>
+      <div class="brick-info">
+        <div class="brick-info-item">
+          <div class="brick-info-label">生命</div>
+          <div class="brick-info-value" id="lives">3</div>
+        </div>
+        <div class="brick-info-item">
+          <div class="brick-info-label">砖块</div>
+          <div class="brick-info-value" id="bricks">0</div>
+        </div>
+        <div class="brick-info-item">
+          <div class="brick-info-label">等级</div>
+          <div class="brick-info-value" id="level">1</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="game-end-modal" class="game-end-modal hidden">
+    <div class="game-end-content">
+      <h2 class="game-end-title" id="end-title">游戏结束</h2>
+      <div class="game-end-score">最终积分: <span id="final-score">0</span></div>
+      <div class="game-end-rewards" id="rewards-info"></div>
+      <div class="game-end-actions">
+        <button class="pixel-btn primary" id="btn-restart">再来一局</button>
+        <button class="pixel-btn" id="btn-return">←</button>
+      </div>
+    </div>
+  </div>
+  
+  </div>
+  <script src="../script.js"></script>
+  <script src="game-brick.js"></script>
+</body>
+</html>
+

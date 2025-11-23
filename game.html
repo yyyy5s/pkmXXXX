@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#FFD700">
+  <title>宝可梦养成日记</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="game-screen" data-theme="day">
+  <div class="phone-frame">
+    <!-- 顶部状态栏 -->
+  <header id="status-bar">
+    <div id="time-display">
+      <span id="current-time">12:34</span>
+      <span id="day-night-icon" style="cursor: default; user-select: none;" title="当前时段：白天">☀️</span>
+    </div>
+    <div id="owner-info">
+      <span id="owner-name-display"></span>的宠物
+    </div>
+    <div id="coin-display">
+      <span class="coin-icon">💰</span>
+      <span id="coin-count">1000</span>
+    </div>
+    <!-- 设置按钮 -->
+    <button id="btn-settings-header" class="ai-queue-btn" title="设置">
+      <span style="font-size: 18px;">⚙️</span>
+    </button>
+    <!-- AI任务队列 -->
+    <div id="ai-queue-container">
+      <button id="ai-queue-toggle" class="ai-queue-btn" title="AI任务队列">
+        <span id="ai-queue-icon">🤖</span>
+        <span id="ai-queue-count" class="queue-count-badge hidden">0</span>
+      </button>
+      <div id="ai-queue-panel" class="ai-queue-panel hidden">
+        <div class="queue-header">
+          <h4>AI任务队列</h4>
+          <button id="ai-queue-close" class="queue-close-btn">×</button>
+        </div>
+        <div id="ai-queue-list" class="queue-list">
+          <!-- 任务列表动态生成 -->
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <!-- 属性条区域 -->
+  <section id="stats-panel">
+    <div class="stat-bar" data-stat="hunger">
+      <span class="stat-icon">🍎</span>
+      <div class="stat-progress">
+        <div class="stat-fill" style="width: 100%"></div>
+      </div>
+      <span class="stat-value">100</span>
+    </div>
+    
+    <div class="stat-bar" data-stat="cleanliness">
+      <span class="stat-icon">✨</span>
+      <div class="stat-progress">
+        <div class="stat-fill" style="width: 100%"></div>
+      </div>
+      <span class="stat-value">100</span>
+    </div>
+    
+    <div class="stat-bar" data-stat="happiness">
+      <span class="stat-icon">😊</span>
+      <div class="stat-progress">
+        <div class="stat-fill" style="width: 100%"></div>
+      </div>
+      <span class="stat-value">100</span>
+    </div>
+    
+    <div class="stat-bar" data-stat="energy">
+      <span class="stat-icon">⚡</span>
+      <div class="stat-progress">
+        <div class="stat-fill" style="width: 100%"></div>
+      </div>
+      <span class="stat-value">100</span>
+    </div>
+  </section>
+  
+  <!-- 主舞台区域 -->
+  <main id="game-stage">
+    <!-- 可替换背景层 -->
+    <div id="background-layer"></div>
+    
+    <!-- 便便层 (最多3个) -->
+    <div id="poop-layer">
+      <!-- 动态生成 <img class="poop" src="assets/poop.svg"> -->
+    </div>
+    
+    <!-- 宠物精灵 -->
+    <div id="pet-container">
+      <img id="pet-sprite" src="" alt="宠物" class="pet-animation">
+      <!-- 状态气泡 -->
+      <div id="status-bubble" class="hidden">
+        <p id="bubble-text">皮卡皮卡！</p>
+      </div>
+    </div>
+    
+    <!-- 年龄显示 -->
+    <div id="pet-age-display">
+      <span id="growth-stage-text">蛋</span> · 
+      <span id="age-text">0天</span>
+    </div>
+  </main>
+  
+  <!-- 底部控制面板 -->
+  <footer id="control-panel">
+    <!-- 第一行 -->
+    <button id="btn-feed" class="action-btn" title="物品">
+      <span class="btn-icon">📦</span>
+      <span class="btn-label">物品</span>
+    </button>
+    
+    <button id="btn-clean" class="action-btn" title="清洁">
+      <span class="btn-icon">🧹</span>
+      <span class="btn-label">清洁</span>
+    </button>
+    
+    <button id="btn-pet" class="action-btn" title="抚摸">
+      <span class="btn-icon">👋</span>
+      <span class="btn-label">抚摸</span>
+    </button>
+    
+    <button id="btn-play" class="action-btn" title="玩耍">
+      <span class="btn-icon">🎮</span>
+      <span class="btn-label">玩耍</span>
+    </button>
+    
+    <!-- 第二行 -->
+    <button id="btn-shop" class="action-btn" title="商店">
+      <span class="btn-icon">🏪</span>
+      <span class="btn-label">商店</span>
+    </button>
+    
+    <button id="btn-adventure" class="action-btn" title="探险">
+      <span class="btn-icon">🗺️</span>
+      <span class="btn-label">探险</span>
+    </button>
+    
+    <button id="btn-chat" class="action-btn" title="聊天">
+      <span class="btn-icon">💬</span>
+      <span class="btn-label">聊天</span>
+    </button>
+    
+    <button id="btn-encyclopedia" class="action-btn" title="图鉴">
+      <span class="btn-icon">📖</span>
+      <span class="btn-label">图鉴</span>
+    </button>
+  </footer>
+  
+  <!-- ========== 模态窗口 ========== -->
+  
+  <!-- 1. 聊天窗口 -->
+  <div id="modal-chat" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>与<span class="pet-name-placeholder"></span>聊天</h3>
+        <button class="close-btn">×</button>
+      </div>
+      <div id="chat-history" class="chat-container">
+        <!-- 聊天记录动态生成 -->
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input" class="pixel-input" placeholder="说点什么...">
+        <button id="send-chat-btn" class="pixel-btn">发送</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 2. 探险窗口 -->
+  <div id="modal-adventure" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>开始探险</h3>
+        <button class="close-btn">×</button>
+      </div>
+      <div id="adventure-content">
+        <div id="adventure-story"></div>
+        <div id="adventure-choices" class="choice-buttons"></div>
+        <div id="adventure-rewards" class="reward-list hidden"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 3. 图鉴窗口 -->
+  <div id="modal-encyclopedia" class="modal hidden">
+    <div class="modal-content wide">
+      <div class="modal-header">
+        <h3>📖 图鉴</h3>
+        <button class="close-btn">×</button>
+      </div>
+      
+      <!-- 标签页切换 -->
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-tab="items">📦 商品</button>
+        <button class="tab-btn" data-tab="treasures">💎 宝物</button>
+        <button class="tab-btn" data-tab="photos">📷 相册</button>
+        <button class="tab-btn" data-tab="reports">📊 报告</button>
+        <button class="tab-btn" data-tab="letters">💌 来信</button>
+      </div>
+      
+      <!-- 徽章数字单独一行 -->
+      <div class="tab-stats-row">
+        <span class="tab-stat">收集度: <span id="items-completion">0%</span></span>
+        <span class="tab-stat">宝物: <span id="treasures-count">0</span></span>
+        <span class="tab-stat">相册: <span id="photos-count">0</span></span>
+        <span class="tab-stat">报告: <span id="reports-count">0</span></span>
+        <span class="tab-stat">来信: <span id="letters-count">0</span></span>
+      </div>
+      
+      <!-- 商品图鉴内容 -->
+      <div id="encyclopedia-items" class="encyclopedia-grid tab-content">
+        <!-- 动态生成 -->
+      </div>
+      
+      <!-- 宝物图鉴内容 -->
+      <div id="encyclopedia-treasures" class="encyclopedia-grid tab-content hidden">
+        <!-- 动态生成 -->
+      </div>
+      
+      <!-- 相册内容 -->
+      <div id="encyclopedia-photos" class="photo-gallery tab-content hidden">
+        <!-- 动态生成 -->
+      </div>
+      
+      <!-- 报告内容 -->
+      <div id="encyclopedia-reports" class="reports-container tab-content hidden">
+        <div class="log-view-controls">
+          <button class="pixel-btn small" id="view-reports-btn" data-view="reports">📊 查看报告</button>
+          <button class="pixel-btn small" id="view-logs-btn" data-view="logs">📝 查看所有日志</button>
+        </div>
+        <div id="reports-view" class="log-view">
+          <!-- 报告内容动态生成 -->
+        </div>
+        <div id="logs-view" class="log-view hidden">
+          <!-- 日志列表动态生成 -->
+        </div>
+      </div>
+      
+      <!-- 来信内容 -->
+      <div id="encyclopedia-letters" class="letters-container tab-content hidden">
+        <!-- 动态生成 -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- 4. 设置窗口 -->
+  <div id="modal-settings" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>⚙️ 设置</h3>
+        <button class="close-btn">×</button>
+      </div>
+      
+      <div class="settings-list">
+        <!-- API配置区域 -->
+        <div class="setting-section">
+          <h4 class="section-title">🔑 API配置</h4>
+          
+          <!-- 温度设置（通用） -->
+          <div class="setting-item">
+            <label class="pixel-label">温度 (Temperature): <span id="temperature-value">0.9</span></label>
+            <input type="range" id="temperature-slider" class="pixel-input" min="0" max="2" step="0.1" value="0.9">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #666;">
+              <span>0.0 (保守)</span>
+              <span>2.0 (创新)</span>
+            </div>
+          </div>
+          
+          <div class="setting-item">
+            <label class="setting-label">
+              <input type="radio" name="api-mode" value="embedded">
+              使用内嵌API（开发者预设）
+            </label>
+          </div>
+          
+          <!-- 内置API模型选择（条件显示） -->
+          <div id="embedded-api-config" class="api-config-panel">
+            <div class="setting-item">
+              <label class="pixel-label" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>📌 API #1</span>
+                <label style="font-size: 10px; display: flex; align-items: center; gap: 4px;">
+                  <input type="checkbox" id="embedded-api-1-enabled" checked> 启用
+                </label>
+              </label>
+              <select id="embedded-model-select-1" class="pixel-input">
+                <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+              </select>
+              <div style="display: flex; gap: var(--space-xs); margin-top: var(--space-xs);">
+                <button class="pixel-btn small" id="refresh-embedded-1-btn">🔄 刷新模型</button>
+                <button class="pixel-btn small" id="test-embedded-1-btn">测试连接</button>
+              </div>
+            </div>
+            
+            <div class="setting-item">
+              <label class="pixel-label" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>📌 API #2 (备用)</span>
+                <label style="font-size: 10px; display: flex; align-items: center; gap: 4px;">
+                  <input type="checkbox" id="embedded-api-2-enabled"> 启用
+                </label>
+              </label>
+              <select id="embedded-model-select-2" class="pixel-input">
+                <option value="">请选择模型</option>
+                <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+              </select>
+              <div style="display: flex; gap: var(--space-xs); margin-top: var(--space-xs);">
+                <button class="pixel-btn small" id="refresh-embedded-2-btn">🔄 刷新模型</button>
+                <button class="pixel-btn small" id="test-embedded-2-btn">测试连接</button>
+              </div>
+            </div>
+            <div id="embedded-current-api" style="margin-top: var(--space-sm); font-size: 9px; color: var(--success);">
+              当前使用: API #1
+            </div>
+          </div>
+          
+          <div class="setting-item">
+            <label class="setting-label">
+              <input type="radio" name="api-mode" value="custom">
+              使用自定义API
+            </label>
+          </div>
+          
+          <!-- 自定义API配置（条件显示） -->
+          <div id="custom-api-config" class="api-config-panel hidden">
+            <!-- API #1 -->
+            <div class="setting-item" style="border: 2px solid var(--border-color); padding: var(--space-md); margin-bottom: var(--space-md);">
+              <label class="pixel-label" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-sm);">
+                <span>📌 API #1</span>
+                <label style="font-size: 10px; display: flex; align-items: center; gap: 4px;">
+                  <input type="checkbox" id="custom-api-1-enabled" checked> 启用
+                </label>
+              </label>
+              
+              <div class="setting-item">
+                <label class="pixel-label">API密钥</label>
+                <input type="password" id="custom-api-key-1" class="pixel-input" placeholder="sk-...">
+              </div>
+              
+              <div class="setting-item">
+                <label class="pixel-label">API端点</label>
+                <input type="text" id="custom-api-endpoint-1" class="pixel-input" placeholder="https://api.openai.com/v1/chat/completions">
+              </div>
+              
+              <div class="setting-item">
+                <label class="pixel-label">模型</label>
+                <select id="custom-model-select-1" class="pixel-input">
+                  <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                </select>
+              </div>
+              
+              <div style="display: flex; gap: var(--space-xs); margin-top: var(--space-xs);">
+                <button class="pixel-btn small" id="refresh-custom-1-btn">🔄 刷新模型</button>
+                <button class="pixel-btn small" id="test-custom-1-btn">测试连接</button>
+              </div>
+            </div>
+            
+            <!-- API #2 -->
+            <div class="setting-item" style="border: 2px solid var(--border-color); padding: var(--space-md); margin-bottom: var(--space-md);">
+              <label class="pixel-label" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-sm);">
+                <span>📌 API #2 (备用)</span>
+                <label style="font-size: 10px; display: flex; align-items: center; gap: 4px;">
+                  <input type="checkbox" id="custom-api-2-enabled"> 启用
+                </label>
+              </label>
+              
+              <div class="setting-item">
+                <label class="pixel-label">API密钥</label>
+                <input type="password" id="custom-api-key-2" class="pixel-input" placeholder="sk-...">
+              </div>
+              
+              <div class="setting-item">
+                <label class="pixel-label">API端点</label>
+                <input type="text" id="custom-api-endpoint-2" class="pixel-input" placeholder="https://api.openai.com/v1/chat/completions">
+              </div>
+              
+              <div class="setting-item">
+                <label class="pixel-label">模型</label>
+                <select id="custom-model-select-2" class="pixel-input">
+                  <option value="">请选择模型</option>
+                  <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                </select>
+              </div>
+              
+              <div style="display: flex; gap: var(--space-xs); margin-top: var(--space-xs);">
+                <button class="pixel-btn small" id="refresh-custom-2-btn">🔄 刷新模型</button>
+                <button class="pixel-btn small" id="test-custom-2-btn">测试连接</button>
+              </div>
+            </div>
+            
+            <button class="pixel-btn small" id="toggle-api-key-visibility">👁️ 显示/隐藏密钥</button>
+            <button class="pixel-btn primary" id="save-api-config-btn">保存API配置</button>
+            <div id="custom-current-api" style="margin-top: var(--space-sm); font-size: 9px; color: var(--success);">
+              当前使用: API #1
+            </div>
+          </div>
+        </div>
+        
+        <!-- 个性化设置 -->
+        <div class="setting-section">
+          <h4 class="section-title">🎨 个性化</h4>
+          
+          <div class="setting-item">
+            <label class="pixel-label">主人名字</label>
+            <input type="text" id="owner-name-input" class="pixel-input" maxlength="10">
+          </div>
+          
+          <div class="setting-item">
+            <label class="pixel-label">宠物昵称</label>
+            <input type="text" id="pet-nickname-input" class="pixel-input" maxlength="10">
+          </div>
+          
+          <!-- 手机边框尺寸设置 -->
+          <div class="setting-item">
+            <h4 class="section-title" style="margin-bottom: var(--space-sm);">📱 手机边框尺寸</h4>
+            <div style="display: flex; gap: var(--space-sm); margin-bottom: var(--space-sm);">
+              <div style="flex: 1;">
+                <label class="pixel-label">宽度 (px)</label>
+                <input type="number" id="phone-frame-width" class="pixel-input" min="300" max="600" value="390">
+              </div>
+              <div style="flex: 1;">
+                <label class="pixel-label">高度 (px)</label>
+                <input type="number" id="phone-frame-height" class="pixel-input" min="500" max="1200" value="844">
+              </div>
+            </div>
+            <div style="display: flex; gap: var(--space-xs); flex-wrap: wrap; margin-bottom: var(--space-sm);">
+              <button class="pixel-btn small phone-frame-preset-btn" data-preset="iphone-se">iPhone SE</button>
+              <button class="pixel-btn small phone-frame-preset-btn" data-preset="iphone-12">iPhone 12</button>
+              <button class="pixel-btn small phone-frame-preset-btn" data-preset="iphone-14-pro-max">iPhone 14 Pro Max</button>
+              <button class="pixel-btn small" id="phone-frame-reset-btn">重置默认</button>
+            </div>
+            <p style="font-size: 8px; color: var(--text-secondary); margin-top: var(--space-xs);">
+              提示: 调整尺寸后立即生效，保存设置后永久保存
+            </p>
+          </div>
+          
+          <div class="setting-item">
+            <label class="pixel-label">更换背景</label>
+            <input type="file" id="bg-upload" accept="image/*">
+            <button class="pixel-btn small" id="reset-bg-btn">重置</button>
+          </div>
+          
+          <!-- 日夜模式设置 -->
+          <div class="setting-item">
+            <label class="pixel-label">🌓 日夜模式</label>
+            <div class="daynight-mode-selector">
+              <label class="setting-label">
+                <input type="radio" name="daynight-mode" value="auto" id="daynight-auto">
+                自动（根据时间）
+              </label>
+              <label class="setting-label">
+                <input type="radio" name="daynight-mode" value="manual" id="daynight-manual">
+                手动模式
+              </label>
+            </div>
+            <div id="manual-theme-selector" class="hidden" style="margin-top: var(--space-sm);">
+              <label class="pixel-label">当前主题:</label>
+              <button class="pixel-btn small" id="toggle-manual-theme-btn">切换为夜间</button>
+              <p style="font-size: 0.7em; color: var(--text-secondary); margin-top: var(--space-xs);">
+                提示: 也可以点击顶部的时间图标快速切换
+              </p>
+            </div>
+            <button class="pixel-btn small" id="save-daynight-mode-btn">保存日夜设置</button>
+          </div>
+        </div>
+        
+        <!-- 数据管理 -->
+        <div class="setting-section">
+          <h4 class="section-title">💾 数据管理</h4>
+          
+          <div class="setting-item">
+            <button class="pixel-btn" id="export-save-btn">📤 导出存档</button>
+            <button class="pixel-btn" id="import-save-btn">📥 导入存档</button>
+            <input type="file" id="import-file" accept=".json" class="hidden">
+          </div>
+        </div>
+        
+        <!-- 保存所有设置 -->
+        <div class="setting-section">
+          <div class="setting-item">
+            <button class="pixel-btn primary" id="save-all-settings-btn" style="width: 100%; font-size: 16px; padding: 12px;">💾 保存所有设置</button>
+          </div>
+        </div>
+        
+        <!-- 危险区域 -->
+        <div class="setting-section danger-zone">
+          <h4 class="section-title">⚠️ 危险操作</h4>
+          <button class="pixel-btn danger" id="reset-game-btn">🔄 重置游戏</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+</body>
+</html>
