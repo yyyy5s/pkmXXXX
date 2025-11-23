@@ -18,23 +18,63 @@ const SAVE_KEY = 'pokemon_pet_save_v1';
 
 /**
  * 获取基础路径，自动检测部署环境
- * 支持相对路径和绝对路径两种模式
+ * 支持GitHub Pages子目录部署和根目录部署
+ * 始终返回项目根目录路径，而不是当前文件所在目录
  * @returns {string} 基础路径（以/结尾，或空字符串）
  */
 function getBasePath() {
   const path = window.location.pathname;
-  // 如果是根目录或index.html，返回空字符串（相对路径）
-  if (path === '/' || path.endsWith('/index.html') || path.endsWith('/')) {
+  
+  // 提取项目的base path（项目根目录）
+  // 例如：/repo-name/play.html -> /repo-name/
+  //      /play.html -> / (返回空字符串)
+  //      /repo-name/games/game-tetris.html -> /repo-name/
+  
+  // 检查是否在子目录中（如games/）
+  // 如果在子目录中，需要返回到项目根目录
+  const pathParts = path.split('/').filter(p => p);
+  
+  // 如果路径包含已知的根目录HTML文件，提取到该文件所在目录
+  const rootFiles = ['index.html', 'game.html', 'play.html', 'shop.html'];
+  let rootIndex = -1;
+  
+  for (let i = 0; i < pathParts.length; i++) {
+    if (rootFiles.includes(pathParts[i])) {
+      rootIndex = i;
+      break;
+    }
+  }
+  
+  if (rootIndex >= 0) {
+    // 找到了根目录文件，提取到该文件所在目录
+    const rootParts = pathParts.slice(0, rootIndex);
+    if (rootParts.length === 0) {
+      return ''; // 根目录部署
+    }
+    return '/' + rootParts.join('/') + '/';
+  }
+  
+  // 如果没有找到根目录文件，检查是否在games/子目录中
+  const gamesIndex = pathParts.indexOf('games');
+  if (gamesIndex >= 0) {
+    // 在games目录中，返回到项目根目录
+    const rootParts = pathParts.slice(0, gamesIndex);
+    if (rootParts.length === 0) {
+      return ''; // 根目录部署
+    }
+    return '/' + rootParts.join('/') + '/';
+  }
+  
+  // 默认情况：移除文件名，返回所在目录
+  let basePath = path.substring(0, path.lastIndexOf('/') + 1);
+  
+  // 如果basePath是根目录，返回空字符串（使用相对路径）
+  if (basePath === '/') {
     return '';
   }
   
-  // 如果在子目录中（如games/），计算相对路径
-  const depth = path.split('/').filter(p => p && !p.endsWith('.html')).length;
-  if (depth > 0) {
-    return '../'.repeat(depth);
-  }
-  
-  return '';
+  // 否则返回base path（用于GitHub Pages子目录部署）
+  return basePath;
 }
 
 /**
