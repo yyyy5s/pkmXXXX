@@ -10,6 +10,7 @@
   let maxTile = 2;
   let gameRunning = false;
   let board = [];
+  let isReturning = false;
   const SIZE = 4;
   
   // 初始化游戏板
@@ -238,6 +239,7 @@
     moves = 0;
     maxTile = 2;
     gameRunning = true;
+    isReturning = false; // 重置返回标志
     
     initBoard();
     updateUI();
@@ -248,7 +250,15 @@
     gameRunning = false;
     
     // 计算最终积分（基础分 + 最高数字 * 10 + 移动次数）
-    const finalScore = score + maxTile * 10 + moves * 5;
+    let finalScore = score + maxTile * 10 + moves * 5;
+    
+    // 难度越高得分越少
+    const difficultyMultipliers = {
+      easy: 1.2,   // 简单模式得分更多
+      normal: 1.0, // 普通模式正常得分
+      hard: 0.7    // 困难模式得分更少
+    };
+    finalScore = Math.floor(finalScore * (difficultyMultipliers[difficulty] || 1.0));
     
     // 处理游戏结束
     if (typeof handleGameEnd === 'function') {
@@ -282,18 +292,44 @@
     startGame();
   }
   
-  // 返回
+  // 返回（左上角返回按钮）
   function returnToPlay() {
-    // 使用路径辅助函数（如果可用），否则使用相对路径
-    if (typeof getPagePath === 'function') {
-      window.location.href = getPagePath('play.html');
+    // 防止重复调用
+    if (isReturning) return;
+    
+    // 清理所有资源
+    gameRunning = false;
+    
+    // 检查游戏是否有积分
+    if (score > 0) {
+      // 有积分，先结算
+      isReturning = true;
+      let finalScore = score + maxTile * 10 + moves * 5;
+      // 应用难度系数
+      const difficultyMultipliers = {
+        easy: 1.2,
+        normal: 1.0,
+        hard: 0.7
+      };
+      finalScore = Math.floor(finalScore * (difficultyMultipliers[difficulty] || 1.0));
+      if (typeof handleGameEnd === 'function') {
+        const result = handleGameEnd('2048', finalScore, difficulty);
+        showGameEnd(result);
+      } else {
+        // 兜底：直接返回
+        isReturning = true;
+        window.location.href = getPagePath('play.html');
+      }
     } else {
-      // 计算相对路径
-      const path = window.location.pathname;
-      const depth = path.split('/').filter(p => p && !p.endsWith('.html')).length;
-      const base = depth > 0 ? '../'.repeat(depth) : '';
-      window.location.href = base + 'play.html';
+      // 没有积分，直接返回（不设置isReturning，因为马上就要跳转了）
+      const path = typeof getPagePath === 'function' ? getPagePath('play.html') : '../play.html';
+      window.location.href = path;
     }
+  }
+  
+  // 从结算弹窗返回（结算弹窗的返回按钮）
+  function returnFromModal() {
+    window.location.href = getPagePath('play.html');
   }
   
   // 触屏控制
@@ -391,7 +427,7 @@
   
   // 返回按钮
   document.getElementById('btn-back').addEventListener('click', returnToPlay);
-  document.getElementById('btn-return').addEventListener('click', returnToPlay);
+  document.getElementById('btn-return').addEventListener('click', returnFromModal);
   document.getElementById('btn-restart').addEventListener('click', restartGame);
   
   // 初始化

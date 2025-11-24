@@ -191,10 +191,11 @@ html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, button, input, select, text
 
 /* 手机边框容器 */
 .phone-frame {
-  width: var(--phone-width);
-  height: var(--phone-height);
-  max-width: 100vw;
-  max-height: 100vh;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  max-width: var(--phone-width);
+  max-height: var(--phone-height);
   background: var(--bg-primary);  /* 默认背景色，可被JS动态替换为图片 */
   background-size: cover;
   background-position: center;
@@ -209,7 +210,7 @@ html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, button, input, select, text
   display: flex;
   flex-direction: column;
   margin: auto;
-  transition: width var(--transition-normal), height var(--transition-normal), background-color var(--transition-slow);
+  transition: max-width var(--transition-normal), max-height var(--transition-normal), background-color var(--transition-slow);
 }
 
 /* phone-frame 的直接子元素应该填满容器 */
@@ -245,18 +246,19 @@ html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, button, input, select, text
   background: var(--bg-primary) !important;
 }
 
-/* 小屏手机自适应 */
+/* 小屏手机自适应 - 移除scale，使用自适应尺寸 */
 @media (max-width: 389px) {
   .phone-frame {
-    transform: scale(0.9);
-    transform-origin: center;
+    max-width: 100vw;
+    border-radius: 0;
   }
 }
 
 @media (max-height: 800px) {
   .phone-frame {
-    transform: scale(0.9);
-    transform-origin: center;
+    max-height: 100vh;
+    max-height: 100dvh;
+    border-radius: 0;
   }
 }
 
@@ -508,6 +510,41 @@ button,
   width: 95%;
 }
 
+/* 聊天对话框特殊布局 */
+#modal-chat .modal-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+
+#modal-chat .modal-header {
+  flex-shrink: 0;
+  padding: var(--space-sm);
+  border-bottom: 2px solid var(--border-color);
+  justify-content: center;
+  position: relative;
+}
+
+#modal-chat .modal-header h3 {
+  flex: 1;
+  text-align: center;
+}
+
+#modal-chat .modal-header .close-btn {
+  position: absolute;
+  right: var(--space-sm);
+}
+
+#modal-chat .modal-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: var(--space-sm);
+  min-height: 0;
+}
+
 @keyframes modalSlideIn {
   from {
     transform: translateY(-20px);
@@ -573,14 +610,14 @@ button,
 
 /* ========== 统一关闭按钮样式 ========== */
 .modal-close {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  min-height: 26px;
   background: var(--danger);
   color: var(--pixel-white);
   border: 2px solid var(--pixel-black);
-  font-size: 18px;
+  font-size: 14px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -597,8 +634,8 @@ button,
 .back-btn,
 #btn-back,
 #btn-return {
-  min-width: 36px;
-  min-height: 36px;
+  min-width: 28px;
+  min-height: 28px;
   font-size: 16px;
   padding: var(--space-xs);
   background: var(--pixel-white);
@@ -621,14 +658,14 @@ button,
 }
 
 .close-btn {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
   background: var(--danger);
   color: var(--pixel-white);
   border: 2px solid var(--pixel-black);
-  font-size: 18px;
+  font-size: 14px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -677,11 +714,32 @@ button,
 
 #game-logo {
   margin-bottom: var(--space-xl);
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-primary);
   padding: var(--space-md);
   border-radius: 8px;
-  border: 3px solid var(--border-color);
+  border: none;
   box-shadow: 4px 4px 0 var(--shadow-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-slow);
+}
+
+#logo-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  animation: logoSway 3s ease-in-out infinite;
+}
+
+/* SVG logo 主题色填充 */
+#logo-image {
+  filter: brightness(0) saturate(100%) invert(77%) sepia(100%) saturate(1352%) hue-rotate(0deg) brightness(107%) contrast(107%);
+}
+
+/* 夜间主题时，SVG logo 使用浅色 */
+[data-theme="night"] #logo-image {
+  filter: brightness(0) saturate(100%) invert(100%);
 }
 
 .pixel-title {
@@ -757,9 +815,26 @@ button,
 }
 
 .save-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 6px 6px 0 var(--shadow-color);
-  border-color: var(--primary);
+  transform: translateY(-4px) !important;
+  box-shadow: 6px 6px 0 var(--shadow-color) !important;
+  border-color: var(--primary) !important;
+  background: var(--pixel-light-gray) !important;
+}
+
+.save-card:active {
+  transform: translateY(-2px) !important;
+  box-shadow: 3px 3px 0 var(--shadow-color) !important;
+  border-color: var(--primary) !important;
+}
+
+.save-card:focus {
+  outline: none;
+}
+
+.save-card:focus-visible {
+  transform: translateY(-4px) !important;
+  box-shadow: 6px 6px 0 var(--shadow-color) !important;
+  border-color: var(--primary) !important;
 }
 
 /* 存档卡片中的宠物预览图 */
@@ -832,13 +907,13 @@ button,
   left: var(--space-xs);
   background: var(--primary);
   color: var(--pixel-white);
-  font-size: 6px;
-  padding: var(--space-xs) var(--space-sm);
-  border: 2px solid var(--border-color);
+  font-size: 5px;
+  padding: 2px 4px;
+  border: 1px solid var(--border-color);
   font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
   font-weight: bold;
   z-index: 10;
-  box-shadow: 2px 2px 0 var(--shadow-color);
+  box-shadow: 1px 1px 0 var(--shadow-color);
 }
 
 /* 删除存档按钮 */
@@ -1277,8 +1352,27 @@ button,
 
 .stat-fill {
   height: 100%;
+  /* 恢复绿色渐变，但使用更美观的渐变效果 */
   background: linear-gradient(90deg, var(--success) 0%, var(--success-light) 100%);
   transition: width var(--transition-normal), background-color var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 添加轻微的圆柱效果，使用更柔和的渐变 */
+.stat-fill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, 
+    rgba(255, 255, 255, 0.15) 0%, 
+    transparent 30%, 
+    transparent 70%, 
+    rgba(0, 0, 0, 0.1) 100%);
+  pointer-events: none;
 }
 
 .stat-value {
@@ -1288,10 +1382,29 @@ button,
   color: var(--text-primary);
 }
 
-/* 属性警告闪烁 */
+/* 属性警告闪烁 - 低值时红色闪烁 */
 .stat-bar.warning-blink .stat-fill {
-  background: var(--danger);
-  animation: pulse 1s infinite;
+  background: var(--danger) !important;
+  animation: warningBlink 1s infinite;
+}
+
+.stat-bar.warning-blink .stat-fill::before {
+  background: linear-gradient(to bottom, 
+    rgba(255, 255, 255, 0.3) 0%, 
+    transparent 30%, 
+    transparent 70%, 
+    rgba(0, 0, 0, 0.2) 100%);
+}
+
+@keyframes warningBlink {
+  0%, 100% { 
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+  }
+  50% { 
+    opacity: 0.7;
+    box-shadow: 0 0 8px 4px rgba(255, 0, 0, 0.5);
+  }
 }
 
 @keyframes pulse {
@@ -1367,6 +1480,12 @@ button,
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
+}
+
+@keyframes logoSway {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
 }
 
 .pet-animation.anim-eat {
@@ -1473,22 +1592,27 @@ button,
 
 .action-btn {
   background: var(--bg-panel);
-  border: none;
+  border: 2px solid transparent;
   padding: var(--space-md) var(--space-sm);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-xs);
-  transition: background var(--transition-fast), transform var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast);
   font-family: inherit;
   min-height: 44px;
   min-width: 44px;
 }
 
+.action-btn:hover {
+  border-color: var(--primary);
+}
+
 .action-btn:active {
   background: var(--pixel-light-gray);
   transform: scale(0.95);
+  border-color: var(--primary);
 }
 
 .btn-icon {
@@ -1503,67 +1627,110 @@ button,
 
 /* ========== 聊天窗口 ========== */
 .chat-container {
-  max-height: 450px;
-  min-height: 350px;
-  overflow-y: auto;
+  flex: 1;
   padding: var(--space-sm);
   background: var(--pixel-light-gray);
   border: none;
   margin-bottom: var(--space-sm);
   font-size: 8px;
   font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+}
+
+.chat-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+  background: var(--pixel-light-gray);
+  border: 1px solid var(--border-color);
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border: 1px solid var(--border-color);
+}
+
+.chat-container::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+.chat-bubble-wrapper {
+  margin-bottom: var(--space-md);
+  max-width: 85%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.chat-bubble-wrapper.user {
+  margin-left: auto;
+  align-items: flex-end;
+}
+
+.chat-bubble-wrapper.assistant {
+  margin-right: auto;
+  align-items: flex-start;
 }
 
 .chat-bubble {
-  margin-bottom: var(--space-md);
   padding: var(--space-sm) var(--space-md);
   border: 2px solid var(--border-color);
-  max-width: 85%;
   word-wrap: break-word;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xs);
 }
 
 .chat-bubble.user {
   background: var(--primary-light-alpha, rgba(255, 215, 0, 0.2));
-  margin-left: auto;
   border: 2px solid var(--primary);
-  border-radius: var(--radius-md) var(--radius-md) 0 var(--radius-md);
+  border-radius: 16px;
 }
 
 .chat-bubble.assistant {
-  background: #FFFFFF;
-  margin-right: auto;
+  background: rgba(255, 255, 255, 0.9);
   border: 2px solid var(--border-color);
-  border-radius: var(--radius-md) var(--radius-md) var(--radius-md) 0;
+  border-radius: 16px;
 }
 
-.bubble-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-xs);
-  font-size: 9px;
-}
-
-.bubble-name {
-  font-weight: bold;
-  color: var(--text-primary);
+.bubble-content {
+  flex: 1;
+  font-size: 8px;
+  line-height: 1.4;
+  color: var(--pixel-black);
+  font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
 }
 
 .bubble-time {
   color: var(--text-secondary);
-  font-size: 8px;
-  opacity: 0.7;
+  font-size: 6px;
+  opacity: 0.6;
+  margin-top: 2px;
+  padding: 0 var(--space-xs);
+}
+
+.chat-bubble-wrapper.user .bubble-time {
+  text-align: right;
+}
+
+.chat-bubble-wrapper.assistant .bubble-time {
+  text-align: left;
 }
 
 .delete-chat-btn {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 14px;
-  opacity: 0.6;
+  font-size: 12px;
+  opacity: 0.5;
   transition: opacity 0.2s;
-  padding: 2px 4px;
-  margin-left: 8px;
+  padding: 2px;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 .delete-chat-btn:hover {
@@ -1571,23 +1738,12 @@ button,
   transform: scale(1.1);
 }
 
-.bubble-header {
-  font-size: 8px;
-  font-weight: bold;
-  margin-bottom: var(--space-xs);
-  color: var(--text-secondary);
-}
-
-.bubble-content {
-  font-size: 8px;
-  line-height: 1.4;
-  color: var(--pixel-black);
-  font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
-}
-
 .chat-input-area {
   display: flex;
   gap: var(--space-sm);
+  flex-shrink: 0;
+  padding-top: var(--space-sm);
+  border-top: 2px solid var(--border-color);
 }
 
 .chat-input-area .pixel-input {
@@ -2085,6 +2241,7 @@ button,
   align-items: center;
   gap: var(--space-xs);
   min-height: 44px;
+  position: relative;
 }
 
 .game-icon {
@@ -2093,9 +2250,26 @@ button,
 }
 
 .game-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 6px 6px 0 var(--shadow-color);
-  border-color: var(--primary);
+  transform: translateY(-4px) !important;
+  box-shadow: 6px 6px 0 var(--shadow-color) !important;
+  border-color: var(--primary) !important;
+  background: var(--pixel-light-gray) !important;
+}
+
+.game-card:active {
+  transform: translateY(-2px) !important;
+  box-shadow: 3px 3px 0 var(--shadow-color) !important;
+  border-color: var(--primary) !important;
+}
+
+.game-card:focus {
+  outline: none;
+}
+
+.game-card:focus-visible {
+  transform: translateY(-4px) !important;
+  box-shadow: 6px 6px 0 var(--shadow-color) !important;
+  border-color: var(--primary) !important;
 }
 
 .game-card h4 {
@@ -2144,7 +2318,7 @@ button,
   color: var(--success);
   text-shadow: 2px 2px 0 var(--pixel-black);
   pointer-events: none;
-  z-index: 9999;
+  z-index: 10001;
   animation: floatUp 2s ease-out forwards;
 }
 
@@ -2327,9 +2501,9 @@ button,
 }
 
 .adventure-event {
-  background: var(--bg-panel);
-  padding: var(--space-md);
-  border: 3px solid var(--border-color);
+  background: transparent;
+  padding: 0;
+  border: none;
   margin: var(--space-md) 0;
   text-align: left;
   color: var(--text-primary);
@@ -2468,11 +2642,13 @@ button,
 .photo-info h4 {
   font-size: 9px;
   margin-bottom: var(--space-xs);
+  text-align: center;
 }
 
 .photo-date {
   font-size: 7px;
   color: var(--text-secondary);
+  text-align: center;
 }
 
 /* 照片大图查看器 */
@@ -2517,6 +2693,7 @@ button,
   font-size: 10px;
   color: var(--text-secondary);
   margin-bottom: var(--space-xs);
+  text-align: center;
 }
 
 .photo-caption {
@@ -2548,8 +2725,6 @@ button,
   color: var(--primary);
 }
 
-.log-view {
-}
 
 .log-entry {
   background: var(--bg-panel);
@@ -2578,8 +2753,14 @@ button,
 }
 
 .delete-log-btn {
-  padding: 2px 6px;
-  font-size: 0.8em;
+  padding: var(--space-xs);
+  min-width: auto;
+  width: 20px;
+  height: 20px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .log-entry-content {
@@ -2650,13 +2831,22 @@ button,
 }
 
 .delete-report-btn,
-.delete-letter-btn,
-.delete-treasure-btn {
+.delete-letter-btn {
   padding: var(--space-xs);
   min-width: auto;
   width: 20px;
   height: 20px;
   font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 宝物删除按钮使用flex布局，不设置固定宽度 */
+.delete-treasure-btn {
+  padding: var(--space-xs);
+  min-width: 0;
+  font-size: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2917,16 +3107,18 @@ button,
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--pixel-light-gray);
+  background: var(--bg-secondary, var(--pixel-light-gray));
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--pixel-gray);
-  border: 2px solid var(--pixel-light-gray);
+  border: 2px solid var(--bg-secondary, var(--pixel-light-gray));
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--pixel-dark-gray);
+  background: var(--primary);
 }
 
 /* ========== 物品选择弹窗布局 ========== */
@@ -3425,5 +3617,27 @@ button,
   #control-panel,
   .pixel-btn {
     display: none !important;
+  }
+}
+
+/* ========== 粒子特效 ========== */
+.particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  font-size: 20px;
+  animation: particle-float var(--duration, 1.5s) ease-out forwards;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx, 0), var(--ty, -80px)) rotate(var(--rotate, 360deg)) scale(0.5);
+    opacity: 0;
   }
 }

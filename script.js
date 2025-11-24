@@ -123,7 +123,7 @@ const aiRequestQueue = {
   },
   
   // 添加任务到列表
-  addTask(type, description, priority = 0) {
+  addTask(type, description, priority = 0, retryData = null) {
     const task = {
       id: `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       type: type, // 'chat', 'letter', 'adventure', 'image', 'treasure', 'report'
@@ -134,7 +134,8 @@ const aiRequestQueue = {
       endTime: null,
       result: null,
       error: null,
-      cancelled: false
+      cancelled: false,
+      retryData: retryData  // 新增：保存重试所需数据
     };
     
     this.taskList.push(task);
@@ -661,7 +662,8 @@ let gameState = {
     lastPlayTime: 0,
     lastCleanTime: 0,
     totalChats: 0,
-    totalAdventures: 0
+    totalAdventures: 0,
+    lastPlayedGame: null // 最近玩过的游戏类型
   },
   
   // 背包系统
@@ -1006,9 +1008,10 @@ function renderSaveCards() {
         const customSave = slot.save;
         const customPet = slot.customPet;
         
+        const fallbackPath = getPetFallbackPath(customPet.petId, 'adult');
         card.innerHTML = `
           ${recentlyPlayedLabel}
-          <img src="${customPet.assets.adult}" alt="${customPet.petName}" class="save-preview-img" onerror="this.src='assets/pikachu/adult.gif'">
+          <img src="${customPet.assets.adult}" alt="${customPet.petName}" class="save-preview-img" onerror="this.onerror=null; this.src='${fallbackPath}.gif'">
           <div class="save-info">
             <h3 class="save-pet-name">${customPet.petName}</h3>
             <p class="save-stats">第 ${Math.floor((Date.now() - customSave.birthTimestamp) / 86400000)} 天 · ${getStageText(customSave.growthStage)}</p>
@@ -1478,6 +1481,14 @@ function loadMultiGameState(saveId) {
   // 恢复gameState
   gameState = { ...saveData };
   
+  // 兼容性处理：确保interactions对象存在并包含lastPlayedGame字段
+  if (!gameState.interactions) {
+    gameState.interactions = {};
+  }
+  if (!gameState.interactions.hasOwnProperty('lastPlayedGame')) {
+    gameState.interactions.lastPlayedGame = null;
+  }
+  
   // 合并全局设置到gameState.settings
   if (!gameState.settings) {
     gameState.settings = {};
@@ -1506,6 +1517,11 @@ function loadMultiGameState(saveId) {
 function switchSave(saveId) {
   if (saveId === multiSaveData.currentSaveId) {
     return true;
+  }
+  
+  // 保存当前存档的最后活动时间
+  if (gameState && gameState.petId) {
+    gameState.lastLoginTimestamp = Date.now();
   }
   
   // 先保存当前存档
@@ -1645,6 +1661,70 @@ function getCurrentPetConfig(petId = null) {
   }
   
   return null;
+}
+
+/**
+ * 获取宠物默认fallback图片路径
+ * @param {string} petId - 宠物ID，如果为null则使用当前宠物
+ * @param {string} stage - 成长阶段，默认为'adult'
+ * @returns {string} 默认fallback路径
+ */
+function getPetFallbackPath(petId = null, stage = 'adult') {
+  const targetPetId = petId || gameState?.petId;
+  if (!targetPetId) {
+    // 如果无法获取宠物ID，使用第一个内置宠物作为最终fallback
+    const firstBuiltinPet = Object.keys(POKEMON_DATABASE)[0] || 'pikachu';
+    return `assets/${firstBuiltinPet}/${stage}`;
+  }
+  
+  const petConfig = getCurrentPetConfig(targetPetId);
+  if (petConfig && petConfig.assets && petConfig.assets[stage]) {
+    // 使用当前宠物的指定阶段图片
+    const path = petConfig.assets[stage];
+    return path.replace(/\.(svg|png|gif|jpg|jpeg|webp)$/i, '');
+  }
+  
+  // 如果当前宠物没有该阶段，尝试使用adult阶段
+  if (petConfig && petConfig.assets && petConfig.assets.adult) {
+    const path = petConfig.assets.adult;
+    return path.replace(/\.(svg|png|gif|jpg|jpeg|webp)$/i, '');
+  }
+  
+  // 如果当前宠物没有资源，使用第一个内置宠物作为fallback
+  const firstBuiltinPet = Object.keys(POKEMON_DATABASE)[0] || 'pikachu';
+  return `assets/${firstBuiltinPet}/${stage}`;
+}
+
+/**
+ * 获取宠物通用emoji（用于占位符）
+ * @param {string} petId - 宠物ID，如果为null则使用当前宠物
+ * @returns {string} emoji字符
+ */
+function getPetEmoji(petId = null) {
+  const targetPetId = petId || gameState?.petId;
+  if (!targetPetId) return '🐾';
+  
+  const petConfig = getCurrentPetConfig(targetPetId);
+  if (!petConfig) return '🐾';
+  
+  // 尝试从宠物名称或物种中提取emoji特征
+  // 如果没有特殊特征，使用通用emoji
+  const name = (petConfig.petName || '').toLowerCase();
+  const species = (petConfig.species || '').toLowerCase();
+  
+  // 根据名称或物种特征返回相应emoji
+  if (name.includes('皮卡') || name.includes('pika') || species.includes('电气')) {
+    return '⚡';
+  } else if (name.includes('卡比') || name.includes('kirby') || species.includes('星之')) {
+    return '⭐';
+  } else if (name.includes('库洛') || name.includes('kuromi') || species.includes('酷洛')) {
+    return '🌟';
+  } else if (name.includes('杰尼') || name.includes('squirtle') || species.includes('水')) {
+    return '💧';
+  } else {
+    // 默认使用通用emoji
+    return '🐾';
+  }
 }
 
 /**
@@ -1812,10 +1892,14 @@ function initializeNewGame() {
     customModel: 'gpt-3.5-turbo'
   };
   
+  // 获取第一个内置宠物作为默认值
+  const firstBuiltinPetId = Object.keys(POKEMON_DATABASE)[0] || 'pikachu';
+  const firstBuiltinPet = POKEMON_DATABASE[firstBuiltinPetId];
+  
   gameState = {
     ownerName: '',
-    petId: 'pikachu',
-    petNickname: '皮卡丘',
+    petId: firstBuiltinPetId,
+    petNickname: firstBuiltinPet?.petName || '宠物',
     birthTimestamp: Date.now(),
     lastLoginTimestamp: Date.now(),
     totalPlayTime: 0,
@@ -2520,7 +2604,9 @@ function bindGameEventListeners() {
   }
   if (btnPlay) {
     btnPlay.addEventListener('click', () => {
+      checkAITasksBeforeLeaveGame(() => {
       window.location.href = getPagePath('play.html');
+      }, '玩耍页面');
     });
     btnPlay.style.pointerEvents = 'auto';
     btnPlay.style.cursor = 'pointer';
@@ -2543,13 +2629,17 @@ function bindGameEventListeners() {
     btnChat.addEventListener('click', () => {
       showModal('modal-chat');
       renderChatHistory();
+      // 确保滚动到底部
+      scrollChatToBottom();
     });
     btnChat.style.pointerEvents = 'auto';
     btnChat.style.cursor = 'pointer';
   }
   if (btnShop) {
     btnShop.addEventListener('click', () => {
+      checkAITasksBeforeLeaveGame(() => {
       window.location.href = getPagePath('shop.html');
+      }, '商店');
     });
     btnShop.style.pointerEvents = 'auto';
     btnShop.style.cursor = 'pointer';
@@ -2576,10 +2666,12 @@ function bindGameEventListeners() {
   const btnBackHome = document.getElementById('btn-back-home');
   if (btnBackHome) {
     btnBackHome.addEventListener('click', () => {
+      checkAITasksBeforeLeaveGame(() => {
       // 保存当前状态
       saveGameState();
       // 返回首页
       window.location.href = getPagePath('index.html');
+      }, '主界面');
     });
   }
   
@@ -2831,6 +2923,28 @@ function bindGameEventListeners() {
     document.getElementById('view-logs-btn')?.classList.add('active');
     renderAllLogs(); // 确保日志列表已渲染
   });
+  
+  // 点击宠物触发气泡（70%概率）
+  const petSprite = document.getElementById('pet-sprite');
+  if (petSprite) {
+    petSprite.addEventListener('click', () => {
+      if (Math.random() < 0.7) {
+        // 直接根据状态调用现有的showEmojiBubble函数
+        if (gameState.stats.hunger < 30) {
+          showEmojiBubble('🍖');
+        } else if (gameState.stats.cleanliness < 30) {
+          showEmojiBubble('💩');
+        } else if (gameState.stats.energy < 30) {
+          showEmojiBubble('😴');
+        } else if (gameState.stats.happiness < 50) {
+          showEmojiBubble('😢');
+        } else {
+          // 状态良好，显示开心
+          showEmojiBubble('😊');
+        }
+      }
+    });
+  }
 }
 
 /**
@@ -3046,6 +3160,42 @@ function handlePetDeath() {
 // ============================================================
 
 /**
+ * 检查AI任务后执行导航（仅用于game.html离开）
+ * @param {Function} callback - 导航回调
+ * @param {String} actionName - 目标页面名称
+ */
+function checkAITasksBeforeLeaveGame(callback, actionName) {
+  const activeCount = aiRequestQueue.getActiveTaskCount();
+  
+  if (activeCount === 0) {
+    // 无任务，直接执行
+    callback();
+    return;
+  }
+  
+  // 有任务，弹窗确认
+  const confirmed = confirm(
+    `AI任务正在生成中（${activeCount}个）\n` +
+    `离开主界面会取消所有任务\n` +
+    `确定要前往${actionName}吗？`
+  );
+  
+  if (confirmed) {
+    // 取消所有活跃任务
+    const tasks = aiRequestQueue.getAllTasks();
+    tasks.forEach(task => {
+      if (task.status === 'pending' || task.status === 'processing') {
+        aiRequestQueue.cancelTask(task.id);
+      }
+    });
+    
+    // 执行导航
+    callback();
+  }
+  // 不确认就什么都不做
+}
+
+/**
  * 打开物品菜单
  */
 function openItemMenu() {
@@ -3256,12 +3406,35 @@ function useFoodItem(itemId) {
     showFloatingText(`+${hungerChange} 饱食度`, null, null);
   }
   
+  // 粒子特效 - 食物
+  const petSprite = document.getElementById('pet-sprite');
+  if (petSprite) {
+    const rect = petSprite.getBoundingClientRect();
+    createParticleEffect({
+      type: 'emoji',
+      emojis: ['🍎', '🍖', '🥕', '🍞', '🍰'],
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      count: 5
+    });
+  }
+  
   // 喂食随机响应（10个）- 使用动态口癖
   const feedResponses = [
     `好好吃~${getPetCatchphrase('short')}！`, '真美味！', '还想要~', '饱饱的~', '谢谢主人！',
     '超级好吃！', '最爱这个了！', `吃饱了${getPetCatchphrase('short')}~`, '好幸福啊~', '主人最好了！'
   ];
   showBubbleText(feedResponses[Math.floor(Math.random() * feedResponses.length)]);
+  
+  // 30%概率加速消化，2-5分钟后排便
+  if (Math.random() < 0.3) {
+    const delay = (Math.random() * 3 + 2) * 60 * 1000;
+    setTimeout(() => {
+      if (gameState.physiology.poopCount < 3) {
+        addPoop();
+      }
+    }, delay);
+  }
   
   updateAllStats();
   saveGameState();
@@ -3304,7 +3477,26 @@ function useMedicineItem(itemId) {
   if (effectText.length > 0) {
     showFloatingText(effectText.join(' '), null, null);
   }
-  showBubbleText(`感觉好多了~${getPetCatchphrase('short')}！`);
+  
+  // 粒子特效 - 药品
+  const petSprite = document.getElementById('pet-sprite');
+  if (petSprite) {
+    const rect = petSprite.getBoundingClientRect();
+    createParticleEffect({
+      type: 'emoji',
+      emojis: ['✨', '💊', '❤️‍🩹', '💚'],
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      count: 5
+    });
+  }
+  
+  // 药品使用随机响应（10个）- 使用动态口癖
+  const medicineResponses = [
+    `感觉好多了~${getPetCatchphrase('short')}！`, `恢复活力${getPetCatchphrase('short')}~`, '谢谢治疗！', `舒服多了${getPetCatchphrase('double')}！`, '好有效果~',
+    `健康恢复${getPetCatchphrase('short')}！`, '药效真棒！', `精神满满${getPetCatchphrase('short')}~`, '感觉棒极了！', `谢谢主人${getPetCatchphrase('short')}！`
+  ];
+  showBubbleText(medicineResponses[Math.floor(Math.random() * medicineResponses.length)]);
   
   updateAllStats();
   saveGameState();
@@ -3347,7 +3539,13 @@ function useToyItem(itemId) {
   if (effectText.length > 0) {
     showFloatingText(effectText.join(' '), null, null);
   }
-  showBubbleText(`好好玩~${getPetCatchphrase('short')}！`);
+  
+  // 玩具使用随机响应（10个）- 使用动态口癖
+  const toyResponses = [
+    `好好玩~${getPetCatchphrase('short')}！`, `太有趣了${getPetCatchphrase('double')}！`, '好喜欢这个！', `玩得好开心${getPetCatchphrase('short')}~`, '还想再玩~',
+    `超级好玩${getPetCatchphrase('short')}！`, '这个玩具真棒！', `玩得停不下来${getPetCatchphrase('short')}~`, '好有趣啊！', `谢谢主人${getPetCatchphrase('short')}！`
+  ];
+  showBubbleText(toyResponses[Math.floor(Math.random() * toyResponses.length)]);
   
   updateAllStats();
   saveGameState();
@@ -3390,6 +3588,20 @@ function useToolItem(itemId) {
   if (effectText.length > 0) {
     showFloatingText(effectText.join(' '), null, null);
   }
+  
+  // 粒子特效 - 工具
+  const petSprite = document.getElementById('pet-sprite');
+  if (petSprite) {
+    const rect = petSprite.getBoundingClientRect();
+    createParticleEffect({
+      type: 'sparkle',
+      colors: ['#FFD700', '#FF69B4', '#00CED1', '#9370DB'],
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      count: 8
+    });
+  }
+  
   showBubbleText(`谢谢~${getPetCatchphrase('short')}！`);
   
   updateAllStats();
@@ -3454,6 +3666,15 @@ function petThePet() {
   showBubbleText(petResponses[Math.floor(Math.random() * petResponses.length)]);
   
   setTimeout(() => renderPetSprite(), 2000);
+  
+  // 15%概率触发打盹
+  if (Math.random() < 0.15) {
+    const energyLoss = Math.floor(Math.random() * 6) + 5;  // 5-10点
+    gameState.stats.energy = Math.max(0, gameState.stats.energy - energyLoss);
+    setTimeout(() => {
+      showEmojiBubble('😴');
+    }, 1500);
+  }
   
   updateAllStats();
   saveGameState();
@@ -4122,6 +4343,8 @@ function typeText(element, text, speed = 30) {
       if (index < text.length) {
         element.textContent += text[index];
         index++;
+        // 逐字显示时也滚动到底部
+        scrollChatToBottom();
       } else {
         clearInterval(typeInterval);
         resolve();
@@ -4196,6 +4419,8 @@ async function sendChatMessage(userMessage) {
       loadingBubble.remove();
       const replyBubble = appendChatBubble('assistant', '', Date.now());
       await typeText(replyBubble, aiReply, 30);
+      // 逐字显示完成后也滚动到底部
+      scrollChatToBottom();
       
       showBubbleText(aiReply.substring(0, 15) + '...');
       
@@ -4228,7 +4453,21 @@ function renderChatHistory() {
     appendChatBubble(msg.role, msg.content, msg.timestamp);
   });
   
-  chatHistory.scrollTop = chatHistory.scrollHeight;
+  // 滚动到底部（滚动条在modal-content上）
+  scrollChatToBottom();
+}
+
+/**
+ * 滚动聊天记录到底部
+ */
+function scrollChatToBottom() {
+  const chatHistory = document.getElementById('chat-history');
+  if (chatHistory) {
+    // 使用setTimeout确保DOM已更新
+    setTimeout(() => {
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+    }, 0);
+  }
 }
 
 /**
@@ -4415,6 +4654,11 @@ function renderAIQueue() {
             <button class="queue-cancel-btn" onclick="cancelAITask('${task.id}')">取消</button>
           </div>
         ` : ''}
+        ${task.status === 'failed' ? `
+          <div class="queue-item-actions">
+            <button class="queue-retry-btn pixel-btn small" onclick="retryAITask('${task.id}')">🔄 重试</button>
+          </div>
+        ` : ''}
       </div>
     `;
   }).join('');
@@ -4441,6 +4685,63 @@ function updateQueueBadge() {
  */
 function cancelAITask(taskId) {
   aiRequestQueue.cancelTask(taskId);
+}
+
+/**
+ * 重试失败的AI任务
+ */
+function retryAITask(taskId) {
+  const task = aiRequestQueue.taskList.find(t => t.id === taskId);
+  if (!task || task.status !== 'failed') {
+    showNotification('任务不存在或状态不正确');
+    return;
+  }
+  
+  if (!task.retryData) {
+    showNotification('该任务不支持重试（缺少重试数据）');
+    return;
+  }
+  
+  // 根据任务类型重新调用生成函数
+  switch (task.type) {
+    case 'chat':
+      showNotification('聊天任务不支持重试，请重新发送消息');
+      break;
+      
+    case 'letter':
+      generatePetLetter(task.retryData.triggerType || 'default');
+      break;
+      
+    case 'adventure':
+      showNotification('探险任务不支持单独重试');
+      break;
+      
+    case 'image':
+      if (task.retryData.type === 'treasure') {
+        const treasureId = task.retryData.treasureId || `treasure_${Date.now()}`;
+        regenerateTreasureImage(treasureId);
+      } else if (task.retryData.type === 'location') {
+        // 地点图片需要photoId
+        if (task.retryData.photoId) {
+          regeneratePhotoImage(task.retryData.photoId);
+        } else if (task.retryData.imagePrompt) {
+          // 直接使用imagePrompt重新生成
+          generateLocationImage(task.retryData.imagePrompt);
+        }
+      }
+      break;
+      
+    case 'report':
+      triggerLogSummary();
+      break;
+      
+    default:
+      showNotification('未知任务类型，无法重试');
+  }
+  
+  // 移除失败任务
+  aiRequestQueue.taskList = aiRequestQueue.taskList.filter(t => t.id !== taskId);
+  aiRequestQueue.triggerRender();
 }
 
 /**
@@ -4482,25 +4783,23 @@ function appendChatBubble(role, content, timestamp = null) {
   const chatHistory = document.getElementById('chat-history');
   if (!chatHistory) return null;
   
-  const bubble = document.createElement('div');
-  bubble.className = `chat-bubble ${role}`;
+  const bubbleWrapper = document.createElement('div');
+  bubbleWrapper.className = `chat-bubble-wrapper ${role}`;
   const actualTimestamp = timestamp || Date.now();
-  bubble.dataset.timestamp = actualTimestamp;
+  bubbleWrapper.dataset.timestamp = actualTimestamp;
   
-  const name = role === 'user' ? gameState.ownerName : gameState.petNickname;
   const timeStr = formatTime(actualTimestamp);
   
-  bubble.innerHTML = `
-    <div class="bubble-header">
-      <span class="bubble-name">${name}</span>
-      <span class="bubble-time">${timeStr}</span>
+  bubbleWrapper.innerHTML = `
+    <div class="chat-bubble ${role}">
+      <div class="bubble-content">${content}</div>
       <button class="delete-chat-btn" title="删除">🗑️</button>
     </div>
-    <div class="bubble-content">${content}</div>
+    <div class="bubble-time">${timeStr}</div>
   `;
   
   // 绑定删除事件
-  const deleteBtn = bubble.querySelector('.delete-chat-btn');
+  const deleteBtn = bubbleWrapper.querySelector('.delete-chat-btn');
   if (deleteBtn) {
     deleteBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -4508,9 +4807,10 @@ function appendChatBubble(role, content, timestamp = null) {
     });
   }
   
-  chatHistory.appendChild(bubble);
-  chatHistory.scrollTop = chatHistory.scrollHeight;
-  return bubble;
+  chatHistory.appendChild(bubbleWrapper);
+  // 滚动到底部（滚动条在modal-content上）
+  scrollChatToBottom();
+  return bubbleWrapper;
 }
 
 /**
@@ -5436,6 +5736,14 @@ JSON结构示例：
  * @param {string} imagePrompt - 可选的英文图片提示词（如果提供则直接使用，不再调用AI翻译）
  */
 async function generateTreasureImage(treasureName, imagePrompt = null) {
+  // 添加到队列
+  const taskId = aiRequestQueue.addTask('image', `生成宝物图片：${treasureName}`, 3, {
+    type: 'treasure',
+    treasureName: treasureName,
+    imagePrompt: imagePrompt
+  });
+  
+  try {
   // 显示生图提示
   showNotification(`正在为"${treasureName}"生成图片...`);
   
@@ -5479,17 +5787,27 @@ async function generateTreasureImage(treasureName, imagePrompt = null) {
   const imageUrl = `${POLLINATIONS_IMAGE_API}${encodedPrompt}?width=256&height=256&seed=${Date.now()}&nologo=true`;
   
   // 预加载图片确保可用
-  return new Promise((resolve) => {
+    const finalImageUrl = await new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
       resolve(imageUrl);
     };
     img.onerror = () => {
-      // 如果生成失败,返回默认占位符
-      resolve('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect fill="%23FFD700" width="256" height="256" rx="20"/><text x="50%" y="50%" text-anchor="middle" fill="black" font-size="40">💎</text></svg>');
+      // 如果生成失败,返回默认占位符（使用主题色）
+      const colors = getThemeColors();
+      resolve(`data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect fill="${colors.primary}" width="256" height="256" rx="20"/><text x="50%" y="50%" text-anchor="middle" fill="black" font-size="40">💎</text></svg>`);
     };
     img.src = imageUrl;
   });
+    
+    // 更新任务为完成
+    aiRequestQueue.updateTask(taskId, 'completed', finalImageUrl);
+    return finalImageUrl;
+  } catch (error) {
+    // 更新任务为失败
+    aiRequestQueue.updateTask(taskId, 'failed', null, error.message);
+    throw error;
+  }
 }
 
 /**
@@ -5497,6 +5815,13 @@ async function generateTreasureImage(treasureName, imagePrompt = null) {
  * @param {string} imagePrompt - 英文图片提示词（AI已生成）
  */
 async function generateLocationImage(imagePrompt) {
+  // 添加到队列
+  const taskId = aiRequestQueue.addTask('image', '生成地点图片', 3, {
+    type: 'location',
+    imagePrompt: imagePrompt
+  });
+  
+  try {
   // 显示生图提示
   showNotification('正在生成图片，请稍候，不要离开页面...');
   
@@ -5512,18 +5837,29 @@ async function generateLocationImage(imagePrompt) {
   const imageUrl = `${POLLINATIONS_IMAGE_API}${encodedPrompt}?width=512&height=384&seed=${Date.now()}&nologo=true`;
   
   // 预加载图片确保可用
-  return new Promise((resolve) => {
+    const finalImageUrl = await new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
-      showNotification('图片生成完成！');
       resolve(imageUrl);
     };
     img.onerror = () => {
-      showNotification('图片生成失败，使用默认图片');
-      resolve('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="512" height="384"><rect fill="%2387CEEB" width="512" height="384"/><text x="50%" y="50%" text-anchor="middle" fill="white" font-size="24">风景图生成失败</text></svg>');
+      // 使用主题背景色
+      const colors = getThemeColors();
+      resolve(`data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="512" height="384"><rect fill="${colors.bgPrimary}" width="512" height="384"/><text x="50%" y="50%" text-anchor="middle" fill="white" font-size="24">风景图生成失败</text></svg>`);
     };
     img.src = imageUrl;
   });
+    
+    // 更新任务为完成
+    aiRequestQueue.updateTask(taskId, 'completed', finalImageUrl);
+    showNotification('图片生成完成！');
+    return finalImageUrl;
+  } catch (error) {
+    // 更新任务为失败
+    aiRequestQueue.updateTask(taskId, 'failed', null, error.message);
+    showNotification('图片生成失败');
+    throw error;
+  }
 }
 
 /**
@@ -5600,7 +5936,6 @@ function showAdventureProgress() {
       
       <div class="adventure-stats">
         <p>⏱️ 剩余时间: <strong>${remainingTime}分钟</strong></p>
-        <p>🎲 事件进度: <strong>${triggeredCount}/${totalEvents}</strong></p>
       </div>
       
       <div id="current-event-container">
@@ -5729,7 +6064,35 @@ function handleEventChoice(eventId, choiceIdx) {
   updateCoinDisplay();
   saveGameState();
   
-  showFloatingText(choice.text + '！', null, null);
+  // 定义颜色池（主题色和彩虹色）
+  const colors = [
+    'var(--primary)', 
+    'var(--secondary)', 
+    '#FF1493',  // 深粉色
+    '#00CED1',  // 青色
+    '#FFD700',  // 金色
+    '#FF69B4',  // 亮粉色
+    '#9370DB',  // 紫色
+    '#32CD32',  // 绿色
+    '#FF4500',  // 橙红色
+    '#1E90FF',  // 蓝色
+    '#FF6347',  // 番茄红
+    '#20B2AA'   // 浅海绿
+  ];
+  
+  // 随机选择颜色
+  const randomColor = colors[Math.floor(Math.random() * colors.length)];
+  
+  // 获取按钮位置用于飘字
+  const choiceBtn = document.querySelector(`[data-event-id="${eventId}"][data-choice-idx="${choiceIdx}"]`);
+  let x = null, y = null;
+  if (choiceBtn) {
+    const rect = choiceBtn.getBoundingClientRect();
+    x = rect.left + rect.width / 2;
+    y = rect.top;
+  }
+  
+  showFloatingText(choice.text + '！', x, y, randomColor);
   
   setTimeout(() => showAdventureProgress(), 1000);
 }
@@ -6059,6 +6422,9 @@ function initShop() {
   const isDay = hour >= 6 && hour < 18;
   updateBackgroundTheme(isDay ? 'day' : 'night');
   
+  // 初始化夜间模式定时器（持续更新主题）
+  syncRealTimeClock();
+  
   // 绑定返回按钮
   document.getElementById('btn-back')?.addEventListener('click', () => {
     window.location.href = getPagePath('game.html');
@@ -6372,7 +6738,10 @@ function renderEncyclopediaTreasures() {
         <h4>${treasure.name}</h4>
         <p class="encyc-desc">${treasure.description || '探险发现的神秘宝物'}</p>
         <p class="encyc-date">📅 ${new Date(treasure.foundAt).toLocaleDateString('zh-CN')}</p>
-        <button class="delete-treasure-btn pixel-btn small" data-treasure-id="${treasureId}" title="删除宝物" onclick="event.stopPropagation(); deleteTreasure('${treasureId}')" style="margin-top: var(--space-xs);">🗑️</button>
+        <div style="display: flex; justify-content: space-between; gap: var(--space-sm); margin-top: var(--space-sm); width: 100%;">
+          <button class="delete-treasure-btn pixel-btn small danger" onclick="event.stopPropagation(); deleteTreasure('${treasureId}')" style="flex: 1;">🗑️ 删除</button>
+          <button class="regenerate-treasure-btn pixel-btn small" onclick="event.stopPropagation(); regenerateTreasureImage('${treasureId}')" style="flex: 1;">🔄 重新生成</button>
+        </div>
       </div>
     `;
     
@@ -6457,7 +6826,6 @@ function showPhotoModal(photo) {
         ${photo.caption ? `<p class="photo-caption">${photo.caption}</p>` : ''}
         <div style="margin-top: var(--space-md); display: flex; gap: var(--space-sm); justify-content: center; flex-wrap: wrap;">
           <button class="pixel-btn primary" id="set-bg-btn">设为背景</button>
-          ${photo.imagePrompt ? `<button class="pixel-btn" id="regenerate-bg-btn" data-photo-id="${photo.photoId || photo.takenAt}">重新生成</button>` : ''}
         </div>
       </div>
     </div>
@@ -6471,58 +6839,6 @@ function showPhotoModal(photo) {
     setBgBtn.addEventListener('click', () => {
       setPhotoAsBackground(photo.imageUrl);
       modal.remove();
-    });
-  }
-  
-  // 绑定重新生成按钮
-  const regenerateBgBtn = modal.querySelector('#regenerate-bg-btn');
-  if (regenerateBgBtn) {
-    regenerateBgBtn.addEventListener('click', async () => {
-      // 先要求用户输入英文提示词
-      const promptModal = createPromptInputModal(
-        '输入图片提示词（英文）',
-        photo.imagePrompt || '',
-        async (imagePrompt) => {
-          if (!imagePrompt || !imagePrompt.trim()) {
-            showNotification('提示词不能为空');
-            return;
-          }
-          
-          regenerateBgBtn.disabled = true;
-          regenerateBgBtn.textContent = '生成中...';
-          
-          try {
-            const newImageUrl = await generateLocationImage(imagePrompt.trim());
-            
-            // 更新相册中的图片
-            const photoIndex = gameState.encyclopedia.photoAlbum.findIndex(p => 
-              (p.photoId && p.photoId === photo.photoId) || 
-              (!p.photoId && p.takenAt === photo.takenAt && p.locationName === photo.locationName)
-            );
-            
-            if (photoIndex !== -1) {
-              gameState.encyclopedia.photoAlbum[photoIndex].imageUrl = newImageUrl;
-              gameState.encyclopedia.photoAlbum[photoIndex].imagePrompt = imagePrompt.trim();
-              saveGameState();
-              renderPhotoAlbum();
-              
-              // 更新模态框中的图片
-              const photoImg = modal.querySelector('.fullsize-photo');
-              if (photoImg) {
-                photoImg.src = newImageUrl;
-              }
-              
-              showNotification('图片重新生成完成！');
-            }
-          } catch (error) {
-            console.error('重新生成图片失败:', error);
-            showNotification('重新生成失败，请稍后重试');
-          } finally {
-            regenerateBgBtn.disabled = false;
-            regenerateBgBtn.textContent = '重新生成';
-          }
-        }
-      );
     });
   }
   
@@ -6891,7 +7207,7 @@ function renderAllLogs() {
       <div class="log-entry-header">
         <span class="log-type-icon">${typeIcon}</span>
         <span class="log-date">${dateStr}</span>
-        <button class="delete-log-btn pixel-btn small" data-log-id="${log.logId}" title="删除">🗑️</button>
+        <button class="delete-log-btn pixel-btn small danger" data-log-id="${log.logId}" title="删除">🗑️</button>
       </div>
       <div class="log-entry-content">
         ${contentText}
@@ -6963,7 +7279,7 @@ function renderPetLetters() {
           <h4>${letter.subject}</h4>
           <small>📅 ${letterDateStr}</small>
         </div>
-        <button class="delete-letter-btn pixel-btn small" data-letter-id="${letter.letterId}" title="删除来信" onclick="event.stopPropagation(); deletePetLetter('${letter.letterId}')">🗑️</button>
+        <button class="delete-letter-btn pixel-btn small danger" data-letter-id="${letter.letterId}" title="删除来信" onclick="event.stopPropagation(); deletePetLetter('${letter.letterId}')">🗑️</button>
         <div class="envelope-arrow">▼</div>
       </div>
       <div class="letter-content" id="letter-${letter.letterId}">
@@ -7141,6 +7457,9 @@ function initPlay() {
   const isDay = hour >= 6 && hour < 18;
   updateBackgroundTheme(isDay ? 'day' : 'night');
   
+  // 初始化夜间模式定时器（持续更新主题）
+  syncRealTimeClock();
+  
   // 更新宠物名称
   document.querySelectorAll('.pet-name-placeholder').forEach(el => {
     el.textContent = gameState.petNickname;
@@ -7163,15 +7482,18 @@ function initPlay() {
           `assets/${gameState.petId}/${gameState.growthStage || 'adult'}`,
           null,
           () => {
-            loadImageWithFallback(petSprite, `assets/pikachu/${gameState.growthStage || 'adult'}`);
+            const fallbackPath = getPetFallbackPath(gameState.petId, gameState.growthStage || 'adult');
+            loadImageWithFallback(petSprite, fallbackPath);
           }
         );
       } else {
-        loadImageWithFallback(petSprite, `assets/${gameState.petId}/${gameState.growthStage || 'adult'}`, 'assets/pikachu/adult');
+        const fallbackPath = getPetFallbackPath(gameState.petId, 'adult');
+        loadImageWithFallback(petSprite, `assets/${gameState.petId}/${gameState.growthStage || 'adult'}`, fallbackPath);
       }
     } else {
       console.error('宠物数据不存在:', gameState.petId);
-      loadImageWithFallback(petSprite, 'assets/pikachu/adult');
+      const fallbackPath = getPetFallbackPath(gameState.petId, 'adult');
+      loadImageWithFallback(petSprite, fallbackPath);
     }
   }
   
@@ -7203,13 +7525,69 @@ function showGameSelection() {
   if (playAnimation) playAnimation.classList.add('hidden');
   if (playFooter) playFooter.classList.add('hidden');
   
-  // 绑定游戏卡片点击事件
-  document.querySelectorAll('.game-card').forEach(card => {
-    card.addEventListener('click', (e) => {
-      const gameType = e.currentTarget.dataset.game;
-      navigateToGame(gameType);
-    });
+  // 游戏列表数据
+  const games = [
+    { type: 'tetris', icon: '🧩', name: '俄罗斯方块', desc: '消除方块，挑战高分' },
+    { type: '2048', icon: '🔢', name: '2048', desc: '合并数字，达到2048' },
+    { type: 'brick', icon: '🎯', name: '打砖块', desc: '击碎所有砖块' },
+    { type: 'dodge', icon: '⚡', name: '躲避游戏', desc: '躲避掉落的障碍物' },
+    { type: 'sokoban', icon: '📦', name: '推箱子', desc: '将箱子推到目标位置' },
+    { type: 'memory', icon: '🧠', name: '记忆游戏', desc: '记住图案顺序' },
+    { type: 'snake', icon: '🐍', name: '贪吃蛇', desc: '控制蛇吃食物' },
+    { type: 'whack', icon: '🔨', name: '打地鼠', desc: '快速击打地鼠' }
+  ];
+  
+  // 获取最近玩过的游戏
+  const lastPlayedGame = gameState?.interactions?.lastPlayedGame || null;
+  
+  // 排序：最近玩过的游戏放在第一位
+  const sortedGames = [...games].sort((a, b) => {
+    if (a.type === lastPlayedGame) return -1;
+    if (b.type === lastPlayedGame) return 1;
+    return 0;
   });
+  
+  // 获取游戏网格容器
+  const gamesGrid = document.querySelector('.games-grid');
+  if (gamesGrid) {
+    gamesGrid.innerHTML = '';
+    
+    // 生成游戏卡片
+    sortedGames.forEach(game => {
+      const card = document.createElement('button');
+      card.className = 'game-card';
+      card.dataset.game = game.type;
+      
+      // 如果是最近玩过的游戏，添加标签
+      const recentlyPlayedTag = game.type === lastPlayedGame 
+        ? '<div class="recently-played-tag">最近玩过</div>' 
+        : '';
+      
+      card.innerHTML = `
+        ${recentlyPlayedTag}
+        <div class="game-icon">${game.icon}</div>
+        <h4>${game.name}</h4>
+        <p>${game.desc}</p>
+      `;
+      
+      // 绑定点击事件
+      card.addEventListener('click', (e) => {
+        const gameType = e.currentTarget.dataset.game;
+        navigateToGame(gameType);
+      });
+      
+      gamesGrid.appendChild(card);
+    });
+  } else {
+    // 如果网格不存在，使用原有的绑定方式（向后兼容）
+    document.querySelectorAll('.game-card').forEach(card => {
+      card.classList.remove('active');
+      card.addEventListener('click', (e) => {
+        const gameType = e.currentTarget.dataset.game;
+        navigateToGame(gameType);
+      });
+    });
+  }
 }
 
 /**
@@ -7318,6 +7696,16 @@ function endPlaySession() {
   
   showNotification(`玩耍结束！心情+${happinessGained}，体力-${energyCost}`);
   
+  // 20%概率玩得太兴奋，拉便便
+  if (Math.random() < 0.2) {
+    setTimeout(() => {
+      if (gameState.physiology.poopCount < 3) {
+        addPoop();
+        showNotification('哎呀，玩得太兴奋了，拉便便了！');
+      }
+    }, 1000);
+  }
+  
   // 返回游戏选择界面
   currentGame = null;
   showGameSelection();
@@ -7396,13 +7784,30 @@ function loadPetSpriteToGame(containerId, stage = null) {
       img.style.display = 'block';
     };
     container.appendChild(img);
-    loadImageWithFallback(img, 'assets/pikachu/adult');
+    const fallbackPath = getPetFallbackPath(gameState?.petId, 'adult');
+    loadImageWithFallback(img, fallbackPath);
     return;
   }
   
   const growthStage = stage || gameState.growthStage || 'adult';
   const spritePath = petData.assets[growthStage] || petData.assets.adult;
-  const basePath = spritePath ? spritePath.replace(/\.(svg|png|gif|jpg|jpeg|webp)$/i, '') : null;
+  
+  // 检测当前页面路径，如果在 games/ 目录下，需要添加 ../
+  const isInGamesDir = window.location.pathname.includes('/games/') || window.location.pathname.includes('\\games\\');
+  const adjustPath = (path) => {
+    if (!path) return path;
+    // 自定义宠物可能使用完整 URL（http/https），直接返回
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+      return path;
+    }
+    // 如果在 games/ 目录下，且路径以 assets/ 开头，添加 ../
+    if (isInGamesDir && path.startsWith('assets/')) {
+      return '../' + path;
+    }
+    return path;
+  };
+  
+  const basePath = spritePath ? adjustPath(spritePath.replace(/\.(svg|png|gif|jpg|jpeg|webp)$/i, '')) : null;
   
   // 清空容器
   container.innerHTML = '';
@@ -7419,40 +7824,67 @@ function loadPetSpriteToGame(containerId, stage = null) {
   
   container.appendChild(img);
   
+  // 检查是否是占位符图片
+  const isPlaceholderImage = (src) => {
+    return src && (
+      src.includes('data:image/svg+xml') || 
+      src.includes('⚡') ||
+      src.includes('placeholder')
+    );
+  };
+  
+  // 显示emoji占位符的统一函数
+  const showEmojiPlaceholder = () => {
+    img.style.display = 'none';
+    const emoji = getPetEmoji(gameState?.petId);
+    container.innerHTML = `<span style="font-size: 24px; display: block; line-height: 30px; text-align: center;">${emoji}</span>`;
+  };
+  
+  // 检查并替换占位符的统一函数
+  const checkAndReplacePlaceholder = (loadedPath) => {
+    if (loadedPath && isPlaceholderImage(loadedPath)) {
+      console.warn('检测到占位符图片，使用emoji占位符替代');
+      showEmojiPlaceholder();
+      return true;
+    }
+    return false;
+  };
+  
   // 加载图片
   const loadImage = () => {
     if (basePath) {
+      const fallbackPath1 = adjustPath(`assets/${gameState.petId}/${growthStage}`);
       loadImageWithFallback(
         img,
         basePath,
-        `assets/${gameState.petId}/${growthStage}`,
-        null,
+        fallbackPath1,
+        (loadedPath) => checkAndReplacePlaceholder(loadedPath),
         () => {
+          const fallbackPath2 = adjustPath(getPetFallbackPath(gameState?.petId, growthStage));
+          const fallbackPath3 = adjustPath(getPetFallbackPath(gameState?.petId, 'adult'));
           loadImageWithFallback(
             img, 
-            `assets/pikachu/${growthStage}`,
-            'assets/pikachu/adult',
-            null,
+            fallbackPath2,
+            fallbackPath3,
+            (loadedPath) => checkAndReplacePlaceholder(loadedPath),
             () => {
               console.warn('所有图片加载失败，使用emoji占位符');
-              img.style.display = 'none';
-              const emoji = gameState?.petId === 'pikachu' ? '⚡' : gameState?.petId === 'squirtle' ? '💧' : gameState?.petId === 'eevee' ? '🌟' : '🐾';
-              container.innerHTML = `<span style="font-size: 24px; display: block; line-height: 30px; text-align: center;">${emoji}</span>`;
+              showEmojiPlaceholder();
             }
           );
         }
       );
     } else {
+      const fallbackPath1 = adjustPath(`assets/${gameState.petId}/${growthStage}`);
+      const fallbackPath2 = adjustPath(getPetFallbackPath(gameState?.petId, 'adult'));
       loadImageWithFallback(
         img, 
-        `assets/${gameState.petId}/${growthStage}`, 
-        'assets/pikachu/adult',
-        null,
+        fallbackPath1, 
+        fallbackPath2,
+        (loadedPath) => checkAndReplacePlaceholder(loadedPath),
         () => {
           console.warn('图片加载失败，使用emoji占位符');
-          img.style.display = 'none';
-          const emoji = gameState?.petId === 'pikachu' ? '⚡' : gameState?.petId === 'squirtle' ? '💧' : gameState?.petId === 'eevee' ? '🌟' : '🐾';
-          container.innerHTML = `<span style="font-size: 24px; display: block; line-height: 30px; text-align: center;">${emoji}</span>`;
+          showEmojiPlaceholder();
         }
       );
     }
@@ -7483,6 +7915,11 @@ function handleGameEnd(gameType, score, difficulty = 'normal') {
   gameState.stats.happiness = Math.min(100, (gameState.stats.happiness || 0) + rewards.happiness);
   gameState.stats.energy = Math.max(0, (gameState.stats.energy || 100) - rewards.energy);
   
+  // 记录最近玩过的游戏
+  if (gameState.interactions) {
+    gameState.interactions.lastPlayedGame = gameType;
+  }
+  
   // 保存游戏状态
   saveGameState();
   
@@ -7500,6 +7937,11 @@ function handleGameEnd(gameType, score, difficulty = 'normal') {
  * @param {string} gameType - 游戏类型
  */
 function navigateToGame(gameType) {
+  // 记录最近玩过的游戏
+  if (gameState && gameState.interactions) {
+    gameState.interactions.lastPlayedGame = gameType;
+    saveGameState();
+  }
   window.location.href = getGamePath(gameType);
 }
 
@@ -7726,6 +8168,7 @@ function updateStatBar(statName, value) {
     valueText.textContent = Math.floor(value);
   }
   
+  // 低值时添加闪烁效果（红色警告）
   if (value < 20) {
     statBar.classList.add('warning-blink');
   } else {
@@ -7753,7 +8196,8 @@ function renderPetSprite() {
   const petData = getCurrentPetConfig();
   if (!petData || !petData.assets) {
     console.error('宠物数据不存在:', gameState.petId);
-    loadImageWithFallback(petSprite, 'assets/pikachu/adult');
+    const fallbackPath = getPetFallbackPath(gameState?.petId, 'adult');
+    loadImageWithFallback(petSprite, fallbackPath);
     return;
   }
   
@@ -7791,14 +8235,16 @@ function renderPetSprite() {
   
   if (!spritePath) {
     console.error('找不到图片资源:', assetKey, stage);
-    loadImageWithFallback(petSprite, 'assets/pikachu/adult', `assets/${gameState.petId}/${stage}`);
+    const fallbackPath1 = getPetFallbackPath(gameState?.petId, 'adult');
+    const fallbackPath2 = `assets/${gameState.petId}/${stage}`;
+    loadImageWithFallback(petSprite, fallbackPath1, fallbackPath2);
     return;
   }
   
   // 移除扩展名，使用多格式加载
   const basePath = spritePath.replace(/\.(svg|png|gif|jpg|jpeg|webp)$/i, '');
   const fallbackPath = `assets/${gameState.petId}/${stage}`;
-  const finalFallback = 'assets/pikachu/adult';
+  const finalFallback = getPetFallbackPath(gameState?.petId, 'adult');
   
   petSprite.alt = gameState.petNickname || '宠物';
   loadImageWithFallback(petSprite, basePath, fallbackPath, null, () => {
@@ -7884,6 +8330,32 @@ function hexToRgb(hex) {
   } : null;
 }
 
+/**
+ * 获取CSS变量值
+ * @param {string} varName - CSS变量名（带--前缀）
+ * @param {string} defaultValue - 默认值（如果变量不存在）
+ * @returns {string} CSS变量值
+ */
+function getCSSVariable(varName, defaultValue = '') {
+  const rootStyle = getComputedStyle(document.documentElement);
+  const value = rootStyle.getPropertyValue(varName).trim();
+  return value || defaultValue;
+}
+
+/**
+ * 获取主题色（用于SVG占位符）
+ * @returns {Object} 包含primary和bgPrimary的对象
+ */
+function getThemeColors() {
+  const primary = getCSSVariable('--primary', '#FFD700');
+  const bgPrimary = getCSSVariable('--bg-primary', '#87CEEB');
+  // 将颜色转换为URL编码格式（去掉#号）
+  return {
+    primary: primary.replace('#', '%23'),
+    bgPrimary: bgPrimary.replace('#', '%23')
+  };
+}
+
 function setPetAnimation(animationType) {
   const petSprite = document.getElementById('pet-sprite');
   if (!petSprite) return;
@@ -7915,16 +8387,18 @@ function setPetAnimation(animationType) {
     const basePath = spritePath.replace(/\.(svg|png|gif|jpg|jpeg|webp)$/i, '');
     const stage = gameState.growthStage || 'adult';
     const fallbackPath = petData.assets[stage] ? petData.assets[stage].replace(/\.(svg|png|gif|jpg|jpeg|webp)$/i, '') : null;
-    loadImageWithFallback(petSprite, basePath, fallbackPath || 'assets/pikachu/adult');
+    const finalFallback = getPetFallbackPath(gameState?.petId, 'adult');
+    loadImageWithFallback(petSprite, basePath, fallbackPath || finalFallback);
   } else {
     // 如果动画类型不存在，使用当前阶段的图片
     const stage = gameState.growthStage || 'adult';
     const spritePath = petData.assets[stage] || petData.assets.adult;
+    const finalFallback = getPetFallbackPath(gameState?.petId, 'adult');
     if (spritePath) {
       const basePath = spritePath.replace(/\.(svg|png|gif|jpg|jpeg|webp)$/i, '');
-      loadImageWithFallback(petSprite, basePath, 'assets/pikachu/adult');
+      loadImageWithFallback(petSprite, basePath, finalFallback);
     } else {
-      loadImageWithFallback(petSprite, 'assets/pikachu/adult');
+      loadImageWithFallback(petSprite, finalFallback);
     }
   }
 }
@@ -7974,10 +8448,11 @@ function showNotification(message) {
 /**
  * 显示浮动文字
  */
-function showFloatingText(text, x, y) {
+function showFloatingText(text, x, y, color = 'var(--success)') {
   const floatingText = document.createElement('div');
   floatingText.className = 'floating-text';
   floatingText.textContent = text;
+  floatingText.style.color = color;  // 使用传入的颜色
   
   if (x && y) {
     floatingText.style.left = `${x}px`;
@@ -8008,6 +8483,69 @@ function showBubbleText(text) {
     setTimeout(() => {
       bubble.classList.add('hidden');
     }, 3000);
+  }
+}
+
+/**
+ * 创建粒子特效
+ * @param {Object} options - 配置选项
+ * @param {String} options.type - 类型：heart, bubble, emoji, sparkle
+ * @param {Number} options.x - 起始X坐标
+ * @param {Number} options.y - 起始Y坐标
+ * @param {Number} options.count - 粒子数量
+ * @param {Array} options.emojis - emoji数组（type='emoji'时使用）
+ * @param {Array} options.colors - 颜色数组（type='sparkle'时使用）
+ */
+function createParticleEffect(options) {
+  const { type, x, y, count, emojis, colors } = options;
+  
+  for (let i = 0; i < count; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    
+    // 设置内容
+    switch (type) {
+      case 'heart':
+        particle.textContent = '❤️';
+        break;
+      case 'bubble':
+        particle.textContent = '◯';
+        particle.style.color = 'white';
+        particle.style.textShadow = '0 0 5px rgba(255,255,255,0.8)';
+        break;
+      case 'emoji':
+        particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        break;
+      case 'sparkle':
+        particle.textContent = '✨';
+        particle.style.color = colors[Math.floor(Math.random() * colors.length)];
+        break;
+    }
+    
+    // 随机角度和距离
+    const angle = (Math.random() * 360) * Math.PI / 180;
+    const distance = Math.random() * 100 + 50;
+    const tx = Math.cos(angle) * distance;
+    const ty = Math.sin(angle) * distance - 50;  // 向上偏移
+    const rotate = Math.random() * 360;
+    const duration = Math.random() * 0.5 + 1.5;  // 1.5-2秒
+    
+    // 设置CSS变量
+    particle.style.setProperty('--tx', `${tx}px`);
+    particle.style.setProperty('--ty', `${ty}px`);
+    particle.style.setProperty('--rotate', `${rotate}deg`);
+    particle.style.setProperty('--duration', `${duration}s`);
+    
+    // 设置初始位置
+    particle.style.left = `${x}px`;
+    particle.style.top = `${y}px`;
+    
+    document.body.appendChild(particle);
+    
+    // 动画结束后移除
+    setTimeout(() => {
+      particle.remove();
+    }, duration * 1000);
   }
 }
 
@@ -8081,6 +8619,15 @@ function playPetAnimation() {
     setTimeout(() => {
       petSprite.classList.remove('anim-shake');
     }, 500);
+    
+    // 添加爱心粒子特效
+    const rect = petSprite.getBoundingClientRect();
+    createParticleEffect({
+      type: 'heart',
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      count: 6
+    });
   }
 }
 
@@ -8088,6 +8635,19 @@ function playPetAnimation() {
  * 播放清洁动画
  */
 function playCleanAnimation() {
+  const petSprite = document.getElementById('pet-sprite');
+  if (petSprite) {
+    // 添加泡泡粒子特效
+    const rect = petSprite.getBoundingClientRect();
+    createParticleEffect({
+      type: 'bubble',
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      count: 12
+    });
+  }
+  
+  // 保留原有的sparkle效果
   const stage = document.getElementById('game-stage');
   if (stage) {
     const sparkles = document.createElement('div');
@@ -8689,7 +9249,10 @@ function initSettingsPanel() {
         gameState.ownerName = ownerNameInput.value.trim() || '主人';
       }
       if (nicknameInput) {
-        gameState.petNickname = nicknameInput.value.trim() || '皮卡丘';
+        // 如果用户没有输入昵称，使用当前宠物的默认名称
+        const petConfig = getCurrentPetConfig();
+        const defaultNickname = petConfig?.petName || '宠物';
+        gameState.petNickname = nicknameInput.value.trim() || defaultNickname;
       }
       
       // 保存手机边框尺寸

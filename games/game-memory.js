@@ -10,6 +10,7 @@
   let moves = 0;
   let matched = 0;
   let gameRunning = false;
+  let isReturning = false;
   
   // 卡片数据
   const symbols = ['🍎', '🍌', '🍇', '🍊', '🍓', '🍉', '🍑', '🥝', '🍒', '🥭', '🍍', '🥥'];
@@ -174,6 +175,7 @@
     moves = 0;
     matched = 0;
     gameRunning = true;
+    isReturning = false; // 重置返回标志
     
     initGame();
     updateUI();
@@ -218,18 +220,37 @@
     startGame();
   }
   
-  // 返回
+  // 返回（左上角返回按钮）
   function returnToPlay() {
-    // 使用路径辅助函数（如果可用），否则使用相对路径
-    if (typeof getPagePath === 'function') {
-      window.location.href = getPagePath('play.html');
+    // 防止重复调用
+    if (isReturning) return;
+    
+    // 清理所有资源
+    gameRunning = false;
+    
+    // 检查游戏是否有积分
+    if (score > 0) {
+      // 有积分，先结算
+      isReturning = true;
+      const finalScore = score;
+      if (typeof handleGameEnd === 'function') {
+        const result = handleGameEnd('memory', finalScore, difficulty);
+        showGameEnd(result);
+      } else {
+        // 兜底：直接返回
+        isReturning = true;
+        window.location.href = getPagePath('play.html');
+      }
     } else {
-      // 计算相对路径
-      const path = window.location.pathname;
-      const depth = path.split('/').filter(p => p && !p.endsWith('.html')).length;
-      const base = depth > 0 ? '../'.repeat(depth) : '';
-      window.location.href = base + 'play.html';
+      // 没有积分，直接返回（不设置isReturning，因为马上就要跳转了）
+      const path = typeof getPagePath === 'function' ? getPagePath('play.html') : '../play.html';
+      window.location.href = path;
     }
+  }
+  
+  // 从结算弹窗返回（结算弹窗的返回按钮）
+  function returnFromModal() {
+    window.location.href = getPagePath('play.html');
   }
   
   // 难度选择
@@ -249,7 +270,7 @@
   
   // 返回按钮
   document.getElementById('btn-back').addEventListener('click', returnToPlay);
-  document.getElementById('btn-return').addEventListener('click', returnToPlay);
+  document.getElementById('btn-return').addEventListener('click', returnFromModal);
   document.getElementById('btn-restart').addEventListener('click', restartGame);
   
   // 初始化
