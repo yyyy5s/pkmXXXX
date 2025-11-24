@@ -4165,7 +4165,7 @@ async function retryAIRequest(model, messages, maxRetries = 3, priority = 0, tas
     } else if (taskType === 'letter') {
       maxTokens = 1500; // 信件内容需要更多token（增加到1500）
     } else if (taskType === 'chat') {
-      maxTokens = 500; // 聊天回复（保持500不变）
+      maxTokens = 1500; // 聊天回复（增加到1500以避免截断）
     } else if (taskType === 'report') {
       maxTokens = 2500; // 相处报告需要更多token来写日记形式的诗意内容（增加到2500）
     }
@@ -4227,11 +4227,26 @@ async function retryAIRequest(model, messages, maxRetries = 3, priority = 0, tas
         const choice = data.choices[0];
         console.log('📋 Choice对象:', JSON.stringify(choice, null, 2));
         
-        // 检查finish_reason，如果是length或content_filter，说明内容被截断或过滤
+        // 检查finish_reason，如果是length、MAX_TOKENS或content_filter，说明内容被截断或过滤
         if (choice.finish_reason) {
           console.log('🏁 Finish reason:', choice.finish_reason);
-          if (choice.finish_reason === 'length') {
+          if (choice.finish_reason === 'length' || choice.finish_reason === 'MAX_TOKENS') {
             console.warn('⚠️ 响应因达到max_tokens限制而被截断');
+            // 如果还有重试次数，自动增加max_tokens并重试
+            if (attempt < maxRetries) {
+              const oldMaxTokens = maxTokens;
+              // 对于聊天任务，增加到3000；其他任务翻倍
+              if (taskType === 'chat') {
+                maxTokens = 3000;
+              } else {
+                maxTokens = Math.min(maxTokens * 2, 8000); // 最多8000
+              }
+              console.log(`🔄 检测到内容截断，将max_tokens从${oldMaxTokens}增加到${maxTokens}并重试...`);
+              // 继续下一次循环，不返回截断的内容
+              continue;
+            } else {
+              console.warn('⚠️ 已达到最大重试次数，返回截断的内容');
+            }
           } else if (choice.finish_reason === 'content_filter') {
             console.warn('⚠️ 响应被内容过滤器拦截');
           }
@@ -5110,8 +5125,14 @@ async function generatePetLetter(triggerType = 'default') {
                       currentHour >= 12 && currentHour < 18 ? '下午' : 
                       currentHour >= 18 && currentHour < 22 ? '晚上' : '深夜';
     
-    // 获取宠物性格设定
-    const petData = POKEMON_DATABASE[gameState.petId];
+    // 获取宠物性格设定（支持自定义宠物）
+    const petData = getCurrentPetConfig();
+    if (!petData) {
+      throw new Error('无法获取宠物配置，请检查游戏状态');
+    }
+    if (!petData.aiPersonality || !petData.aiPersonality.systemPrompt) {
+      throw new Error('宠物配置缺少AI性格设定');
+    }
     const personalityPrompt = petData.aiPersonality.systemPrompt.replace('{{OWNER_NAME}}', gameState.ownerName);
     
     // 计算上次互动时间
