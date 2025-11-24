@@ -1697,8 +1697,8 @@ function saveGameState() {
     if (!gameState) return;
     
     // 限制数据长度避免存储溢出
-    if (gameState.aiData && gameState.aiData.chatHistory && gameState.aiData.chatHistory.length > 50) {
-      gameState.aiData.chatHistory = gameState.aiData.chatHistory.slice(-50);
+    if (gameState.aiData && gameState.aiData.chatHistory && gameState.aiData.chatHistory.length > 55) {
+      gameState.aiData.chatHistory = gameState.aiData.chatHistory.slice(-55);
     }
     if (gameState.aiData && gameState.aiData.unifiedLogs && gameState.aiData.unifiedLogs.length > 200) {
       gameState.aiData.unifiedLogs = gameState.aiData.unifiedLogs.slice(-200);
@@ -2382,10 +2382,23 @@ function updateBackgroundTheme(theme) {
   const bgLayer = document.getElementById('background-layer');
   const phoneFrame = document.querySelector('.phone-frame');
   const gameContainer = document.querySelector('.game-container');
+  const gameScreen = document.querySelector('.game-screen');
+  const shopScreen = document.querySelector('.shop-screen');
+  const playScreen = document.querySelector('.play-screen');
   const body = document.body;
   
+  // 更新body的data-theme属性
+  if (body) {
+    body.dataset.theme = theme;
+  }
+  
+  // 先应用宠物主题（这会设置CSS变量）
+  if (gameState && gameState.petId) {
+    applyPetTheme();
+  }
+  
   // 优先使用保存的背景图片
-  if (gameState.settings && gameState.settings.backgroundImage && gameState.settings.backgroundImage !== 'default') {
+  if (gameState && gameState.settings && gameState.settings.backgroundImage && gameState.settings.backgroundImage !== 'default') {
     const bgImage = gameState.settings.backgroundImage;
     
     // 应用到 phone-frame 容器（主要背景）
@@ -2421,10 +2434,14 @@ function updateBackgroundTheme(theme) {
       body.style.backgroundRepeat = 'no-repeat';
     }
   } else {
-    // 使用默认主题色
+    // 使用默认主题色（通过CSS变量，已在applyPetTheme中设置）
     const petData = getCurrentPetConfig();
     if (petData && petData.theme) {
       const bgColor = theme === 'day' ? petData.theme.bgDay : petData.theme.bgNight;
+      
+      // 更新CSS变量
+      const root = document.documentElement;
+      root.style.setProperty('--bg-primary', bgColor);
       
       // 应用到 phone-frame 容器
       if (phoneFrame) {
@@ -2442,6 +2459,24 @@ function updateBackgroundTheme(theme) {
       if (gameContainer) {
         gameContainer.style.backgroundColor = bgColor;
         gameContainer.style.backgroundImage = 'none';
+      }
+      
+      // 应用到game-screen（game.html主界面）
+      if (gameScreen) {
+        gameScreen.style.backgroundColor = bgColor;
+        gameScreen.style.backgroundImage = 'none';
+      }
+      
+      // 应用到shop-screen（shop.html）
+      if (shopScreen) {
+        shopScreen.style.backgroundColor = bgColor;
+        shopScreen.style.backgroundImage = 'none';
+      }
+      
+      // 应用到play-screen（play.html）
+      if (playScreen) {
+        playScreen.style.backgroundColor = bgColor;
+        playScreen.style.backgroundImage = 'none';
       }
       
       // 应用到body
@@ -2903,6 +2938,9 @@ function renderPoops() {
   poopLayer.innerHTML = '';
   
   const petData = getCurrentPetConfig();
+  // 确保poop资源存在，如果没有则使用默认值
+  const poopAsset = petData?.assets?.poop || 'assets/poop';
+  
   for (let i = 0; i < gameState.physiology.poopCount; i++) {
     const poop = document.createElement('img');
     poop.className = 'poop';
@@ -2910,7 +2948,7 @@ function renderPoops() {
     poop.style.left = `${20 + (i * 25)}%`;
     poop.style.bottom = '15%';
     poop.addEventListener('click', cleanSinglePoop);
-    loadImageWithFallback(poop, petData.assets.poop, 'assets/poop');
+    loadImageWithFallback(poop, poopAsset, 'assets/poop');
     poopLayer.appendChild(poop);
   }
 }
@@ -3071,10 +3109,10 @@ function showItemSelectionMenu() {
               })
               .join(' ');
             
+            const iconPath = shopItem.icon.replace(/\.(svg|png|gif)$/i, ''); // 移除扩展名以支持多格式
             return `
               <div class="item-option" data-item-id="${invItem.itemId}">
-                <img src="${shopItem.icon}" alt="${shopItem.itemName}" class="item-icon" 
-                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2264%22><rect fill=%22%23ddd%22 width=%2264%22 height=%2264%22/><text x=%2232%22 y=%2240%22 text-anchor=%22middle%22 font-size=%2224%22>📦</text></svg>'">
+                <img src="" alt="${shopItem.itemName}" class="item-icon" data-icon-path="${iconPath}">
                 <div class="item-info">
                   <h4>${shopItem.itemName}</h4>
                   <p>数量: ${invItem.count}</p>
@@ -3102,8 +3140,31 @@ function showItemSelectionMenu() {
   
   document.body.appendChild(modal);
   
-  // 绑定选择事件
+  // 绑定选择事件并加载图标
   modal.querySelectorAll('.item-option').forEach(option => {
+    const iconImg = option.querySelector('.item-icon');
+    const iconPath = iconImg?.dataset.iconPath;
+    if (iconImg && iconPath && typeof loadImageWithFallback === 'function') {
+      const shopItem = SHOP_ITEMS.find(si => si.itemId === option.dataset.itemId);
+      if (shopItem) {
+        loadImageWithFallback(iconImg, iconPath, shopItem.icon);
+      }
+    } else if (iconImg && iconPath) {
+      // 降级方案
+      iconImg.src = `${iconPath}.gif`;
+      iconImg.onerror = function() {
+        this.onerror = null;
+        this.src = `${iconPath}.png`;
+        this.onerror = function() {
+          this.onerror = null;
+          this.src = `${iconPath}.svg`;
+          this.onerror = function() {
+            this.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect fill="%23ddd" width="64" height="64"/><text x="32" y="40" text-anchor="middle" font-size="24">📦</text></svg>';
+          };
+        };
+      };
+    }
+    
     option.addEventListener('click', () => {
       const itemId = option.dataset.itemId;
       useItem(itemId);
@@ -4105,7 +4166,7 @@ async function sendChatMessage(userMessage) {
                         currentHour >= 18 && currentHour < 22 ? '晚上' : '深夜';
       const systemPrompt = `${baseSystemPrompt}\n\n当前时间：${timeOfDay} ${currentHour}:${String(nowDate.getMinutes()).padStart(2, '0')}`;
       
-      const recentHistory = gameState.aiData.chatHistory.slice(-10).map(h => ({
+      const recentHistory = gameState.aiData.chatHistory.slice(-55).map(h => ({
         role: h.role,
         content: h.content
       }));
@@ -6046,15 +6107,35 @@ function renderShopItems(category = 'all') {
     const inventoryItem = gameState.inventory.items.find(i => i.itemId === item.itemId);
     const ownedCount = inventoryItem ? inventoryItem.count : 0;
     
+    const iconPath = item.icon.replace(/\.(svg|png|gif)$/i, ''); // 移除扩展名以支持多格式
     itemCard.innerHTML = `
-      <img src="${item.icon}" class="item-icon" alt="${item.itemName}" 
-           onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect fill=%22%23ddd%22 width=%22100%22 height=%22100%22/><text x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 font-size=%2240%22>📦</text></svg>'">
+      <img src="" class="item-icon" alt="${item.itemName}" data-icon-path="${iconPath}">
       <h4 class="item-name">${item.itemName}</h4>
       <p class="item-desc">${item.description}</p>
       <p class="item-owned">已拥有: ${ownedCount}</p>
       <p class="item-price">💰 ${item.price}</p>
       <button class="buy-btn pixel-btn small" data-item-id="${item.itemId}">购买</button>
     `;
+    
+    // 使用loadImageWithFallback加载图标
+    const iconImg = itemCard.querySelector('.item-icon');
+    if (iconImg && typeof loadImageWithFallback === 'function') {
+      loadImageWithFallback(iconImg, iconPath, item.icon);
+    } else {
+      // 降级方案
+      iconImg.src = `${iconPath}.gif`;
+      iconImg.onerror = function() {
+        this.onerror = null;
+        this.src = `${iconPath}.png`;
+        this.onerror = function() {
+          this.onerror = null;
+          this.src = `${iconPath}.svg`;
+          this.onerror = function() {
+            this.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%23ddd" width="100" height="100"/><text x="50%" y="50%" text-anchor="middle" font-size="40">📦</text></svg>';
+          };
+        };
+      };
+    }
     
     shopGrid.appendChild(itemCard);
   });
@@ -6291,7 +6372,7 @@ function renderEncyclopediaTreasures() {
         <h4>${treasure.name}</h4>
         <p class="encyc-desc">${treasure.description || '探险发现的神秘宝物'}</p>
         <p class="encyc-date">📅 ${new Date(treasure.foundAt).toLocaleDateString('zh-CN')}</p>
-        <button class="delete-treasure-btn pixel-btn small" data-treasure-id="${treasureId}" title="删除宝物" onclick="event.stopPropagation(); deleteTreasure('${treasureId}')" style="margin-top: var(--space-xs);">🗑️ 删除</button>
+        <button class="delete-treasure-btn pixel-btn small" data-treasure-id="${treasureId}" title="删除宝物" onclick="event.stopPropagation(); deleteTreasure('${treasureId}')" style="margin-top: var(--space-xs);">🗑️</button>
       </div>
     `;
     
@@ -6682,10 +6763,12 @@ function renderLogReports() {
       reportCard.className = 'report-card';
       reportCard.innerHTML = `
         <div class="report-header" onclick="toggleReportContent('${reportId}')" style="cursor: pointer;">
-          <h4>${title}</h4>
-          <div style="display: flex; align-items: center; gap: var(--space-sm);">
-            <span class="report-date">📅 ${dateStr}</span>
-            <button class="delete-report-btn pixel-btn small" data-summary-id="${summary.summaryId || summary.timestamp}" title="删除报告" onclick="event.stopPropagation(); deleteLogReport('${summary.summaryId || summary.timestamp}')">🗑️</button>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: var(--space-xs);">
+            <h4>${title}</h4>
+            <span class="report-date">${dateStr}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: var(--space-xs);">
+            <button class="delete-report-btn pixel-btn small danger" data-summary-id="${summary.summaryId || summary.timestamp}" title="删除报告" onclick="event.stopPropagation(); deleteLogReport('${summary.summaryId || summary.timestamp}')">🗑️</button>
             <div class="report-arrow">▼</div>
           </div>
         </div>
@@ -7338,12 +7421,6 @@ function loadPetSpriteToGame(containerId, stage = null) {
   
   // 加载图片
   const loadImage = () => {
-    // 添加错误处理，确保加载失败时显示占位符
-    img.onerror = () => {
-      console.warn('loadPetSpriteToGame: 图片加载失败，使用emoji占位符', basePath);
-      container.innerHTML = `<span style="font-size: 24px; display: block; line-height: 30px; text-align: center;">🐾</span>`;
-    };
-    
     if (basePath) {
       loadImageWithFallback(
         img,
@@ -7696,6 +7773,22 @@ function renderPetSprite() {
   // 获取图片路径，优先使用assetKey，否则使用stage
   let spritePath = petData.assets[assetKey] || petData.assets[stage] || petData.assets.adult;
   
+  // 检查是否需要显示emoji气泡（当缺少特定状态立绘时）
+  const emojiMap = {
+    happy: '😊',
+    sad: '😢',
+    sick: '🤒',
+    sleeping: '😴'
+  };
+  
+  // 如果assetKey是心情状态且没有对应资源，显示emoji气泡
+  if (emojiMap[assetKey] && !petData.assets[assetKey]) {
+    // 使用当前阶段的图片
+    spritePath = petData.assets[stage] || petData.assets.adult;
+    // 显示emoji气泡
+    showEmojiBubble(emojiMap[assetKey]);
+  }
+  
   if (!spritePath) {
     console.error('找不到图片资源:', assetKey, stage);
     loadImageWithFallback(petSprite, 'assets/pikachu/adult', `assets/${gameState.petId}/${stage}`);
@@ -7712,6 +7805,27 @@ function renderPetSprite() {
     // 最后的fallback
     loadImageWithFallback(petSprite, finalFallback, null);
   });
+}
+
+/**
+ * 显示emoji气泡（当宠物缺少特定状态立绘时）
+ */
+function showEmojiBubble(emoji) {
+  const statusBubble = document.getElementById('status-bubble');
+  if (!statusBubble) return;
+  
+  const bubbleText = document.getElementById('bubble-text');
+  if (bubbleText) {
+    bubbleText.textContent = emoji;
+    statusBubble.classList.add('emoji-mode');
+    statusBubble.classList.remove('hidden');
+    
+    // 3秒后自动隐藏
+    setTimeout(() => {
+      statusBubble.classList.add('hidden');
+      statusBubble.classList.remove('emoji-mode');
+    }, 3000);
+  }
 }
 
 /**
@@ -7733,11 +7847,41 @@ function applyPetTheme(petId = null) {
   root.style.setProperty('--bg-day', petConfig.theme.bgDay);
   root.style.setProperty('--bg-night', petConfig.theme.bgNight);
   
+  // 计算RGB值用于透明度
+  const primaryRgb = hexToRgb(petConfig.theme.primary);
+  const secondaryRgb = hexToRgb(petConfig.theme.secondary);
+  if (primaryRgb) {
+    root.style.setProperty('--primary-rgb', `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`);
+    root.style.setProperty('--primary-light-alpha', `rgba(${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}, 0.3)`);
+  }
+  if (secondaryRgb) {
+    root.style.setProperty('--secondary-rgb', `${secondaryRgb.r}, ${secondaryRgb.g}, ${secondaryRgb.b}`);
+  }
+  
+  // 根据当前主题设置 --bg-primary
+  const body = document.body;
+  const currentTheme = body?.dataset.theme || 'day';
+  const bgColor = currentTheme === 'night' ? petConfig.theme.bgNight : petConfig.theme.bgDay;
+  root.style.setProperty('--bg-primary', bgColor);
+  
   // 更新meta theme-color
   const metaTheme = document.querySelector('meta[name="theme-color"]');
   if (metaTheme) {
     metaTheme.setAttribute('content', petConfig.theme.primary);
   }
+}
+
+/**
+ * 将十六进制颜色转换为RGB对象
+ */
+function hexToRgb(hex) {
+  if (!hex) return null;
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
 }
 
 function setPetAnimation(animationType) {
@@ -7752,6 +7896,19 @@ function setPetAnimation(animationType) {
   
   petSprite.className = 'pet-animation';
   petSprite.classList.add(`anim-${animationType}`);
+  
+  // emoji映射
+  const emojiMap = {
+    happy: '😊',
+    sad: '😢',
+    sick: '🤒',
+    sleeping: '😴'
+  };
+  
+  // 如果动画类型是心情状态且没有对应资源，显示emoji气泡
+  if (emojiMap[animationType] && !petData.assets[animationType]) {
+    showEmojiBubble(emojiMap[animationType]);
+  }
   
   if (petData.assets[animationType]) {
     const spritePath = petData.assets[animationType];

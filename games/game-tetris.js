@@ -18,11 +18,6 @@
   const nextCanvas = document.getElementById('next-canvas');
   const nextCtx = nextCanvas.getContext('2d');
   
-  // 获取CSS变量值的辅助函数
-  function getCSSVariable(varName) {
-    return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-  }
-  
   // 游戏配置
   const COLS = 10;
   const ROWS = 20;
@@ -56,17 +51,14 @@
     '#FF8C00'  // L - 深橙色
   ];
   
-  // 渐变色辅助函数 - 增强渐变效果
+  // 渐变色辅助函数
   function getGradientColor(ctx, x, y, width, height, baseColor) {
     const gradient = ctx.createLinearGradient(x, y, x + width, y + height);
-    // 创建更亮的渐变，增强视觉层次
-    const lightColor = lightenColor(baseColor, 40);
-    const midLightColor = lightenColor(baseColor, 20);
-    const darkColor = darkenColor(baseColor, 25);
+    // 创建更亮的渐变
+    const lightColor = lightenColor(baseColor, 30);
+    const darkColor = darkenColor(baseColor, 20);
     gradient.addColorStop(0, lightColor);
-    gradient.addColorStop(0.3, midLightColor);
     gradient.addColorStop(0.5, baseColor);
-    gradient.addColorStop(0.7, baseColor);
     gradient.addColorStop(1, darkColor);
     return gradient;
   }
@@ -223,7 +215,7 @@
   
   // 带消除动画的绘制
   function drawBoardWithClearAnimation(rowsToClear, alpha, scale) {
-    ctx.fillStyle = getCSSVariable('--pixel-black') || '#1a1a2e';
+    ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     // 绘制已放置的方块
@@ -328,38 +320,31 @@
     updateUI();
   }
   
-  // 绘制方块（带增强渐变和阴影效果）
+  // 绘制方块（带渐变和阴影效果）
   function drawBlock(ctx, x, y, color, alpha = 1) {
     const px = x * BLOCK_SIZE;
     const py = y * BLOCK_SIZE;
     
-    // 绘制渐变背景 - 增强渐变
+    // 绘制渐变背景
     const gradient = getGradientColor(ctx, px, py, BLOCK_SIZE, BLOCK_SIZE, color);
     ctx.fillStyle = gradient;
     ctx.globalAlpha = alpha;
     ctx.fillRect(px, py, BLOCK_SIZE, BLOCK_SIZE);
     
-    // 绘制高光 - 增强高光效果
-    const highlightGradient = ctx.createLinearGradient(px, py, px, py + BLOCK_SIZE / 2);
-    highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
-    highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
-    ctx.fillStyle = highlightGradient;
-    ctx.fillRect(px + 1, py + 1, BLOCK_SIZE - 2, BLOCK_SIZE / 2);
+    // 绘制高光
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.fillRect(px + 1, py + 1, BLOCK_SIZE - 4, BLOCK_SIZE / 3);
     
-    // 绘制边框 - 增强边框
-    ctx.strokeStyle = getCSSVariable('--pixel-black') || '#1a1a2e';
+    // 绘制边框
+    ctx.strokeStyle = '#000';
     ctx.lineWidth = 2;
     ctx.globalAlpha = alpha;
     ctx.strokeRect(px, py, BLOCK_SIZE, BLOCK_SIZE);
     
-    // 绘制内边框 - 增强内边框高光
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    // 绘制内边框
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
     ctx.lineWidth = 1;
     ctx.strokeRect(px + 2, py + 2, BLOCK_SIZE - 4, BLOCK_SIZE - 4);
-    
-    // 添加底部阴影
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-    ctx.fillRect(px + 1, py + BLOCK_SIZE - 2, BLOCK_SIZE - 2, 2);
     
     ctx.globalAlpha = 1;
   }
@@ -367,7 +352,7 @@
   // 绘制游戏板
   function drawBoard() {
     // 绘制背景网格
-    ctx.fillStyle = getCSSVariable('--pixel-dark-gray') || '#404040';
+    ctx.fillStyle = '#111';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     // 绘制网格线
@@ -397,38 +382,21 @@
     
     // 绘制当前方块（带阴影预览）
     if (currentPiece) {
-      // 绘制阴影预览 - 增强阴影效果
+      // 绘制阴影
       let shadowY = currentY;
       while (!checkCollision(currentPiece, currentX, shadowY + 1)) {
         shadowY++;
       }
       if (shadowY > currentY) {
-        // 使用渐变阴影，更明显
-        const shadowGradient = ctx.createLinearGradient(
-          (currentX) * BLOCK_SIZE, (shadowY) * BLOCK_SIZE,
-          (currentX) * BLOCK_SIZE, (shadowY + currentPiece.shape.length) * BLOCK_SIZE
-        );
-        shadowGradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
-        shadowGradient.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
-        ctx.fillStyle = shadowGradient;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
         for (let row = 0; row < currentPiece.shape.length; row++) {
           for (let col = 0; col < currentPiece.shape[row].length; col++) {
             if (currentPiece.shape[row][col]) {
-              // 绘制带边框的阴影
               ctx.fillRect(
-                (currentX + col) * BLOCK_SIZE + 1,
-                (shadowY + row) * BLOCK_SIZE + 1,
-                BLOCK_SIZE - 2,
-                BLOCK_SIZE - 2
-              );
-              // 绘制阴影边框
-              ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-              ctx.lineWidth = 1;
-              ctx.strokeRect(
-                (currentX + col) * BLOCK_SIZE + 1,
-                (shadowY + row) * BLOCK_SIZE + 1,
-                BLOCK_SIZE - 2,
-                BLOCK_SIZE - 2
+                (currentX + col) * BLOCK_SIZE,
+                (shadowY + row) * BLOCK_SIZE,
+                BLOCK_SIZE,
+                BLOCK_SIZE
               );
             }
           }
@@ -448,7 +416,7 @@
   
   // 绘制下一个方块
   function drawNext() {
-    nextCtx.fillStyle = getCSSVariable('--pixel-black') || '#1a1a2e';
+    nextCtx.fillStyle = '#000';
     nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
     
     if (!nextPiece) return;
@@ -467,7 +435,7 @@
             blockSize,
             blockSize
           );
-          nextCtx.strokeStyle = getCSSVariable('--pixel-black') || '#1a1a2e';
+          nextCtx.strokeStyle = '#000';
           nextCtx.lineWidth = 1;
           nextCtx.strokeRect(
             offsetX + col * blockSize,

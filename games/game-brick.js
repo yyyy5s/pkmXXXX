@@ -16,11 +16,6 @@
   const canvas = document.getElementById('brick-canvas');
   const ctx = canvas.getContext('2d');
   
-  // 获取CSS变量值的辅助函数
-  function getCSSVariable(varName) {
-    return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-  }
-  
   // 游戏配置
   const PADDLE_WIDTH = 80;
   const PADDLE_HEIGHT = 10;
@@ -183,169 +178,43 @@
     ball.dy = -baseSpeed * Math.cos(angle);
   }
   
-  // 绘制背景网格
-  function drawBackground() {
-    const gridSize = 20;
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-    ctx.lineWidth = 1;
-    for (let x = 0; x < canvas.width; x += gridSize) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, canvas.height);
-      ctx.stroke();
-    }
-    for (let y = 0; y < canvas.height; y += gridSize) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(canvas.width, y);
-      ctx.stroke();
-    }
-  }
-  
-  // 绘制带渐变的砖块
-  function drawBrick(x, y, color) {
-    // 创建渐变
-    const gradient = ctx.createLinearGradient(x, y, x, y + BRICK_HEIGHT);
-    const lightColor = lightenColor(color, 30);
-    const darkColor = darkenColor(color, 20);
-    gradient.addColorStop(0, lightColor);
-    gradient.addColorStop(0.5, color);
-    gradient.addColorStop(1, darkColor);
-    
-    // 绘制砖块主体
-    ctx.fillStyle = gradient;
-    ctx.fillRect(x, y, BRICK_WIDTH, BRICK_HEIGHT);
-    
-    // 绘制高光
-    const highlightGradient = ctx.createLinearGradient(x, y, x, y + BRICK_HEIGHT / 2);
-    highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
-    highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-    ctx.fillStyle = highlightGradient;
-    ctx.fillRect(x + 1, y + 1, BRICK_WIDTH - 2, BRICK_HEIGHT / 2);
-    
-    // 绘制边框
-    ctx.strokeStyle = getCSSVariable('--pixel-white') || '#FAFAFA';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x, y, BRICK_WIDTH, BRICK_HEIGHT);
-    
-    // 绘制内边框高光
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x + 2, y + 2, BRICK_WIDTH - 4, BRICK_HEIGHT - 4);
-  }
-  
-  // 颜色辅助函数
-  function lightenColor(color, percent) {
-    const num = parseInt(color.replace("#",""), 16);
-    const r = Math.min(255, (num >> 16) + percent);
-    const g = Math.min(255, ((num >> 8) & 0x00FF) + percent);
-    const b = Math.min(255, (num & 0x0000FF) + percent);
-    return "#" + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
-  }
-  
-  function darkenColor(color, percent) {
-    const num = parseInt(color.replace("#",""), 16);
-    const r = Math.max(0, (num >> 16) - percent);
-    const g = Math.max(0, ((num >> 8) & 0x00FF) - percent);
-    const b = Math.max(0, (num & 0x0000FF) - percent);
-    return "#" + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
-  }
-  
   // 绘制
   function draw() {
     // 清空画布
-    ctx.fillStyle = getCSSVariable('--pixel-black') || '#1a1a2e';
+    ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // 绘制背景网格
-    drawBackground();
-    
-    // 绘制挡板 - 添加发光效果
-    const paddleGradient = ctx.createLinearGradient(paddle.x, paddle.y, paddle.x, paddle.y + paddle.height);
-    paddleGradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-    paddleGradient.addColorStop(1, 'rgba(255, 255, 255, 0.7)');
-    ctx.fillStyle = paddleGradient;
+    // 绘制挡板
+    ctx.fillStyle = '#FFF';
     ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
-    // 添加发光阴影
-    ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
-    ctx.shadowBlur = 10;
-    ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
-    ctx.shadowBlur = 0;
-    // 绘制挡板边框
-    ctx.strokeStyle = getCSSVariable('--pixel-white') || '#FAFAFA';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(paddle.x, paddle.y, paddle.width, paddle.height);
     
-    // 绘制球 - 添加发光效果
+    // 绘制球
     ctx.beginPath();
     ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-    // 球体渐变
-    const ballGradient = ctx.createRadialGradient(ball.x - 3, ball.y - 3, 0, ball.x, ball.y, ball.radius);
-    ballGradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-    ballGradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.8)');
-    ballGradient.addColorStop(1, 'rgba(200, 200, 200, 0.6)');
-    ctx.fillStyle = ballGradient;
-    // 添加发光阴影
-    ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-    ctx.shadowBlur = 15;
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.closePath();
-    // 绘制球的高光
-    ctx.beginPath();
-    ctx.arc(ball.x - 2, ball.y - 2, ball.radius / 3, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.fillStyle = '#FFF';
     ctx.fill();
     ctx.closePath();
     
-    // 绘制砖块 - 使用美化函数
+    // 绘制砖块
     for (let r = 0; r < BRICK_ROWS; r++) {
       for (let c = 0; c < BRICK_COLS; c++) {
         if (brickArray[r][c].status === 1) {
-          drawBrick(brickArray[r][c].x, brickArray[r][c].y, brickArray[r][c].color);
+          ctx.fillStyle = brickArray[r][c].color;
+          ctx.fillRect(
+            brickArray[r][c].x,
+            brickArray[r][c].y,
+            BRICK_WIDTH,
+            BRICK_HEIGHT
+          );
+          ctx.strokeStyle = '#FFF';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(
+            brickArray[r][c].x,
+            brickArray[r][c].y,
+            BRICK_WIDTH,
+            BRICK_HEIGHT
+          );
         }
-      }
-    }
-    
-    // 绘制碰撞闪光效果
-    drawFlashEffect();
-  }
-  
-  // 碰撞闪光效果
-  let flashEffect = null;
-  
-  function createFlashEffect(x, y, color) {
-    flashEffect = {
-      x: x,
-      y: y,
-      color: color,
-      alpha: 1,
-      radius: 0,
-      maxRadius: 30
-    };
-  }
-  
-  function drawFlashEffect() {
-    if (flashEffect && flashEffect.alpha > 0) {
-      ctx.save();
-      ctx.globalAlpha = flashEffect.alpha;
-      const gradient = ctx.createRadialGradient(
-        flashEffect.x, flashEffect.y, 0,
-        flashEffect.x, flashEffect.y, flashEffect.radius
-      );
-      gradient.addColorStop(0, flashEffect.color);
-      gradient.addColorStop(1, 'transparent');
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(flashEffect.x, flashEffect.y, flashEffect.radius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-      
-      // 更新闪光效果
-      flashEffect.radius += 2;
-      flashEffect.alpha -= 0.1;
-      if (flashEffect.alpha <= 0 || flashEffect.radius > flashEffect.maxRadius) {
-        flashEffect = null;
       }
     }
   }
@@ -363,8 +232,6 @@
             ball.y > b.y &&
             ball.y < b.y + BRICK_HEIGHT
           ) {
-            // 创建碰撞闪光效果
-            createFlashEffect(ball.x, ball.y, b.color);
             ball.dy = -ball.dy;
             b.status = 0;
             bricks--;

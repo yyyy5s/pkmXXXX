@@ -16,11 +16,6 @@
   const canvas = document.getElementById('dodge-canvas');
   const ctx = canvas.getContext('2d');
   
-  // 获取CSS变量值的辅助函数
-  function getCSSVariable(varName) {
-    return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-  }
-  
   // 游戏配置
   canvas.width = 400;
   canvas.height = 600;
@@ -109,7 +104,7 @@
   // 绘制
   function draw() {
     // 清空画布
-    ctx.fillStyle = getCSSVariable('--pixel-black') || '#1a1a2e';
+    ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     // 绘制障碍物（使用表情符号）
