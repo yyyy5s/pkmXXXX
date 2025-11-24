@@ -1543,16 +1543,6 @@ button,
   opacity: 1;
 }
 
-#status-bubble::after {
-  content: '';
-  position: absolute;
-  bottom: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 8px solid transparent;
-  border-top-color: var(--border-color);
-}
-
 #bubble-text {
   font-size: 10px;
   color: var(--pixel-black);

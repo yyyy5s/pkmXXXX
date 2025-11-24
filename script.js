@@ -409,10 +409,6 @@ const POKEMON_DATABASE = {
       baby: 'assets/pikachu/baby',
       teen: 'assets/pikachu/teen',
       adult: 'assets/pikachu/adult',
-      happy: 'assets/pikachu/happy',
-      sad: 'assets/pikachu/sad',
-      sick: 'assets/pikachu/sick',
-      sleeping: 'assets/pikachu/sleep',
       poop: 'assets/poop'
     },
     
@@ -453,10 +449,6 @@ const POKEMON_DATABASE = {
       baby: 'assets/eevee/baby',
       teen: 'assets/eevee/teen',
       adult: 'assets/eevee/adult',
-      happy: 'assets/eevee/happy',
-      sad: 'assets/eevee/sad',
-      sick: 'assets/eevee/sick',
-      sleeping: 'assets/eevee/sleep',
       poop: 'assets/poop'
     },
     
@@ -498,10 +490,6 @@ const POKEMON_DATABASE = {
       baby: 'assets/squirtle/baby',
       teen: 'assets/squirtle/teen',
       adult: 'assets/squirtle/adult',
-      happy: 'assets/squirtle/happy',
-      sad: 'assets/squirtle/sad',
-      sick: 'assets/squirtle/sick',
-      sleeping: 'assets/squirtle/sleep',
       poop: 'assets/poop'
     },
     
@@ -537,7 +525,7 @@ const POKEMON_DATABASE = {
 const SHOP_ITEMS = [
   {
     itemId: 'food_apple',
-    itemName: '苹果',
+    itemName: '莓果',
     type: 'food',
     price: 50,
     effects: {
@@ -562,7 +550,7 @@ const SHOP_ITEMS = [
   },
   {
     itemId: 'toy_ball',
-    itemName: '精灵球玩具',
+    itemName: '拓麻歌子',
     type: 'toy',
     price: 150,
     effects: {
@@ -570,7 +558,19 @@ const SHOP_ITEMS = [
       energy: -10
     },
     icon: 'assets/shop/pokeball_toy', // 支持svg/png/gif
-    description: '用于玩耍，能大幅提升心情'
+    description: '宠物玩电子宠物，疯狂套娃，能大幅提升心情'
+  },
+  {
+    itemId: 'toy_ball_limited',
+    itemName: '拓麻歌子限定版',
+    type: 'toy',
+    price: 500,
+    effects: {
+      happiness: 50,
+      energy: -15
+    },
+    icon: 'assets/shop/pokeball_toy_limited', // 支持svg/png/gif
+    description: '限量版拓麻歌子，更精美的设计，宠物玩得更开心'
   },
   {
     itemId: 'medicine_potion',
@@ -617,6 +617,48 @@ const SHOP_ITEMS = [
     },
     icon: 'assets/shop/super_energy_drink', // 支持svg/png/gif
     description: '恢复50精力，大幅补充体力'
+  },
+  {
+    itemId: 'medicine_fairy_feather',
+    itemName: '妖精之羽',
+    type: 'medicine',
+    price: 2000,
+    effects: {
+      hunger: 100,
+      cleanliness: 100,
+      happiness: 100,
+      energy: 100,
+      health: 100
+    },
+    icon: 'assets/shop/fairy_feather', // 支持svg/png/gif
+    description: '传说中的妖精之羽，拥有神奇的力量，能瞬间恢复所有属性至满值'
+  },
+  {
+    itemId: 'tool_mario_brick',
+    itemName: '马里奥砖块',
+    type: 'tool',
+    price: 8000,
+    effects: {},
+    icon: 'assets/shop/mario_brick', // 支持svg/png/gif
+    description: '纯收藏。来自经典游戏世界的标志性砖块，承载着无数冒险回忆，是游戏收藏家的珍贵藏品'
+  },
+  {
+    itemId: 'tool_star_fruit',
+    itemName: '星星果实',
+    type: 'tool',
+    price: 12000,
+    effects: {},
+    icon: 'assets/shop/star_fruit', // 支持svg/png/gif
+    description: '纯收藏。闪耀着神秘光芒的星星果实，传说中拥有不可思议的力量，是图鉴收藏的终极目标之一'
+  },
+  {
+    itemId: 'tool_monopoly_trophy',
+    itemName: '大富翁奖杯',
+    type: 'tool',
+    price: 18000,
+    effects: {},
+    icon: 'assets/shop/monopoly_trophy', // 支持svg/png/gif
+    description: '纯收藏。象征着财富与成功的金色奖杯，只有真正的收藏家才能拥有，是图鉴中最珍贵的收藏品'
   }
 ];
 
@@ -1263,10 +1305,6 @@ function setupCustomPetForm() {
         baby: baby,
         teen: teen,
         adult: adult,
-        happy: adult, // 使用成年期作为默认
-        sad: adult,
-        sick: adult,
-        sleeping: adult,
         poop: 'assets/poop'
       },
       theme: {
@@ -2292,7 +2330,8 @@ function startGameLoop() {
     if (hour >= 22 || hour < 6) {
       if (!gameState.physiology.isSleeping) {
         gameState.physiology.isSleeping = true;
-        setPetAnimation('sleeping');
+        // 不再调用 setPetAnimation，sleeping 状态在点击时显示气泡
+        renderPetSprite();
       }
       gameState.stats.energy = Math.min(100, gameState.stats.energy + 2);
     } else {
@@ -2930,17 +2969,22 @@ function bindGameEventListeners() {
     petSprite.addEventListener('click', () => {
       if (Math.random() < 0.7) {
         // 直接根据状态调用现有的showEmojiBubble函数
-        if (gameState.stats.hunger < 30) {
-          showEmojiBubble('🍖');
+        if (gameState.physiology.isSleeping) {
+          // sleeping 状态点击时显示 😴 气泡
+          showEmojiBubble('😴', false);
+        } else if (gameState.stats.hunger < 30) {
+          showEmojiBubble('🍖', false);
         } else if (gameState.stats.cleanliness < 30) {
-          showEmojiBubble('💩');
+          showEmojiBubble('💩', false);
         } else if (gameState.stats.energy < 30) {
-          showEmojiBubble('😴');
+          showEmojiBubble('😴', false);
         } else if (gameState.stats.happiness < 50) {
-          showEmojiBubble('😢');
+          // 心情低落时，如果已经有长期显示的气泡，这里显示临时气泡会被长期气泡覆盖
+          // 但为了确保显示，还是调用一下（临时显示会覆盖长期显示，但3秒后长期显示会恢复）
+          showEmojiBubble('😢', false);
         } else {
           // 状态良好，显示开心
-          showEmojiBubble('😊');
+          showEmojiBubble('😊', false);
         }
       }
     });
@@ -3102,11 +3146,16 @@ function updateHealthStatus() {
   if (gameState.stats.health < 30) {
     if (!gameState.physiology.isSick) {
       gameState.physiology.isSick = true;
-      setPetAnimation('sick');
+      // 使用状态气泡显示，由 updateStatusBubble() 统一管理长期显示
+      updateStatusBubble();
       showNotification(`😷 ${gameState.petNickname} 生病了！`);
     }
   } else {
-    gameState.physiology.isSick = false;
+    if (gameState.physiology.isSick) {
+      gameState.physiology.isSick = false;
+      // 状态改变时更新气泡显示
+      updateStatusBubble();
+    }
   }
 }
 
@@ -3656,7 +3705,8 @@ function petThePet() {
   gameState.interactions.lastPetTime = now;
   
   playPetAnimation();
-  setPetAnimation('happy');
+  // 不再调用 setPetAnimation('happy')，改为显示临时开心气泡
+  showEmojiBubble('😊', false);
   
   // 抚摸随机响应（10个）- 使用动态口癖
   const petResponses = [
@@ -3672,7 +3722,7 @@ function petThePet() {
     const energyLoss = Math.floor(Math.random() * 6) + 5;  // 5-10点
     gameState.stats.energy = Math.max(0, gameState.stats.energy - energyLoss);
     setTimeout(() => {
-      showEmojiBubble('😴');
+      showEmojiBubble('😴', false);
     }, 1500);
   }
   
@@ -7419,11 +7469,23 @@ async function regenerateTreasureImage(treasureId) {
       
       try {
         const imageUrl = await generateTreasureImage(treasure.name, imagePrompt.trim());
-        treasure.imageUrl = imageUrl;
-        treasure.imagePrompt = imagePrompt.trim(); // 保存新的提示词
-        saveGameState();
-        renderEncyclopediaTreasures();
-        showNotification('图片生成完成！');
+        
+        // 更新宝物图鉴中的图片（使用索引更新，确保保存成功）
+        const treasureIndex = gameState.encyclopedia.treasures.findIndex(t => {
+          const id = t.treasureId || `treasure_${t.foundAt}`;
+          return id === treasureId;
+        });
+        
+        if (treasureIndex !== -1) {
+          gameState.encyclopedia.treasures[treasureIndex].imageUrl = imageUrl;
+          gameState.encyclopedia.treasures[treasureIndex].imagePrompt = imagePrompt.trim(); // 保存新的提示词
+          
+          saveGameState();
+          renderEncyclopediaTreasures();
+          showNotification('图片生成完成！');
+        } else {
+          showNotification('更新失败：找不到该宝物');
+        }
       } catch (error) {
         console.error('生成宝物图片失败:', error);
         showNotification('图片生成失败，请稍后重试');
@@ -7470,8 +7532,8 @@ function initPlay() {
   if (petSprite) {
     const petData = getCurrentPetConfig();
     if (petData && petData.assets) {
-      // 优先使用happy状态，否则使用当前成长阶段
-      const spritePath = petData.assets.happy || petData.assets[gameState.growthStage] || petData.assets.adult;
+      // 使用当前成长阶段
+      const spritePath = petData.assets[gameState.growthStage] || petData.assets.adult;
       const basePath = spritePath ? spritePath.replace(/\.(svg|png|gif|jpg|jpeg|webp)$/i, '') : null;
       petSprite.alt = gameState.petNickname || '宠物';
       
@@ -7534,7 +7596,9 @@ function showGameSelection() {
     { type: 'sokoban', icon: '📦', name: '推箱子', desc: '将箱子推到目标位置' },
     { type: 'memory', icon: '🧠', name: '记忆游戏', desc: '记住图案顺序' },
     { type: 'snake', icon: '🐍', name: '贪吃蛇', desc: '控制蛇吃食物' },
-    { type: 'whack', icon: '🔨', name: '打地鼠', desc: '快速击打地鼠' }
+    { type: 'whack', icon: '🔨', name: '打地鼠', desc: '快速击打地鼠' },
+    { type: 'gomoku', icon: '⚫', name: '技能五子棋', desc: '五子连珠，策略对决' },
+    { type: 'match3', icon: '💎', name: '三消游戏', desc: '消除宝石，连锁得分' }
   ];
   
   // 获取最近玩过的游戏
@@ -8138,6 +8202,8 @@ function updateAllStats() {
   updateStatBar('happiness', gameState.stats.happiness);
   updateStatBar('energy', gameState.stats.energy);
   updateCoinDisplay();
+  // 更新状态气泡显示（sad 和 sick 状态需要长期显示）
+  updateStatusBubble();
 }
 
 /**
@@ -8201,40 +8267,12 @@ function renderPetSprite() {
     return;
   }
   
+  // 始终使用当前成长阶段的资源，不再根据状态切换图片
   const stage = gameState.growthStage || 'egg';
-  
-  let assetKey = stage;
-  if (gameState.physiology.isSick) {
-    assetKey = 'sick';
-  } else if (gameState.physiology.isSleeping) {
-    assetKey = 'sleeping';
-  } else if (gameState.stats.happiness >= 80) {
-    assetKey = 'happy';
-  } else if (gameState.stats.happiness < 30) {
-    assetKey = 'sad';
-  }
-  
-  // 获取图片路径，优先使用assetKey，否则使用stage
-  let spritePath = petData.assets[assetKey] || petData.assets[stage] || petData.assets.adult;
-  
-  // 检查是否需要显示emoji气泡（当缺少特定状态立绘时）
-  const emojiMap = {
-    happy: '😊',
-    sad: '😢',
-    sick: '🤒',
-    sleeping: '😴'
-  };
-  
-  // 如果assetKey是心情状态且没有对应资源，显示emoji气泡
-  if (emojiMap[assetKey] && !petData.assets[assetKey]) {
-    // 使用当前阶段的图片
-    spritePath = petData.assets[stage] || petData.assets.adult;
-    // 显示emoji气泡
-    showEmojiBubble(emojiMap[assetKey]);
-  }
+  let spritePath = petData.assets[stage] || petData.assets.adult;
   
   if (!spritePath) {
-    console.error('找不到图片资源:', assetKey, stage);
+    console.error('找不到图片资源:', stage);
     const fallbackPath1 = getPetFallbackPath(gameState?.petId, 'adult');
     const fallbackPath2 = `assets/${gameState.petId}/${stage}`;
     loadImageWithFallback(petSprite, fallbackPath1, fallbackPath2);
@@ -8251,12 +8289,17 @@ function renderPetSprite() {
     // 最后的fallback
     loadImageWithFallback(petSprite, finalFallback, null);
   });
+  
+  // 更新状态气泡显示（sad 和 sick 状态长期显示）
+  updateStatusBubble();
 }
 
 /**
  * 显示emoji气泡（当宠物缺少特定状态立绘时）
+ * @param {string} emoji - 要显示的emoji
+ * @param {boolean} persistent - 是否长期显示（默认false，3秒后自动隐藏）
  */
-function showEmojiBubble(emoji) {
+function showEmojiBubble(emoji, persistent = false) {
   const statusBubble = document.getElementById('status-bubble');
   if (!statusBubble) return;
   
@@ -8266,11 +8309,62 @@ function showEmojiBubble(emoji) {
     statusBubble.classList.add('emoji-mode');
     statusBubble.classList.remove('hidden');
     
-    // 3秒后自动隐藏
-    setTimeout(() => {
-      statusBubble.classList.add('hidden');
-      statusBubble.classList.remove('emoji-mode');
-    }, 3000);
+    // 如果不是长期显示，3秒后自动隐藏
+    if (!persistent) {
+      // 清除之前的定时器（如果有）
+      if (statusBubble._hideTimer) {
+        clearTimeout(statusBubble._hideTimer);
+      }
+      statusBubble._hideTimer = setTimeout(() => {
+        statusBubble.classList.add('hidden');
+        statusBubble.classList.remove('emoji-mode');
+        statusBubble._hideTimer = null;
+      }, 3000);
+    } else {
+      // 长期显示时，清除之前的定时器
+      if (statusBubble._hideTimer) {
+        clearTimeout(statusBubble._hideTimer);
+        statusBubble._hideTimer = null;
+      }
+    }
+  }
+}
+
+/**
+ * 隐藏状态气泡
+ */
+function hideStatusBubble() {
+  const statusBubble = document.getElementById('status-bubble');
+  if (!statusBubble) return;
+  
+  // 清除定时器
+  if (statusBubble._hideTimer) {
+    clearTimeout(statusBubble._hideTimer);
+    statusBubble._hideTimer = null;
+  }
+  
+  statusBubble.classList.add('hidden');
+  statusBubble.classList.remove('emoji-mode');
+}
+
+/**
+ * 根据当前状态更新状态气泡显示
+ * 在 renderPetSprite() 中调用，自动显示/隐藏状态气泡
+ */
+function updateStatusBubble() {
+  const statusBubble = document.getElementById('status-bubble');
+  if (!statusBubble) return;
+  
+  // 检查是否需要显示长期状态气泡
+  if (gameState.physiology.isSick) {
+    // 生病状态：长期显示 🤒
+    showEmojiBubble('🤒', true);
+  } else if (gameState.stats.happiness < 30) {
+    // 心情低落：长期显示 😢
+    showEmojiBubble('😢', true);
+  } else {
+    // 没有需要长期显示的状态，隐藏气泡
+    hideStatusBubble();
   }
 }
 
@@ -8369,7 +8463,7 @@ function setPetAnimation(animationType) {
   petSprite.className = 'pet-animation';
   petSprite.classList.add(`anim-${animationType}`);
   
-  // emoji映射
+  // emoji映射 - 对于这些状态，只显示状态气泡，不改变图片
   const emojiMap = {
     happy: '😊',
     sad: '😢',
@@ -8377,29 +8471,24 @@ function setPetAnimation(animationType) {
     sleeping: '😴'
   };
   
-  // 如果动画类型是心情状态且没有对应资源，显示emoji气泡
-  if (emojiMap[animationType] && !petData.assets[animationType]) {
-    showEmojiBubble(emojiMap[animationType]);
+  // 如果是心情状态，显示对应的emoji气泡（临时显示）
+  if (emojiMap[animationType]) {
+    // happy 和 sleeping 临时显示，sad 和 sick 由 updateStatusBubble() 长期显示
+    if (animationType === 'happy' || animationType === 'sleeping') {
+      showEmojiBubble(emojiMap[animationType], false);
+    }
+    // sad 和 sick 状态由 updateStatusBubble() 统一管理，这里不处理
   }
   
-  if (petData.assets[animationType]) {
-    const spritePath = petData.assets[animationType];
+  // 始终使用当前成长阶段的图片，不再根据状态切换
+  const stage = gameState.growthStage || 'adult';
+  const spritePath = petData.assets[stage] || petData.assets.adult;
+  const finalFallback = getPetFallbackPath(gameState?.petId, 'adult');
+  if (spritePath) {
     const basePath = spritePath.replace(/\.(svg|png|gif|jpg|jpeg|webp)$/i, '');
-    const stage = gameState.growthStage || 'adult';
-    const fallbackPath = petData.assets[stage] ? petData.assets[stage].replace(/\.(svg|png|gif|jpg|jpeg|webp)$/i, '') : null;
-    const finalFallback = getPetFallbackPath(gameState?.petId, 'adult');
-    loadImageWithFallback(petSprite, basePath, fallbackPath || finalFallback);
+    loadImageWithFallback(petSprite, basePath, finalFallback);
   } else {
-    // 如果动画类型不存在，使用当前阶段的图片
-    const stage = gameState.growthStage || 'adult';
-    const spritePath = petData.assets[stage] || petData.assets.adult;
-    const finalFallback = getPetFallbackPath(gameState?.petId, 'adult');
-    if (spritePath) {
-      const basePath = spritePath.replace(/\.(svg|png|gif|jpg|jpeg|webp)$/i, '');
-      loadImageWithFallback(petSprite, basePath, finalFallback);
-    } else {
-      loadImageWithFallback(petSprite, finalFallback);
-    }
+    loadImageWithFallback(petSprite, finalFallback);
   }
 }
 

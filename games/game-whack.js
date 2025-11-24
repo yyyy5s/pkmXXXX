@@ -20,6 +20,11 @@
   const holes = [];
   let activeMole = null;
   
+  // 连击系统
+  let combo = 0;
+  let lastHitTime = 0;
+  const COMBO_TIMEOUT = 2000; // 2秒内连续命中才算连击
+  
   // 初始化游戏
   function initGame() {
     const grid = document.getElementById('whack-grid');
@@ -94,14 +99,37 @@
   function whackMole(index) {
     if (!gameRunning) return;
     
+    const currentTime = Date.now();
+    
     if (activeMole === index && holes[index].mole.classList.contains('show')) {
       // 打中了
       hits++;
-      score += 10 * level;
+      const baseScore = 10 * level;
+      
+      // 连击系统
+      if (currentTime - lastHitTime < COMBO_TIMEOUT) {
+        combo++;
+      } else {
+        combo = 1;
+      }
+      lastHitTime = currentTime;
+      
+      // 连击加成
+      const comboBonus = combo > 1 ? Math.floor(baseScore * (combo - 1) * 0.5) : 0;
+      const totalScore = baseScore + comboBonus;
+      score += totalScore;
       level = Math.floor(hits / 10) + 1;
       
       holes[index].mole.classList.add('hit');
       holes[index].mole.classList.remove('show');
+      
+      // 显示飘字 - 获取地鼠元素的位置
+      const rect = holes[index].element.getBoundingClientRect();
+      if (combo > 1) {
+        showScorePopup(`+${totalScore} (${combo}x COMBO!)`, rect.left + rect.width / 2, rect.top, 'combo');
+      } else {
+        showScorePopup(`+${totalScore}`, rect.left + rect.width / 2, rect.top, 'positive');
+      }
       
       setTimeout(() => {
         holes[index].mole.classList.remove('hit');
@@ -109,11 +137,42 @@
       
       activeMole = null;
       updateUI();
+      
+      // 🎵 音效提示：这里可以添加打中音效
+      // playSound('hit');
+      
     } else {
       // 打空了
+      combo = 0; // 打空重置连击
       score = Math.max(0, score - 5);
+      
+      // 显示飘字 - 获取点击位置
+      const rect = holes[index].element.getBoundingClientRect();
+      showScorePopup('-5', rect.left + rect.width / 2, rect.top, 'negative');
+      
       updateUI();
+      
+      // 🎵 音效提示：这里可以添加打空音效
+      // playSound('miss');
     }
+  }
+  
+  // 显示分数飘字效果
+  function showScorePopup(text, x, y, type) {
+    const popup = document.createElement('div');
+    popup.className = `score-popup ${type}`;
+    popup.textContent = text;
+    popup.style.left = `${x}px`;
+    popup.style.top = `${y}px`;
+    
+    document.body.appendChild(popup);
+    
+    // 1秒后移除
+    setTimeout(() => {
+      if (document.body.contains(popup)) {
+        document.body.removeChild(popup);
+      }
+    }, 1000);
   }
   
   // 游戏循环
@@ -285,4 +344,3 @@
     startGame();
   }
 })();
-

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
+  <meta name="theme-color" content="#FFD700">
+  <link rel="apple-touch-icon" href="../assets/icon.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="../assets/icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/icon.png">
+  <title>三消游戏 - 宠物养成日记</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    #match3-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: var(--space-xs);
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      overflow: visible;
+      min-height: 0;
+    }
+    
+    .match3-board {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+      gap: 2px;
+      background: var(--pixel-dark-gray);
+      padding: 6px;
+      border: 3px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      width: 100%;
+      aspect-ratio: 1;
+      max-width: min(80vw, 300px);
+      max-height: min(80vw, 300px);
+      box-shadow: 4px 4px 0 var(--shadow-color);
+      box-sizing: border-box;
+      overflow: hidden;
+      margin-top: 0;
+      flex-shrink: 0;
+    }
+    
+    .match3-gem {
+      aspect-ratio: 1;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      background: linear-gradient(135deg, var(--pixel-light-gray) 0%, rgba(255, 255, 255, 0.8) 100%);
+      user-select: none;
+    }
+    
+    .match3-gem:hover {
+      transform: scale(1.02);
+      z-index: 10;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      border-color: var(--primary);
+    }
+    
+    .match3-gem.selected {
+      border: 3px solid var(--primary);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+      transform: scale(1.03);
+      z-index: 20;
+      animation: selectedGemPulse 0.8s ease-in-out infinite;
+    }
+    
+    @keyframes selectedGemPulse {
+      0%, 100% { 
+        box-shadow: 0 0 20px rgba(255, 215, 0, 1);
+      }
+      50% { 
+        box-shadow: 0 0 30px rgba(255, 215, 0, 1);
+      }
+    }
+    
+    .match3-gem.matched {
+      animation: matchAnimation 0.5s ease forwards;
+    }
+    
+    .match3-gem.falling {
+      animation: fallAnimation 0.3s ease;
+    }
+    
+    @keyframes matchAnimation {
+      0% { 
+        transform: scale(1); 
+        opacity: 1;
+      }
+      30% { 
+        transform: scale(1.4) rotate(180deg); 
+        opacity: 0.8;
+      }
+      60% { 
+        transform: scale(1.2) rotate(270deg); 
+        opacity: 0.5;
+      }
+      100% { 
+        transform: scale(0) rotate(360deg); 
+        opacity: 0; 
+      }
+    }
+    
+    @keyframes fallAnimation {
+      0% { 
+        transform: translateY(-100%); 
+        opacity: 0.5;
+      }
+      100% { 
+        transform: translateY(0); 
+        opacity: 1;
+      }
+    }
+    
+    .match3-info {
+      display: flex;
+      gap: var(--space-xs);
+      margin-top: var(--space-xs);
+      width: 100%;
+      max-width: min(80vw, 300px);
+      justify-content: center;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+    
+    .match3-info-item {
+      text-align: center;
+      padding: 4px;
+      background: var(--bg-panel);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      flex: 1;
+      min-width: 80px;
+    }
+    
+    .match3-info-label {
+      font-size: 7px;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+      font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
+    }
+    
+    .match3-info-value {
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: bold;
+      font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
+    }
+    
+    .match3-combo {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 32px;
+      font-weight: bold;
+      color: var(--primary);
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 215, 0, 0.8);
+      pointer-events: none;
+      z-index: 1000;
+      animation: comboAnimation 1s ease forwards;
+      opacity: 0;
+      font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
+    }
+    
+    @keyframes comboAnimation {
+      0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.3) rotate(-10deg);
+      }
+      20% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1.3) rotate(5deg);
+      }
+      50% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1.1) rotate(-3deg);
+      }
+      100% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.8) translateY(-80px) rotate(0deg);
+      }
+    }
+    
+    .match3-board {
+      animation: boardFadeIn 0.5s ease;
+    }
+    
+    @keyframes boardFadeIn {
+      0% { 
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      100% { 
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .match3-gem {
+        font-size: 16px;
+      }
+      
+      .match3-board {
+        gap: 2px;
+        padding: 4px;
+        max-width: min(85vw, 280px);
+        max-height: min(85vw, 280px);
+      }
+      
+      #match3-container {
+        padding: 4px;
+        margin-top: 0;
+      }
+      
+      .match3-info {
+        max-width: min(85vw, 280px);
+      }
+      
+      .match3-gem {
+        font-size: 14px;
+      }
+      
+      .match3-combo {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body class="game-fullscreen" data-theme="day">
+  <div class="phone-frame">
+    <header class="game-header">
+    <div class="game-header-left">
+      <button id="btn-back" class="back-btn">←</button>
+    </div>
+    <div class="game-header-center">
+      <span class="game-title">三消游戏</span>
+      <span class="game-score">🏆 <span id="score">0</span></span>
+      <div class="game-pet-container" id="pet-container"></div>
+    </div>
+    <div class="game-header-right">
+      <div class="game-difficulty-select" id="difficulty-select">
+        <button class="difficulty-btn" data-difficulty="easy">简单</button>
+        <button class="difficulty-btn active" data-difficulty="normal">普通</button>
+        <button class="difficulty-btn" data-difficulty="hard">地狱</button>
+      </div>
+    </div>
+  </header>
+  
+  <div class="game-container" style="align-items: flex-start; justify-content: flex-start; padding-top: var(--space-sm); overflow-y: auto;">
+    <div id="match3-container">
+      <div class="match3-board" id="match3-board"></div>
+      <div class="match3-info">
+        <div class="match3-info-item">
+          <div class="match3-info-label">消除数</div>
+          <div class="match3-info-value" id="matches">0</div>
+        </div>
+        <div class="match3-info-item">
+          <div class="match3-info-label">连锁</div>
+          <div class="match3-info-value" id="combos">0</div>
+        </div>
+        <div class="match3-info-item">
+          <div class="match3-info-label">移动</div>
+          <div class="match3-info-value" id="moves">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="game-end-modal" class="game-end-modal hidden">
+    <div class="game-end-content">
+      <h2 class="game-end-title">游戏结束</h2>
+      <div class="game-end-score">最终积分: <span id="final-score">0</span></div>
+      <div class="game-end-rewards" id="rewards-info"></div>
+      <div class="game-end-actions">
+        <button class="pixel-btn primary" id="btn-restart">再来一局</button>
+        <button class="back-btn" id="btn-return">←</button>
+      </div>
+    </div>
+  </div>
+  </div>
+  
+  <script src="../script.js"></script>
+  <script src="game-match3.js"></script>
+</body>
+</html>

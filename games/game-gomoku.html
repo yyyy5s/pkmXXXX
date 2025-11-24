@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#FFD700">
+  <link rel="apple-touch-icon" href="../assets/icon.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="../assets/icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/icon.png">
+  <title>技能五子棋 - 宠物养成日记</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    #gomoku-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: var(--space-xs);
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      margin-top: var(--space-sm);
+    }
+    
+    .gomoku-board-container {
+      display: flex;
+      flex-direction: row;
+      gap: var(--space-xs);
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    .gomoku-board {
+      display: grid;
+      grid-template-columns: repeat(15, 1fr);
+      grid-template-rows: repeat(15, 1fr);
+      gap: 0;
+      background: linear-gradient(135deg, #DEB887 0%, #D2B48C 100%);
+      padding: 8px;
+      border: 3px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      width: 100%;
+      max-width: min(85vw, 350px);
+      aspect-ratio: 1;
+      box-shadow: 4px 4px 0 var(--shadow-color);
+      position: relative;
+    }
+    
+    .gomoku-cell {
+      background: transparent;
+      border: none;
+      aspect-ratio: 1;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* 绘制网格线 */
+    .gomoku-cell::before {
+      content: '';
+      position: absolute;
+      width: 2px;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    
+    .gomoku-cell::after {
+      content: '';
+      position: absolute;
+      height: 2px;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    
+    .gomoku-cell:hover:not(.occupied):not(.skill-target) {
+      background: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+    }
+    
+    .gomoku-cell.occupied {
+      cursor: not-allowed;
+    }
+    
+    .gomoku-cell.skill-target {
+      background: rgba(255, 255, 0, 0.5);
+      cursor: pointer;
+      animation: pulse 1s ease-in-out infinite;
+    }
+    
+    .gomoku-cell.skill-hint {
+      background: rgba(0, 255, 0, 0.3);
+    }
+    
+    .gomoku-cell.protected {
+      box-shadow: inset 0 0 0 2px rgba(255, 215, 0, 0.8);
+    }
+    
+    .gomoku-stone {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70%;
+      height: 70%;
+      border-radius: 50%;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      z-index: 10;
+      animation: placeStone 0.3s ease;
+    }
+    
+    .gomoku-stone.black {
+      background: radial-gradient(circle at 30% 30%, #666, #000);
+    }
+    
+    .gomoku-stone.white {
+      background: radial-gradient(circle at 30% 30%, #fff, #ccc);
+    }
+    
+    @keyframes placeStone {
+      0% { 
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+      }
+      50% { 
+        transform: translate(-50%, -50%) scale(1.2);
+      }
+      100% { 
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+    
+    .gomoku-skills {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+      padding: 6px;
+      background: var(--bg-panel);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      max-width: min(85vw, 350px);
+      width: 100%;
+    }
+    
+    .skill-btn {
+      padding: 6px 4px;
+      font-size: 5px;
+      background: var(--bg-button);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      min-width: 0;
+    }
+    
+    .skill-btn:hover:not(.disabled) {
+      background: var(--primary);
+      color: var(--pixel-white);
+      transform: scale(1.08);
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+    }
+    
+    .skill-btn.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .skill-btn.active {
+      background: var(--primary);
+      color: var(--pixel-white);
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+      animation: activeSkillPulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes activeSkillPulse {
+      0%, 100% { 
+        box-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+      }
+      50% { 
+        box-shadow: 0 0 20px rgba(255, 215, 0, 1);
+      }
+    }
+    
+    .skill-name {
+      font-size: 6px;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+    
+    .skill-desc {
+      font-size: 4px;
+      color: var(--text-secondary);
+      line-height: 1.1;
+    }
+    
+    .skill-count {
+      font-size: 5px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    
+    .skill-btn.active .skill-count {
+      color: var(--pixel-white);
+    }
+    
+    /* 技能特效 */
+    .skill-effect {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--primary);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+      pointer-events: none;
+      z-index: 1000;
+      animation: skillFlyOut 1.5s ease forwards;
+      opacity: 0;
+      font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
+    }
+    
+    @keyframes skillFlyOut {
+      0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+      }
+      20% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1.2) rotate(5deg);
+      }
+      100% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(1) translateY(-100px) rotate(-5deg);
+      }
+    }
+    
+    .gomoku-info {
+      display: flex;
+      gap: var(--space-xs);
+      margin-top: var(--space-xs);
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .gomoku-info-item {
+      text-align: center;
+      padding: 4px;
+      background: var(--bg-panel);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      flex: 1;
+      min-width: 80px;
+    }
+    
+    .gomoku-info-label {
+      font-size: 7px;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+      font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
+    }
+    
+    .gomoku-info-value {
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: bold;
+      font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { 
+        opacity: 0.5;
+        transform: scale(1);
+      }
+      50% { 
+        opacity: 1;
+        transform: scale(1.05);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .gomoku-board-container {
+        flex-direction: column;
+      }
+      
+      .gomoku-skills {
+        flex-direction: row;
+        flex-wrap: wrap;
+        max-width: 100%;
+        min-width: auto;
+        width: 100%;
+      }
+      
+      .skill-btn {
+        min-width: 0;
+        font-size: 4px;
+      }
+      
+      .skill-name {
+        font-size: 5px;
+      }
+      
+      .skill-desc {
+        font-size: 3px;
+      }
+    }
+  </style>
+</head>
+<body class="game-fullscreen" data-theme="day">
+  <div class="phone-frame">
+    <header class="game-header">
+    <div class="game-header-left">
+      <button id="btn-back" class="back-btn">←</button>
+    </div>
+    <div class="game-header-center">
+      <span class="game-title">技能五子棋</span>
+      <span class="game-score">🏆 <span id="score">0</span></span>
+      <div class="game-pet-container" id="pet-container"></div>
+    </div>
+    <div class="game-header-right">
+      <div class="game-difficulty-select" id="difficulty-select">
+        <button class="difficulty-btn" data-difficulty="easy">简单</button>
+        <button class="difficulty-btn active" data-difficulty="normal">普通</button>
+        <button class="difficulty-btn" data-difficulty="hard">地狱</button>
+      </div>
+    </div>
+  </header>
+  
+  <div class="game-container">
+    <div id="gomoku-container">
+      <div class="gomoku-board-container">
+        <div class="gomoku-board" id="gomoku-board"></div>
+        <div class="gomoku-skills" id="skills-panel">
+          <button class="skill-btn" data-skill="timeback" id="skill-timeback">
+            <span class="skill-name">⏰ 时光倒流</span>
+            <span class="skill-desc">悔棋三步</span>
+            <span class="skill-count" id="count-timeback">3</span>
+          </button>
+          <button class="skill-btn" data-skill="remove" id="skill-remove">
+            <span class="skill-name">🌺 移花接木</span>
+            <span class="skill-desc">移除对手一子</span>
+            <span class="skill-count" id="count-remove">2</span>
+          </button>
+          <button class="skill-btn" data-skill="hint" id="skill-hint">
+            <span class="skill-name">👁️ 天眼通</span>
+            <span class="skill-desc">显示AI下一步</span>
+            <span class="skill-count" id="count-hint">2</span>
+          </button>
+          <button class="skill-btn" data-skill="thunder" id="skill-thunder">
+            <span class="skill-name">⚡ 雷霆万钧</span>
+            <span class="skill-desc">清除3x3范围</span>
+            <span class="skill-count" id="count-thunder">1</span>
+          </button>
+        </div>
+      </div>
+      <div class="gomoku-info">
+        <div class="gomoku-info-item">
+          <div class="gomoku-info-label">回合数</div>
+          <div class="gomoku-info-value" id="rounds">0</div>
+        </div>
+        <div class="gomoku-info-item">
+          <div class="gomoku-info-label">当前玩家</div>
+          <div class="gomoku-info-value" id="current-player">你</div>
+        </div>
+        <div class="gomoku-info-item">
+          <div class="gomoku-info-label">技能使用</div>
+          <div class="gomoku-info-value" id="skills-used">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="game-end-modal" class="game-end-modal hidden">
+    <div class="game-end-content">
+      <h2 class="game-end-title" id="end-title">游戏结束</h2>
+      <div class="game-end-score">最终积分: <span id="final-score">0</span></div>
+      <div class="game-end-rewards" id="rewards-info"></div>
+      <div class="game-end-actions">
+        <button class="pixel-btn primary" id="btn-restart">再来一局</button>
+        <button class="back-btn" id="btn-return">←</button>
+      </div>
+    </div>
+  </div>
+  </div>
+  
+  <script src="../script.js"></script>
+  <script src="game-gomoku.js"></script>
+</body>
+</html>
+

@@ -99,6 +99,46 @@
       100% { transform: translateX(-50%) translateY(100%) scale(0.7) rotate(0deg); }
     }
     
+    /* 分数飘字效果 */
+    .score-popup {
+      position: fixed;
+      font-size: 24px;
+      font-weight: bold;
+      font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
+      pointer-events: none;
+      z-index: 1000;
+      animation: floatUp 1s ease-out forwards;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    }
+    
+    .score-popup.positive {
+      color: #4CAF50;
+    }
+    
+    .score-popup.negative {
+      color: #f44336;
+    }
+    
+    .score-popup.combo {
+      color: #FFD700;
+      font-size: 28px;
+    }
+    
+    @keyframes floatUp {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(0.8);
+      }
+      50% {
+        opacity: 1;
+        transform: translateY(-30px) scale(1.2);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-80px) scale(1);
+      }
+    }
+    
     .whack-info {
       display: flex;
       flex-direction: row;
@@ -189,4 +229,3 @@
   <script src="game-whack.js"></script>
 </body>
 </html>
-
