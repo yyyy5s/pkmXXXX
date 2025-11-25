@@ -42,6 +42,14 @@
   // 触屏控制
   let paddleX = 0;
   
+  // 砖块回弹特效
+  let brickAnimations = []; // 存储正在回弹的砖块动画
+  
+  // 连击系统
+  let combo = 0; // 当前连击数
+  let lastBrickHitTime = 0; // 上次消砖时间
+  const COMBO_TIMEOUT = 1500; // 1.5秒内连续消砖才算连击
+  
   // 预设关卡布局（10个关卡）
   // 1表示有砖块，0表示无砖块
   const levelLayouts = [
@@ -173,6 +181,11 @@
     ball.x = canvas.width / 2;
     ball.y = canvas.height - PADDLE_HEIGHT - 20;
     
+    // 清除所有动画和连击
+    brickAnimations = [];
+    combo = 0;
+    lastBrickHitTime = 0;
+    
     // 根据难度设置球速
     const baseSpeed = difficulty === 'easy' ? 3 : difficulty === 'hard' ? 6 : 4;
     const angle = (Math.random() - 0.5) * Math.PI / 3; // -30到30度
@@ -197,28 +210,156 @@
     ctx.fill();
     ctx.closePath();
     
+    // 更新并绘制砖块回弹动画
+    updateBrickAnimations();
+    
     // 绘制砖块
     for (let r = 0; r < BRICK_ROWS; r++) {
       for (let c = 0; c < BRICK_COLS; c++) {
         if (brickArray[r][c].status === 1) {
-          ctx.fillStyle = brickArray[r][c].color;
-          ctx.fillRect(
-            brickArray[r][c].x,
-            brickArray[r][c].y,
-            BRICK_WIDTH,
-            BRICK_HEIGHT
-          );
-          ctx.strokeStyle = '#FFF';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(
-            brickArray[r][c].x,
-            brickArray[r][c].y,
-            BRICK_WIDTH,
-            BRICK_HEIGHT
-          );
+          const brick = brickArray[r][c];
+          const animation = brickAnimations.find(a => a.row === r && a.col === c);
+          
+          if (animation) {
+            // 绘制回弹动画效果
+            drawBrickWithAnimation(brick, animation);
+          } else {
+            // 正常绘制
+            ctx.fillStyle = brick.color;
+            ctx.fillRect(
+              brick.x,
+              brick.y,
+              BRICK_WIDTH,
+              BRICK_HEIGHT
+            );
+            ctx.strokeStyle = '#FFF';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(
+              brick.x,
+              brick.y,
+              BRICK_WIDTH,
+              BRICK_HEIGHT
+            );
+          }
         }
       }
     }
+  }
+  
+  // 更新砖块回弹动画
+  function updateBrickAnimations() {
+    const now = Date.now();
+    for (let i = brickAnimations.length - 1; i >= 0; i--) {
+      const anim = brickAnimations[i];
+      const elapsed = now - anim.startTime;
+      
+      if (elapsed >= anim.duration) {
+        // 动画结束，移除
+        brickAnimations.splice(i, 1);
+      }
+    }
+  }
+  
+  // 绘制带动画的砖块
+  function drawBrickWithAnimation(brick, animation) {
+    const elapsed = Date.now() - animation.startTime;
+    const progress = Math.min(elapsed / animation.duration, 1);
+    
+    // 回弹效果：先放大再缩小，同时有轻微的位移
+    const scale = 1 + Math.sin(progress * Math.PI) * 0.3; // 0.3倍放大
+    const offsetX = Math.sin(progress * Math.PI * 2) * 3; // 左右摆动
+    const offsetY = -Math.sin(progress * Math.PI) * 2; // 向上回弹
+    
+    const centerX = brick.x + BRICK_WIDTH / 2;
+    const centerY = brick.y + BRICK_HEIGHT / 2;
+    const newWidth = BRICK_WIDTH * scale;
+    const newHeight = BRICK_HEIGHT * scale;
+    const newX = centerX - newWidth / 2 + offsetX;
+    const newY = centerY - newHeight / 2 + offsetY;
+    
+    // 保存上下文
+    ctx.save();
+    
+    // 绘制砖块（带缩放和位移）
+    ctx.fillStyle = brick.color;
+    ctx.fillRect(newX, newY, newWidth, newHeight);
+    
+    // 添加高光效果（回弹时更亮）
+    const brightness = 1 + Math.sin(progress * Math.PI) * 0.5;
+    ctx.globalAlpha = 0.3;
+    ctx.fillStyle = '#FFF';
+    ctx.fillRect(newX + 2, newY + 2, newWidth * 0.3, newHeight * 0.3);
+    ctx.globalAlpha = 1;
+    
+    // 边框
+    ctx.strokeStyle = '#FFF';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(newX, newY, newWidth, newHeight);
+    
+    // 恢复上下文
+    ctx.restore();
+  }
+  
+  // 添加砖块回弹动画
+  function addBrickBounceAnimation(row, col) {
+    // 移除该位置之前的动画（如果有）
+    brickAnimations = brickAnimations.filter(a => !(a.row === row && a.col === col));
+    
+    // 添加新动画
+    brickAnimations.push({
+      row: row,
+      col: col,
+      startTime: Date.now(),
+      duration: 200 // 200毫秒动画
+    });
+  }
+  
+  // 显示分数飘字效果
+  function showScorePopup(text, x, y, type) {
+    const popup = document.createElement('div');
+    popup.className = `score-popup ${type}`;
+    popup.textContent = text;
+    
+    // 获取画布在页面中的位置
+    const rect = canvas.getBoundingClientRect();
+    popup.style.position = 'fixed';
+    popup.style.left = `${rect.left + x}px`;
+    popup.style.top = `${rect.top + y}px`;
+    popup.style.pointerEvents = 'none';
+    popup.style.zIndex = '1000';
+    popup.style.fontSize = '16px';
+    popup.style.fontWeight = 'bold';
+    popup.style.fontFamily = '"MuzaiPixel", "Press Start 2P", monospace';
+    popup.style.textAlign = 'center';
+    popup.style.whiteSpace = 'nowrap';
+    popup.style.transition = 'all 0.8s ease-out';
+    
+    // 根据类型设置颜色
+    if (type === 'combo') {
+      popup.style.color = '#FFD700';
+      popup.style.textShadow = '0 0 10px rgba(255, 215, 0, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.8)';
+    } else if (type === 'positive') {
+      popup.style.color = '#4ECDC4';
+      popup.style.textShadow = '0 0 8px rgba(78, 205, 196, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.8)';
+    } else {
+      popup.style.color = '#FF6B6B';
+      popup.style.textShadow = '0 0 8px rgba(255, 107, 107, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.8)';
+    }
+    
+    document.body.appendChild(popup);
+    
+    // 触发动画
+    requestAnimationFrame(() => {
+      popup.style.transform = 'translateY(-40px) scale(1.2)';
+      popup.style.opacity = '0';
+    });
+    
+    // 1秒后移除
+    setTimeout(() => {
+      if (document.body.contains(popup)) {
+        document.body.removeChild(popup);
+      }
+    }, 800);
   }
   
   // 碰撞检测
@@ -234,10 +375,39 @@
             ball.y > b.y &&
             ball.y < b.y + BRICK_HEIGHT
           ) {
+            // 添加回弹特效
+            addBrickBounceAnimation(r, c);
+            
+            // 连击系统
+            const currentTime = Date.now();
+            if (currentTime - lastBrickHitTime < COMBO_TIMEOUT) {
+              combo++;
+            } else {
+              combo = 1; // 重置连击
+            }
+            lastBrickHitTime = currentTime;
+            
+            // 计算得分（连击加成）
+            const baseScore = 10;
+            const comboBonus = combo > 1 ? Math.floor(baseScore * (combo - 1) * 0.5) : 0;
+            const totalScore = baseScore + comboBonus;
+            score += totalScore;
+            
+            // 显示飘字提示
+            const brickCenterX = b.x + BRICK_WIDTH / 2;
+            const brickCenterY = b.y + BRICK_HEIGHT / 2;
+            
+            if (combo > 1) {
+              // 显示连击提示
+              showScorePopup(`${combo}x 连击！`, brickCenterX, brickCenterY, 'combo');
+            } else {
+              // 显示普通得分
+              showScorePopup(`+${totalScore}`, brickCenterX, brickCenterY, 'positive');
+            }
+            
             ball.dy = -ball.dy;
             b.status = 0;
             bricks--;
-            score += 10;
             updateUI();
             
             // 检查是否完成关卡
@@ -290,6 +460,10 @@
     
     // 底部碰撞（失去生命）
     if (ball.y + ball.radius > canvas.height) {
+      // 重置连击
+      combo = 0;
+      lastBrickHitTime = 0;
+      
       lives--;
       updateUI();
       
@@ -453,6 +627,8 @@
     const touch = e.touches[0];
     const rect = canvas.getBoundingClientRect();
     paddleX = touch.clientX - rect.left;
+    // 限制范围，防止超出画布
+    paddleX = Math.max(PADDLE_WIDTH / 2, Math.min(canvas.width - PADDLE_WIDTH / 2, paddleX));
   });
   
   canvas.addEventListener('touchstart', (e) => {
@@ -465,6 +641,8 @@
     
     const rect = canvas.getBoundingClientRect();
     paddleX = e.clientX - rect.left;
+    // 限制范围，防止超出画布
+    paddleX = Math.max(PADDLE_WIDTH / 2, Math.min(canvas.width - PADDLE_WIDTH / 2, paddleX));
   });
   
   // 键盘控制

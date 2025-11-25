@@ -92,7 +92,7 @@
     // 如果翻了两张牌，检查是否匹配
     if (flippedCards.length === 2) {
       canFlip = false;
-      setTimeout(checkMatch, 800);
+      setTimeout(checkMatch, 500);
     }
   }
   
@@ -130,7 +130,7 @@
         flippedCards = [];
         canFlip = true;
         render();
-      }, 1000);
+      }, 600);
     }
   }
   

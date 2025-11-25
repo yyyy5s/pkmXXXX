@@ -207,9 +207,9 @@
     gameRunning = true;
     isReturning = false; // 重置返回标志
     
-    // 贪吃蛇速度调慢一点
-    const baseSpeed = difficulty === 'easy' ? 250 : difficulty === 'hard' ? 120 : 180;
-    const speed = Math.max(80, baseSpeed - (level - 1) * 8);
+    // 贪吃蛇速度调慢
+    const baseSpeed = difficulty === 'easy' ? 350 : difficulty === 'hard' ? 180 : 250;
+    const speed = Math.max(120, baseSpeed - (level - 1) * 6);
     gameLoop = setInterval(update, speed);
   }
   

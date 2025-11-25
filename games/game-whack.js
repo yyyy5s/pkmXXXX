@@ -80,9 +80,9 @@
     activeMole = randomIndex;
     holes[randomIndex].mole.classList.add('show');
     
-    // 根据难度设置地鼠显示时间 - 所有模式都更快一点
-    const baseTime = difficulty === 'easy' ? 1600 : difficulty === 'hard' ? 600 : 1200;
-    const showTime = Math.max(400, baseTime - (level - 1) * 80);
+    // 根据难度设置地鼠显示时间 - 所有模式都更快
+    const baseTime = difficulty === 'easy' ? 1000 : difficulty === 'hard' ? 400 : 800;
+    const showTime = Math.max(300, baseTime - (level - 1) * 60);
     
     // 自动隐藏
     setTimeout(() => {
@@ -209,14 +209,14 @@
     
     gameLoop = setInterval(update, 16); // 60fps
     
-    // 开始显示地鼠
-    const baseInterval = difficulty === 'easy' ? 2000 : difficulty === 'hard' ? 800 : 1500;
-    const interval = Math.max(500, baseInterval - (level - 1) * 50);
+    // 开始显示地鼠 - 出现间隔缩短
+    const baseInterval = difficulty === 'easy' ? 1200 : difficulty === 'hard' ? 500 : 900;
+    const interval = Math.max(300, baseInterval - (level - 1) * 40);
     
     function scheduleNextMole() {
       if (!gameRunning) return;
       showMole();
-      const nextInterval = Math.max(500, baseInterval - (level - 1) * 50);
+      const nextInterval = Math.max(300, baseInterval - (level - 1) * 40);
       moleTimer = setTimeout(scheduleNextMole, nextInterval);
     }
     

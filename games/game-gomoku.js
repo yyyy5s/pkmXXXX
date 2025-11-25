@@ -225,9 +225,29 @@
     // 获取所有可能的移动（优先考虑已有棋子附近）
     const candidates = getCandidateMoves();
     
+    // 首先检查是否有必须防守的位置（玩家即将五连）
+    const defensiveMove = findDefensiveMove();
+    if (defensiveMove) {
+      return defensiveMove;
+    }
+    
     for (let move of candidates) {
       board[move.row][move.col] = 2;
-      let score = evaluatePosition(2) - evaluatePosition(1) * 0.8;
+      
+      // 评估：AI得分 - 玩家得分（防守权重更高）
+      let aiScore = evaluatePosition(2);
+      let playerScore = evaluatePosition(1);
+      
+      // 防守权重：如果玩家有威胁，优先防守
+      let defensiveWeight = 1.5; // 防守权重
+      let score = aiScore - playerScore * defensiveWeight;
+      
+      // 检查这个位置是否能阻止玩家的威胁
+      let playerThreat = evaluateThreat(move.row, move.col, 1);
+      if (playerThreat > 0) {
+        score += playerThreat * 2000; // 防守威胁的奖励
+      }
+      
       board[move.row][move.col] = 0;
       
       if (score > bestScore) {
@@ -237,6 +257,60 @@
     }
     
     return bestMove || getRandomMove();
+  }
+  
+  // 查找必须防守的位置（玩家即将五连）
+  function findDefensiveMove() {
+    // 检查玩家是否即将形成五连
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      for (let j = 0; j < BOARD_SIZE; j++) {
+        if (board[i][j] === 0) {
+          // 模拟玩家下在这里
+          board[i][j] = 1;
+          if (checkWin(i, j, 1)) {
+            // 玩家下这里会赢，必须防守
+            board[i][j] = 0;
+            return {row: i, col: j};
+          }
+          board[i][j] = 0;
+        }
+      }
+    }
+    return null;
+  }
+  
+  // 评估威胁级别（检查如果对手下在这里会形成多长的连子）
+  function evaluateThreat(row, col, player) {
+    if (board[row][col] !== 0) return 0;
+    
+    let maxThreat = 0;
+    const directions = [
+      [[0, 1], [0, -1]],   // 横向
+      [[1, 0], [-1, 0]],   // 纵向
+      [[1, 1], [-1, -1]],  // 主对角线
+      [[1, -1], [-1, 1]]   // 副对角线
+    ];
+    
+    for (let dir of directions) {
+      let count = 1; // 包括当前位置
+      
+      for (let [dx, dy] of dir) {
+        let r = row + dx;
+        let c = col + dy;
+        while (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && 
+               board[r][c] === player) {
+          count++;
+          r += dx;
+          c += dy;
+        }
+      }
+      
+      if (count > maxThreat) {
+        maxThreat = count;
+      }
+    }
+    
+    return maxThreat;
   }
   
   // 获取候选移动（已有棋子附近）

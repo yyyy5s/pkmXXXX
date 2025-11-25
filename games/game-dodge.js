@@ -45,9 +45,9 @@
   function spawnObstacle() {
     if (!gameRunning) return;
     
-    // 所有模式速度都更快一点
-    const baseSpeed = difficulty === 'easy' ? 2.5 : difficulty === 'hard' ? 6 : 3.5;
-    const baseSpawnRate = difficulty === 'easy' ? 1800 : difficulty === 'hard' ? 700 : 1000;
+    // 所有模式速度都更快
+    const baseSpeed = difficulty === 'easy' ? 3.5 : difficulty === 'hard' ? 7.5 : 4.5;
+    const baseSpawnRate = difficulty === 'easy' ? 1200 : difficulty === 'hard' ? 500 : 700;
     
     obstacles.push({
       x: Math.random() * (canvas.width - 40) + 20,
