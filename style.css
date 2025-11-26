@@ -96,6 +96,26 @@
   /* 手机边框尺寸 */
   --phone-width: 390px;
   --phone-height: 844px;
+  
+  /* 字号变量 */
+  --font-size-5: 12px;
+  --font-size-6: 12px;
+  --font-size-7: 12px;
+  --font-size-8: 12px;
+  --font-size-9: 12px;
+  --font-size-10: 14px;
+  --font-size-11: 14px;
+  --font-size-12: 14px;
+  --font-size-14: 16px;
+  --font-size-16: 16px;
+  --font-size-18: 20px;
+  --font-size-20: 20px;
+  --font-size-24: 25px;
+  --font-size-28: 28px;
+  --font-size-32: 32px;
+  --font-size-36: 36px;
+  --font-size-40: 40px;
+  --font-size-48: 48px;
 }
 
 /* ========== 夜间模式变量 ========== */
@@ -155,12 +175,12 @@ img,
 }
 
 html {
-  font-size: 16px;
+  font-size: var(--font-size-18);
   -webkit-text-size-adjust: 100%;
 }
 
 body {
-  font-size: 14px;
+  font-size: var(--font-size-16);
   line-height: 1.6;
   color: var(--text-primary);
   background: var(--bg-primary) !important;
@@ -302,7 +322,7 @@ body {
 /* ========== 5. 通用按钮 ========== */
 .pixel-btn {
   font-family: inherit;
-  font-size: 10px;
+  font-size: var(--font-size-12);
   padding: var(--space-sm) var(--space-md);
   background: var(--pixel-white);
   color: var(--pixel-black);
@@ -355,7 +375,7 @@ body {
 }
 
 .pixel-btn.small {
-  font-size: 8px;
+  font-size: var(--font-size-8);
   padding: var(--space-xs) var(--space-sm);
   border-width: 2px;
   box-shadow: 2px 2px 0 var(--shadow-color);
@@ -383,7 +403,7 @@ a,
 /* ========== 6. 输入框 ========== */
 .pixel-input {
   font-family: inherit;
-  font-size: 12px;
+  font-size: var(--font-size-14);
   padding: var(--space-sm) var(--space-md);
   background: var(--pixel-white);
   color: var(--pixel-black);
@@ -473,11 +493,11 @@ button,
   box-shadow: 4px 4px 0 var(--shadow-color);
   position: relative;
   animation: modalSlideIn 0.3s ease;
-  font-size: 7px;
+  font-size: var(--font-size-10);
 }
 
 .modal-content * {
-  font-size: 7px;
+  font-size: var(--font-size-10);
 }
 
 .modal-content::-webkit-scrollbar {
@@ -565,20 +585,20 @@ button,
 }
 
 .cooldown-modal-icon {
-  font-size: 32px;
+  font-size: var(--font-size-32);
   color: var(--cooldown-modal-icon);
   animation: cooldownPulse 1.5s infinite;
 }
 
 .cooldown-modal-text {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--cooldown-modal-text);
   font-weight: bold;
   line-height: 1.6;
 }
 
 .cooldown-modal-time {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--warning);
   font-weight: bold;
   margin-top: var(--space-xs);
@@ -592,7 +612,7 @@ button,
   color: var(--cooldown-modal-text);
   cursor: pointer;
   border-radius: var(--radius-sm);
-  font-size: 10px;
+  font-size: var(--font-size-10);
   transition: all var(--transition-fast);
 }
 
@@ -651,7 +671,7 @@ button,
 }
 
 .modal-header h3 {
-  font-size: 8px;
+  font-size: var(--font-size-12);
   color: var(--text-primary);
 }
 
@@ -677,7 +697,7 @@ button,
 }
 
 .form-hint {
-  font-size: 7px;
+  font-size: var(--font-size-7);
   color: var(--text-secondary);
   margin-top: var(--space-xs);
   font-style: italic;
@@ -699,7 +719,7 @@ button,
   background: var(--danger);
   color: var(--pixel-white);
   border: 2px solid var(--pixel-black);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -717,7 +737,7 @@ button,
 #btn-return {
   min-width: 28px;
   min-height: 28px;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   padding: var(--space-xs);
   background: var(--pixel-white);
   color: var(--pixel-black);
@@ -745,7 +765,7 @@ button,
   background: var(--danger);
   color: var(--pixel-white);
   border: 2px solid var(--pixel-black);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -823,7 +843,7 @@ button,
 }
 
 .pixel-title {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   color: var(--text-primary);
   text-shadow: 3px 3px 0 var(--primary);
   margin-bottom: var(--space-sm);
@@ -831,7 +851,7 @@ button,
 }
 
 .subtitle {
-  font-size: 10px;
+  font-size: var(--font-size-10);
   color: var(--text-secondary);
   letter-spacing: 2px;
 }
@@ -841,7 +861,7 @@ button,
 }
 
 .location-hint {
-  font-size: 8px;
+  font-size: var(--font-size-8);
   color: var(--text-secondary);
   margin-top: var(--space-xs);
   font-style: italic;
@@ -853,7 +873,7 @@ button,
 
 .pixel-label {
   display: block;
-  font-size: 8px;
+  font-size: var(--font-size-8);
   margin-bottom: var(--space-xs);
   color: var(--text-primary);
 }
@@ -937,38 +957,38 @@ button,
 }
 
 .save-card .save-pet-name {
-  font-size: 10px;
+  font-size: var(--font-size-10);
   color: var(--text-primary);
   margin-bottom: var(--space-xs);
   font-weight: bold;
 }
 
 .save-card .save-stats {
-  font-size: 8px;
+  font-size: var(--font-size-8);
   color: var(--text-secondary);
   margin-bottom: var(--space-xs);
 }
 
 .save-card .save-owner {
-  font-size: 7px;
+  font-size: var(--font-size-7);
   color: var(--text-secondary);
 }
 
 .save-card .save-desc {
-  font-size: 8px;
+  font-size: var(--font-size-8);
   color: var(--text-secondary);
   margin-bottom: var(--space-xs);
 }
 
 .save-card .save-new {
-  font-size: 8px;
+  font-size: var(--font-size-8);
   color: var(--primary);
   font-weight: bold;
 }
 
 /* 创建自定义宠物图标 */
 .save-create-icon {
-  font-size: 48px;
+  font-size: var(--font-size-48);
   color: var(--text-secondary);
   margin-bottom: var(--space-sm);
   line-height: 1;
@@ -981,7 +1001,7 @@ button,
   left: var(--space-xs);
   background: var(--primary);
   color: var(--pixel-white);
-  font-size: 5px;
+  font-size: var(--font-size-5);
   padding: 2px 4px;
   border: 1px solid var(--border-color);
   font-weight: bold;
@@ -1000,7 +1020,7 @@ button,
   padding: var(--space-xs);
   width: 20px;
   height: 20px;
-  font-size: 10px;
+  font-size: var(--font-size-10);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1072,42 +1092,42 @@ button,
 }
 
 .save-pet-name {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   margin-bottom: var(--space-xs);
   font-weight: bold;
 }
 
 .save-stats {
-  font-size: 10px;
+  font-size: var(--font-size-10);
   color: var(--text-secondary);
   margin-bottom: var(--space-xs);
 }
 
 .save-owner {
-  font-size: 9px;
+  font-size: var(--font-size-9);
   color: var(--text-secondary);
 }
 
 .pet-name {
-  font-size: 11px;
+  font-size: var(--font-size-11);
   color: var(--text-primary);
   margin-bottom: var(--space-xs);
 }
 
 .pet-desc {
-  font-size: 8px;
+  font-size: var(--font-size-8);
   color: var(--text-secondary);
 }
 
 .lock-icon {
-  font-size: 40px;
+  font-size: var(--font-size-40);
   margin: var(--space-md) 0;
 }
 
 #btn-start-game {
   padding: var(--space-md) var(--space-xl);
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 /* ========== GAME.HTML - 主游戏界面 ========== */
@@ -1138,7 +1158,7 @@ button,
   flex-shrink: 0;
   z-index: 100;
   min-height: 44px;
-  font-size: 10px;
+  font-size: var(--font-size-10);
   position: relative;
 }
 
@@ -1149,15 +1169,15 @@ button,
 }
 
 #current-time {
-  font-size: 10px;
+  font-size: var(--font-size-10);
 }
 
 #day-night-icon {
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 #owner-info {
-  font-size: 10px;
+  font-size: var(--font-size-10);
   text-align: center;
 }
 
@@ -1169,11 +1189,11 @@ button,
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  font-size: 10px;
+  font-size: var(--font-size-10);
 }
 
 .coin-icon {
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 /* AI任务队列 */
@@ -1186,7 +1206,7 @@ button,
   background: transparent;
   border: none;
   color: var(--pixel-white);
-  font-size: 18px;
+  font-size: var(--font-size-18);
   cursor: pointer;
   padding: var(--space-xs);
   display: flex;
@@ -1211,7 +1231,7 @@ button,
   right: -4px;
   background: var(--danger);
   color: var(--pixel-white);
-  font-size: 10px;
+  font-size: var(--font-size-10);
   padding: 2px 5px;
   border-radius: 10px;
   min-width: 18px;
@@ -1255,7 +1275,7 @@ button,
 }
 
 .queue-header h4 {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   margin: 0;
 }
 
@@ -1263,7 +1283,7 @@ button,
   background: transparent;
   border: none;
   color: var(--pixel-white);
-  font-size: 20px;
+  font-size: var(--font-size-20);
   cursor: pointer;
   padding: 0;
   width: 24px;
@@ -1295,7 +1315,7 @@ button,
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
-  font-size: 10px;
+  font-size: var(--font-size-10);
   color: var(--text-primary);
 }
 
@@ -1336,7 +1356,7 @@ button,
 }
 
 .queue-item-status {
-  font-size: 9px;
+  font-size: var(--font-size-9);
   padding: 2px 6px;
   border-radius: 4px;
   background: var(--pixel-dark-gray);
@@ -1362,7 +1382,7 @@ button,
 
 .queue-item-description {
   color: var(--text-primary);
-  font-size: 9px;
+  font-size: var(--font-size-9);
   word-break: break-word;
   opacity: 0.8;
 }
@@ -1379,7 +1399,7 @@ button,
   border: none;
   padding: 4px 8px;
   border-radius: var(--radius-sm);
-  font-size: 9px;
+  font-size: var(--font-size-9);
   cursor: pointer;
   transition: opacity var(--transition-fast);
 }
@@ -1411,7 +1431,7 @@ button,
 }
 
 .stat-icon {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   flex-shrink: 0;
   width: 24px;
   text-align: center;
@@ -1452,7 +1472,7 @@ button,
 }
 
 .stat-value {
-  font-size: 10px;
+  font-size: var(--font-size-12);
   min-width: 28px;
   text-align: right;
   color: var(--text-primary);
@@ -1498,13 +1518,13 @@ button,
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  font-size: 9px;
+  font-size: var(--font-size-9);
   color: var(--danger);
   font-weight: bold;
 }
 
 .death-warning-icon {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   animation: warning-shake 0.5s infinite;
 }
 
@@ -1663,7 +1683,7 @@ button,
 }
 
 #status-bubble.emoji-mode {
-  font-size: 32px;
+  font-size: var(--font-size-32);
   padding: var(--space-sm);
   line-height: 1;
 }
@@ -1673,7 +1693,7 @@ button,
 }
 
 #bubble-text {
-  font-size: 10px;
+  font-size: var(--font-size-10);
   color: var(--pixel-black);
   text-align: center;
 }
@@ -1688,7 +1708,7 @@ button,
   color: var(--pixel-white);
   padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-lg);
-  font-size: 9px;
+  font-size: var(--font-size-9);
   z-index: 4;
   white-space: nowrap;
 }
@@ -1735,11 +1755,11 @@ button,
 }
 
 .btn-icon {
-  font-size: 18px;
+  font-size: var(--font-size-18);
 }
 
 .btn-label {
-  font-size: 8px;
+  font-size: var(--font-size-10);
   color: var(--text-primary);
   text-transform: uppercase;
 }
@@ -1751,7 +1771,7 @@ button,
   background: var(--pixel-light-gray);
   border: none;
   margin-bottom: var(--space-sm);
-  font-size: 8px;
+  font-size: var(--font-size-8);
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 0;
@@ -1817,14 +1837,14 @@ button,
 
 .bubble-content {
   flex: 1;
-  font-size: 8px;
+  font-size: var(--font-size-8);
   line-height: 1.4;
   color: var(--pixel-black);
 }
 
 .bubble-time {
   color: var(--text-secondary);
-  font-size: 6px;
+  font-size: var(--font-size-6);
   opacity: 0.6;
   margin-top: 2px;
   padding: 0 var(--space-xs);
@@ -1842,7 +1862,7 @@ button,
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   opacity: 0.5;
   transition: opacity 0.2s;
   padding: 2px;
@@ -1886,7 +1906,7 @@ button,
   border: 2px solid var(--border-color);
   cursor: pointer;
   font-family: inherit;
-  font-size: 9px;
+  font-size: var(--font-size-9);
   transition: all var(--transition-fast);
 }
 
@@ -1908,7 +1928,7 @@ button,
   padding: var(--space-xs) 0;
   border-bottom: 2px solid var(--border-color);
   margin-bottom: var(--space-md);
-  font-size: 6px;
+  font-size: var(--font-size-6);
 }
 
 .tab-stat {
@@ -1923,7 +1943,7 @@ button,
 
 .tab-content {
   min-height: 200px;
-  font-size: 8px;
+  font-size: var(--font-size-8);
 }
 
 .encyclopedia-grid {
@@ -2008,7 +2028,7 @@ button,
 }
 
 .mystery-icon {
-  font-size: 36px;
+  font-size: var(--font-size-36);
   width: 48px;
   height: 48px;
   flex-shrink: 0;
@@ -2023,7 +2043,7 @@ button,
 }
 
 .encyclopedia-card h4 {
-  font-size: 9px;
+  font-size: var(--font-size-9);
   margin-bottom: 2px;
   white-space: nowrap;
   overflow: hidden;
@@ -2032,7 +2052,7 @@ button,
 }
 
 .encyc-desc {
-  font-size: 7px;
+  font-size: var(--font-size-7);
   color: var(--text-secondary);
   margin: 0;
   line-height: 1.3;
@@ -2042,18 +2062,18 @@ button,
 }
 
 .encyc-hint {
-  font-size: 7px;
+  font-size: var(--font-size-7);
   color: var(--text-secondary);
 }
 
 .encyc-date {
-  font-size: 6px;
+  font-size: var(--font-size-6);
   color: var(--text-secondary);
   margin: 0;
 }
 
 .treasure-icon-large {
-  font-size: 48px;
+  font-size: var(--font-size-48);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2092,7 +2112,7 @@ button,
 .settings-list {
   overflow-x: hidden;
   padding-right: var(--space-sm);
-  font-size: 8px;
+  font-size: var(--font-size-8);
 }
 
 .setting-section {
@@ -2107,7 +2127,7 @@ button,
 }
 
 .section-title {
-  font-size: 9px;
+  font-size: var(--font-size-9);
   color: var(--primary-dark);
   margin-bottom: var(--space-sm);
 }
@@ -2120,7 +2140,7 @@ button,
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  font-size: 8px;
+  font-size: var(--font-size-8);
   cursor: pointer;
 }
 
@@ -2157,11 +2177,11 @@ button,
 /* shop-header 样式已合并到统一顶栏样式 */
 
 #shop-header h2 {
-  font-size: 10px;
+  font-size: var(--font-size-10);
 }
 
 #shop-coin-display {
-  font-size: 9px;
+  font-size: var(--font-size-9);
   display: flex;
   align-items: center;
   gap: var(--space-xs);
@@ -2190,7 +2210,7 @@ button,
   border: 2px solid var(--border-color);
   cursor: pointer;
   font-family: inherit;
-  font-size: 9px;
+  font-size: var(--font-size-9);
   white-space: nowrap;
   transition: all var(--transition-fast);
 }
@@ -2233,20 +2253,26 @@ button,
 }
 
 .item-name {
-  font-size: 10px;
+  font-size: var(--font-size-10);
   color: var(--text-primary);
   margin-bottom: var(--space-xs);
 }
 
 .item-desc {
-  font-size: 8px;
+  font-size: var(--font-size-8);
   color: var(--text-secondary);
   margin-bottom: var(--space-sm);
   line-height: 1.4;
 }
 
+.item-owned {
+  font-size: var(--font-size-7);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xs);
+}
+
 .item-price {
-  font-size: 11px;
+  font-size: var(--font-size-11);
   color: var(--success);
   font-weight: bold;
   margin-bottom: var(--space-sm);
@@ -2270,7 +2296,7 @@ button,
 /* play-header 样式已合并到统一顶栏样式 */
 
 #play-header h2 {
-  font-size: 9px;
+  font-size: var(--font-size-9);
   flex: 1;
   text-align: center;
 }
@@ -2323,7 +2349,7 @@ button,
 }
 
 #mini-games-list h3 {
-  font-size: 10px;
+  font-size: var(--font-size-10);
   margin-bottom: var(--space-sm);
   color: var(--text-primary);
 }
@@ -2352,7 +2378,7 @@ button,
 }
 
 .game-icon {
-  font-size: 28px;
+  font-size: var(--font-size-28);
   margin-bottom: 0;
 }
 
@@ -2380,13 +2406,13 @@ button,
 }
 
 .game-card h4 {
-  font-size: 8px;
+  font-size: var(--font-size-8);
   color: var(--text-primary);
   margin-bottom: 0;
 }
 
 .game-card p {
-  font-size: 7px;
+  font-size: var(--font-size-7);
   color: var(--text-secondary);
 }
 
@@ -2403,7 +2429,7 @@ button,
 }
 
 #play-stats p {
-  font-size: 8px;
+  font-size: var(--font-size-8);
   color: var(--text-primary);
   margin-bottom: var(--space-xs);
 }
@@ -2416,7 +2442,7 @@ button,
 /* ========== 通用动效 ========== */
 .floating-text {
   position: fixed;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: bold;
   color: var(--success);
   text-shadow: 2px 2px 0 var(--pixel-black);
@@ -2449,7 +2475,7 @@ button,
   z-index: 9999;
   max-width: 85%;
   text-align: center;
-  font-size: 10px;
+  font-size: var(--font-size-10);
   opacity: 0;
   transition: all var(--transition-normal);
 }
@@ -2617,7 +2643,7 @@ button,
 }
 
 .event-desc {
-  font-size: 10px;
+  font-size: var(--font-size-10);
   line-height: 1.6;
   margin: var(--space-md) 0;
   color: var(--text-primary);
@@ -2635,7 +2661,7 @@ button,
 }
 
 .choice-cost {
-  font-size: 8px;
+  font-size: var(--font-size-8);
   color: var(--text-secondary);
   margin-top: var(--space-xs);
   display: block;
@@ -2695,7 +2721,7 @@ button,
 }
 
 .treasure-item p {
-  font-size: 9px;
+  font-size: var(--font-size-9);
   color: var(--text-primary);
   font-weight: bold;
   margin-top: var(--space-xs);
@@ -2743,13 +2769,13 @@ button,
 }
 
 .photo-info h4 {
-  font-size: 9px;
+  font-size: var(--font-size-9);
   margin-bottom: var(--space-xs);
   text-align: center;
 }
 
 .photo-date {
-  font-size: 7px;
+  font-size: var(--font-size-7);
   color: var(--text-secondary);
   text-align: center;
 }
@@ -2787,20 +2813,20 @@ button,
 }
 
 .photo-details h3 {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   margin-bottom: var(--space-sm);
 }
 
 .photo-modal-date {
-  font-size: 10px;
+  font-size: var(--font-size-10);
   color: var(--text-secondary);
   margin-bottom: var(--space-xs);
   text-align: center;
 }
 
 .photo-caption {
-  font-size: 9px;
+  font-size: var(--font-size-9);
   color: var(--text-secondary);
   font-style: italic;
   margin-top: var(--space-xs);
@@ -2846,12 +2872,12 @@ button,
 }
 
 .log-type-icon {
-  font-size: 1.2em;
+  font-size: var(--font-size-12);
 }
 
 .log-date {
   flex: 1;
-  font-size: 0.85em;
+  font-size: var(--font-size-9);
   color: var(--text-secondary);
 }
 
@@ -2860,7 +2886,7 @@ button,
   min-width: auto;
   width: 20px;
   height: 20px;
-  font-size: 10px;
+  font-size: var(--font-size-10);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2868,7 +2894,7 @@ button,
 
 .log-entry-content {
   color: var(--text-primary);
-  font-size: 0.9em;
+  font-size: var(--font-size-9);
   line-height: 1.4;
   word-break: break-word;
 }
@@ -2939,7 +2965,7 @@ button,
   min-width: auto;
   width: 20px;
   height: 20px;
-  font-size: 10px;
+  font-size: var(--font-size-10);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2949,20 +2975,20 @@ button,
 .delete-treasure-btn {
   padding: var(--space-xs);
   min-width: 0;
-  font-size: 8px;
+  font-size: var(--font-size-8);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .report-header h4 {
-  font-size: 10px;
+  font-size: var(--font-size-10);
   margin: 0;
   color: var(--text-primary);
 }
 
 .report-date {
-  font-size: 8px;
+  font-size: var(--font-size-8);
   color: var(--text-secondary);
 }
 
@@ -2978,14 +3004,14 @@ button,
 
 .report-content {
   padding: var(--space-md);
-  font-size: 9px;
+  font-size: var(--font-size-9);
   line-height: 1.7;
   background: var(--pixel-white);
   color: var(--text-primary);
 }
 
 .report-arrow {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   transition: transform var(--transition-fast);
   margin-left: var(--space-xs);
 }
@@ -3009,7 +3035,7 @@ button,
   margin-left: auto;
   padding: var(--space-xs);
   min-width: auto;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   z-index: 10;
 }
 
@@ -3018,7 +3044,7 @@ button,
 }
 
 .envelope-icon {
-  font-size: 28px;
+  font-size: var(--font-size-28);
 }
 
 .envelope-preview {
@@ -3026,12 +3052,12 @@ button,
 }
 
 .envelope-preview h4 {
-  font-size: 10px;
+  font-size: var(--font-size-10);
   margin-bottom: var(--space-xs);
 }
 
 .envelope-preview small {
-  font-size: 8px;
+  font-size: var(--font-size-8);
   color: var(--pixel-dark-gray);
 }
 
@@ -3052,7 +3078,7 @@ button,
 }
 
 .envelope-arrow {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   transition: transform var(--transition-fast);
   margin-left: var(--space-xs);
 }
@@ -3063,7 +3089,7 @@ button,
 
 .letter-body {
   padding: 0;
-  font-size: 8px;
+  font-size: var(--font-size-8);
   line-height: 1.5;
 }
 
@@ -3076,7 +3102,7 @@ button,
   background: var(--pixel-light-gray);
   border-top: 2px dashed var(--border-color);
   text-align: right;
-  font-size: 9px;
+  font-size: var(--font-size-9);
 }
 
 /* ========== 空状态 ========== */
@@ -3087,7 +3113,7 @@ button,
 }
 
 .empty-state p {
-  font-size: 10px;
+  font-size: var(--font-size-10);
   margin-bottom: var(--space-sm);
   line-height: 1.6;
 }
@@ -3096,7 +3122,7 @@ button,
 .loading {
   text-align: center;
   padding: var(--space-lg);
-  font-size: 11px;
+  font-size: var(--font-size-11);
   color: var(--text-secondary);
 }
 
@@ -3114,11 +3140,11 @@ button,
 /* ========== 响应式适配 ========== */
 @media (max-width: 480px) {
   .pixel-title {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
   
   .subtitle {
-    font-size: 8px;
+    font-size: var(--font-size-8);
   }
   
   #selection-container {
@@ -3173,7 +3199,7 @@ button,
   }
   
   .btn-icon {
-    font-size: 28px;
+    font-size: var(--font-size-28);
   }
   
   .modal-content {
@@ -3187,7 +3213,7 @@ button,
   
   .tab-btn {
     min-width: 70px;
-    font-size: 8px;
+    font-size: var(--font-size-8);
   }
   
   .encyclopedia-grid {
@@ -3272,13 +3298,13 @@ button,
 }
 
 .item-option .item-info h4 {
-  font-size: 9px;
+  font-size: var(--font-size-9);
   margin-bottom: 2px;
   color: var(--text-primary);
 }
 
 .item-option .item-info p {
-  font-size: 7px;
+  font-size: var(--font-size-7);
   margin: 0;
   color: var(--text-secondary);
 }
@@ -3288,7 +3314,7 @@ button,
 }
 
 .category-title {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   margin-bottom: var(--space-md);
   padding-bottom: var(--space-sm);
   border-bottom: 2px solid var(--border-color);
@@ -3308,7 +3334,7 @@ button,
 /* game-header 样式已合并到统一顶栏样式，但保留特殊样式 */
 .game-header {
   z-index: 1001;
-  font-size: 8px;
+  font-size: var(--font-size-8);
   overflow: hidden;
 }
 
@@ -3333,7 +3359,7 @@ button,
 }
 
 .game-title {
-  font-size: 8px;
+  font-size: var(--font-size-8);
   color: var(--pixel-white);
   white-space: nowrap;
   overflow: hidden;
@@ -3341,7 +3367,7 @@ button,
 }
 
 .game-score {
-  font-size: 8px;
+  font-size: var(--font-size-8);
   color: var(--primary);
   font-weight: bold;
   min-width: 50px;
@@ -3391,7 +3417,7 @@ button,
   background: transparent;
   border: none;
   color: var(--pixel-white);
-  font-size: 7px;
+  font-size: var(--font-size-7);
   cursor: pointer;
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
@@ -3457,13 +3483,13 @@ button,
 }
 
 .game-end-title {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   color: var(--text-primary);
   margin-bottom: var(--space-lg);
 }
 
 .game-end-score {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   color: var(--primary);
   font-weight: bold;
   margin-bottom: var(--space-md);
@@ -3477,13 +3503,13 @@ button,
 }
 
 .game-end-rewards h4 {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   margin-bottom: var(--space-sm);
   color: var(--text-primary);
 }
 
 .game-end-rewards p {
-  font-size: 10px;
+  font-size: var(--font-size-10);
   color: var(--text-secondary);
   margin: var(--space-xs) 0;
 }
@@ -3502,11 +3528,11 @@ button,
   }
   
   .game-title {
-    font-size: 9px;
+    font-size: var(--font-size-9);
   }
   
   .game-score {
-    font-size: 10px;
+    font-size: var(--font-size-10);
     min-width: 60px;
   }
   
@@ -3516,7 +3542,7 @@ button,
   }
   
   .difficulty-btn {
-    font-size: 8px;
+    font-size: var(--font-size-8);
     padding: 4px 6px;
     min-width: 44px;
     min-height: 44px;
@@ -3527,11 +3553,11 @@ button,
   }
   
   .game-end-title {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
   
   .game-end-score {
-    font-size: 20px;
+    font-size: var(--font-size-20);
   }
   
   /* 确保所有按钮可点击 */
@@ -3553,7 +3579,7 @@ button,
   padding: var(--space-sm) var(--space-md);
   background: var(--bg-panel);
   border: 3px solid var(--border-color);
-  font-size: 24px;
+  font-size: var(--font-size-24);
   cursor: pointer;
   transition: all var(--transition-fast);
   color: var(--text-primary);
@@ -3608,7 +3634,7 @@ button,
   padding: var(--space-sm) var(--space-md);
   background: var(--bg-panel);
   border: 3px solid var(--border-color);
-  font-size: 24px;
+  font-size: var(--font-size-24);
   cursor: pointer;
   transition: all var(--transition-fast);
   color: var(--text-primary);
@@ -3693,14 +3719,14 @@ button,
 .sokoban-info-label,
 .brick-info-label,
 .tetris-info-label {
-  font-size: 7px !important;
+  font-size: var(--font-size-7) !important;
 }
 
 .dodge-info-value,
 .sokoban-info-value,
 .brick-info-value,
 .tetris-info-value {
-  font-size: 12px !important;
+  font-size: var(--font-size-12) !important;
 }
 
 /* ========== 打印隐藏 ========== */
@@ -3721,7 +3747,7 @@ button,
   position: fixed;
   pointer-events: none;
   z-index: 9999;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   animation: particle-float var(--duration, 1.5s) ease-out forwards;
   user-select: none;
   -webkit-user-select: none;
