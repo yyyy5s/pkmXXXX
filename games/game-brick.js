@@ -327,7 +327,7 @@
     popup.style.top = `${rect.top + y}px`;
     popup.style.pointerEvents = 'none';
     popup.style.zIndex = '1000';
-    popup.style.fontSize = '16px';
+    popup.style.fontSize = 'var(--font-size-md)';
     popup.style.fontWeight = 'bold';
     popup.style.fontFamily = '"MuzaiPixel", "Press Start 2P", monospace';
     popup.style.textAlign = 'center';

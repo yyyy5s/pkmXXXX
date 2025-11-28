@@ -2,11 +2,8 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#FFD700">
-  <link rel="apple-touch-icon" href="../assets/icon.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="../assets/icon.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="../assets/icon.png">
   <title>技能五子棋 - 宠物养成日记</title>
   <link rel="stylesheet" href="../style.css">
   <style>
@@ -154,7 +151,7 @@
     
     .skill-btn {
       padding: 6px 4px;
-      font-size: 5px;
+      font-size: var(--font-size-xs);
       background: var(--bg-button);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
@@ -198,19 +195,19 @@
     }
     
     .skill-name {
-      font-size: 6px;
+      font-size: var(--font-size-xs);
       font-weight: bold;
       line-height: 1.2;
     }
     
     .skill-desc {
-      font-size: 4px;
+      font-size: var(--font-size-xs);
       color: var(--text-secondary);
       line-height: 1.1;
     }
     
     .skill-count {
-      font-size: 5px;
+      font-size: var(--font-size-xs);
       color: var(--text-secondary);
       margin-top: 2px;
     }
@@ -225,7 +222,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 24px;
+      font-size: var(--font-size-xl);
       font-weight: bold;
       color: var(--primary);
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
@@ -271,14 +268,14 @@
     }
     
     .gomoku-info-label {
-      font-size: 7px;
+      font-size: var(--font-size-xs);
       color: var(--text-secondary);
       margin-bottom: 2px;
       font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
     }
     
     .gomoku-info-value {
-      font-size: 12px;
+      font-size: var(--font-size-xs);
       color: var(--primary);
       font-weight: bold;
       font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
@@ -310,15 +307,15 @@
       
       .skill-btn {
         min-width: 0;
-        font-size: 4px;
+        font-size: var(--font-size-xs);
       }
       
       .skill-name {
-        font-size: 5px;
+        font-size: var(--font-size-xs);
       }
       
       .skill-desc {
-        font-size: 3px;
+        font-size: var(--font-size-xs);
       }
     }
   </style>
@@ -400,8 +397,22 @@
   </div>
   </div>
   
-  <script src="../script.js"></script>
+  
+  <script src="../core.js"></script>
+  <script src="../phone.js"></script>
+  <script src="../save.js"></script>
+  <script src="../core_game.js"></script>
+  <script src="../time.js"></script>
+  <script src="../care.js"></script>
+  <script src="../ai.js"></script>
+  <script src="../advent.js"></script>
+  <script src="../shop.js"></script>
+  <script src="../photo.js"></script>
+  <script src="../play.js"></script>
+  <script src="../index.js"></script>
+  <script src="../ui.js"></script>
   <script src="game-gomoku.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
 </body>
 </html>
 

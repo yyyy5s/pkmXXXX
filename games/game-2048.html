@@ -2,11 +2,8 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#FFD700">
-  <link rel="apple-touch-icon" href="../assets/icon.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="../assets/icon.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="../assets/icon.png">
   <title>2048 - 宠物养成日记</title>
   <link rel="stylesheet" href="../style.css">
   <style>
@@ -42,7 +39,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: var(--font-size-xl);
       font-weight: bold;
       color: var(--pixel-black);
       transition: all 0.2s;
@@ -86,42 +83,42 @@
     .game-2048-cell.tile-128 { 
       background: linear-gradient(135deg, #EDCF72 0%, #FFD700 100%);
       color: var(--pixel-black);
-      font-size: 20px;
+      font-size: var(--font-size-lg);
       box-shadow: 0 3px 10px rgba(237,207,114,0.7);
       animation: pulse 0.3s ease;
     }
     .game-2048-cell.tile-256 { 
       background: linear-gradient(135deg, #EDCC61 0%, #FFD700 100%);
       color: var(--pixel-black);
-      font-size: 20px;
+      font-size: var(--font-size-lg);
       box-shadow: 0 3px 10px rgba(237,204,97,0.7);
       animation: pulse 0.3s ease;
     }
     .game-2048-cell.tile-512 { 
       background: linear-gradient(135deg, #EDC850 0%, #FFD700 100%);
       color: var(--pixel-black);
-      font-size: 20px;
+      font-size: var(--font-size-lg);
       box-shadow: 0 3px 10px rgba(237,200,80,0.7);
       animation: pulse 0.3s ease;
     }
     .game-2048-cell.tile-1024 { 
       background: linear-gradient(135deg, #EDC53F 0%, #FFD700 50%, #FFA500 100%);
       color: var(--pixel-black);
-      font-size: 18px;
+      font-size: var(--font-size-md);
       box-shadow: 0 4px 12px rgba(237,197,63,0.8);
       animation: pulse 0.3s ease;
     }
     .game-2048-cell.tile-2048 { 
       background: linear-gradient(135deg, #EDC22E 0%, #FFD700 50%, #FF8C00 100%);
       color: var(--pixel-black);
-      font-size: 18px;
+      font-size: var(--font-size-md);
       box-shadow: 0 4px 12px rgba(237,194,46,0.8);
       animation: pulse 0.3s ease, glow 2s ease-in-out infinite;
     }
     .game-2048-cell.tile-super { 
       background: linear-gradient(135deg, #3C3A32 0%, #2C2C2C 50%, #1a1a1a 100%);
       color: var(--pixel-white);
-      font-size: 16px;
+      font-size: var(--font-size-md);
       box-shadow: 0 4px 12px rgba(0,0,0,0.8), 0 0 20px rgba(255,215,0,0.5);
       animation: pulse 0.3s ease, glow 2s ease-in-out infinite;
     }
@@ -174,14 +171,14 @@
     }
     
     .game-2048-info-label {
-      font-size: 7px;
+      font-size: var(--font-size-xs);
       color: var(--text-secondary);
       margin-bottom: 2px;
       font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
     }
     
     .game-2048-info-value {
-      font-size: 12px;
+      font-size: var(--font-size-xs);
       color: var(--primary);
       font-weight: bold;
       font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
@@ -200,22 +197,22 @@
     
     @media (max-width: 768px) {
       .game-2048-cell {
-        font-size: 16px;
+        font-size: var(--font-size-md);
       }
       
       .game-2048-cell.tile-128,
       .game-2048-cell.tile-256,
       .game-2048-cell.tile-512 {
-        font-size: 12px;
+        font-size: var(--font-size-xs);
       }
       
       .game-2048-cell.tile-1024,
       .game-2048-cell.tile-2048 {
-        font-size: 10px;
+        font-size: var(--font-size-xs);
       }
       
       .game-2048-cell.tile-super {
-        font-size: 8px;
+        font-size: var(--font-size-xs);
       }
       
       #game-2048-container {
@@ -279,8 +276,22 @@
   </div>
   </div>
   
-  <script src="../script.js"></script>
+  
+  <script src="../core.js"></script>
+  <script src="../phone.js"></script>
+  <script src="../save.js"></script>
+  <script src="../core_game.js"></script>
+  <script src="../time.js"></script>
+  <script src="../care.js"></script>
+  <script src="../ai.js"></script>
+  <script src="../advent.js"></script>
+  <script src="../shop.js"></script>
+  <script src="../photo.js"></script>
+  <script src="../play.js"></script>
+  <script src="../index.js"></script>
+  <script src="../ui.js"></script>
   <script src="game-2048.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
 </body>
 </html>
 

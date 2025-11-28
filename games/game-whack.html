@@ -2,11 +2,8 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#FFD700">
-  <link rel="apple-touch-icon" href="../assets/icon.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="../assets/icon.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="../assets/icon.png">
   <title>打地鼠 - 宠物养成日记</title>
   <link rel="stylesheet" href="../style.css">
   <style>
@@ -71,7 +68,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;
+      font-size: var(--font-size-4xl);
       box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.2);
       filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
     }
@@ -102,7 +99,7 @@
     /* 分数飘字效果 */
     .score-popup {
       position: fixed;
-      font-size: 24px;
+      font-size: var(--font-size-xl);
       font-weight: bold;
       font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
       pointer-events: none;
@@ -121,7 +118,7 @@
     
     .score-popup.combo {
       color: #FFD700;
-      font-size: 28px;
+      font-size: var(--font-size-2xl);
     }
     
     @keyframes floatUp {
@@ -158,14 +155,14 @@
     }
     
     .whack-info-label {
-      font-size: 7px;
+      font-size: var(--font-size-xs);
       color: var(--text-secondary);
       margin-bottom: 2px;
       font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
     }
     
     .whack-info-value {
-      font-size: 12px;
+      font-size: var(--font-size-xs);
       color: var(--primary);
       font-weight: bold;
       font-family: "MuzaiPixel", 'Press Start 2P', 'Courier New', monospace !important;
@@ -225,7 +222,21 @@
     </div>
   </div>
   
-  <script src="../script.js"></script>
+  
+  <script src="../core.js"></script>
+  <script src="../phone.js"></script>
+  <script src="../save.js"></script>
+  <script src="../core_game.js"></script>
+  <script src="../time.js"></script>
+  <script src="../care.js"></script>
+  <script src="../ai.js"></script>
+  <script src="../advent.js"></script>
+  <script src="../shop.js"></script>
+  <script src="../photo.js"></script>
+  <script src="../play.js"></script>
+  <script src="../index.js"></script>
+  <script src="../ui.js"></script>
   <script src="game-whack.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
 </body>
 </html>
